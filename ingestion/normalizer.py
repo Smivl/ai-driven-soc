@@ -1,11 +1,11 @@
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def normalize_event(raw_log, source="csv_dataset"):
     return {
-        "timestamp": raw_log.get("timestamp", datetime.utcnow().isoformat()),
+        "timestamp": raw_log.get("timestamp", datetime.now(timezone.utc).isoformat()),
         "source_ip": raw_log.get("src_ip") or raw_log.get("source_ip"),
         "destination_ip": raw_log.get("dst_ip") or raw_log.get("destination_ip"),
         "event_type": raw_log.get("event_type", "unknown"),
