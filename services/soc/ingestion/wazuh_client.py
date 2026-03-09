@@ -30,13 +30,20 @@ class WazuhClient:
         cert_path = os.getenv("WAZUH_CERT", None)
         self.verify = cert_path if cert_path else False
 
-        self._token = None # cache the JWT token so we don't have to re-authenticate every time
+        self._token = None 
 
+    """
+        To log into the Wazuh indexer API
+        JSON Web Token (JWT) authentication, this is more secure than the HTTP basic authentication
+
+        An example for the output of fectching a JSON web token
+        {"user":"admin","authenticationToken":"bA-a-wc9Ip...KcrUV2omGg","durationSeconds":180}
+
+        - https://documentation.wazuh.com/current/user-manual/indexer-api/getting-started.html
+
+    """
     def _authenticate(self) -> str:
-        """
-        POST credentials to Wazuh and get back a JWT token
-        The token is valid for 15 minutes
-        """
+        # If the authentication token is already fetched
         if self._token:
             return self._token
 
@@ -52,15 +59,35 @@ class WazuhClient:
         logger.info("Authenticated with Wazuh successfully")
         return self._token
 
+
     def _headers(self) -> dict:
        # Return auth headers for API calls
         return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token 
 
+    """ (According to Claude) a in affected_items alert might look like this:
+    {
+        "id": "1705312425.12345",
+        "timestamp": "2024-01-15T10:23:45.000Z",
+        "rule": {
+          "id": "5710",
+          "level": 5,
+          "description": "sshd: Attempt to login using a non-existent user",
+          "groups": ["authentication_failed", "sshd"]
+        },
+        "agent": {
+          "id": "001",
+          "name": "ubuntu-server-01"
+        },
+        "data": {
+          "srcip": "192.168.1.105",
+          "dstuser": "admin"
+        },
+        "full_log": "Jan 15 10:23:45 server sshd[1234]: Failed password for admin from 192.168.1.105 port 4444 ssh2"
+      }
+      """
+
     def get_recent_alerts(self, limit: int = 10) -> list:
-        """
-        Fetch the most recent alerts from Wazuh, newest first
-        Returns a list of raw Wazuh alert as dicts
-        """
+  
         r = requests.get(
             f"{self.base_url}/alerts",
             headers=self._headers(),
