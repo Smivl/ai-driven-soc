@@ -64,32 +64,15 @@ class WazuhClient:
        # Return auth headers for API calls
         return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token 
 
-    """ (According to Claude) a in affected_items alert might look like this:
-    {
-        "id": "1705312425.12345",
-        "timestamp": "2024-01-15T10:23:45.000Z",
-        "rule": {
-          "id": "5710",
-          "level": 5,
-          "description": "sshd: Attempt to login using a non-existent user",
-          "groups": ["authentication_failed", "sshd"]
-        },
-        "agent": {
-          "id": "001",
-          "name": "ubuntu-server-01"
-        },
-        "data": {
-          "srcip": "192.168.1.105",
-          "dstuser": "admin"
-        },
-        "full_log": "Jan 15 10:23:45 server sshd[1234]: Failed password for admin from 192.168.1.105 port 4444 ssh2"
-      }
-      """
+    """ 
+        I do not know exactly what the request parameters are for fetching alerts
+        I am assuming its something like this based on the documentation?
+    """
 
     def get_recent_alerts(self, limit: int = 10) -> list:
   
         r = requests.get(
-            f"{self.base_url}/alerts",
+            f"{self.base_url}/wazuh-alerts*",
             headers=self._headers(),
             params={
                 "limit": limit,
