@@ -72,7 +72,7 @@ class WazuhClient:
     def get_recent_alerts(self, limit: int = 10) -> list:
   
         r = requests.get(
-            f"{self.base_url}/wazuh-alerts",
+            f"{self.base_url}/manager/logs", # https://documentation.wazuh.com/current/user-manual/api/reference.html#tag/Manager/operation/api.controllers.manager_controller.get_log
             headers=self._headers(),
             params={
                 "limit": limit,
