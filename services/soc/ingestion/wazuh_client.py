@@ -33,7 +33,7 @@ class WazuhClient:
         self._token = None 
 
     """
-        To log into the Wazuh indexer API
+        To log into the Wazuh API
         JSON Web Token (JWT) authentication, this is more secure than the HTTP basic authentication
 
         An example for the output of fectching a JSON web token
