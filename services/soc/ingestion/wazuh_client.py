@@ -72,7 +72,7 @@ class WazuhClient:
     def get_recent_alerts(self, limit: int = 10) -> list:
   
         r = requests.get(
-            f"{self.base_url}/wazuh-alerts*",
+            f"{self.base_url}/wazuh-alerts",
             headers=self._headers(),
             params={
                 "limit": limit,
