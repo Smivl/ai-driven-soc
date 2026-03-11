@@ -10,6 +10,8 @@ from sklearn.metrics import mean_absolute_error
 import requests
 import ipaddress
 
+from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus
+
 ###### source .venv/bin/activate
 ##### python -m services.soc.log_evaluation.severity_scoring
 
@@ -53,19 +55,31 @@ def port_security(port:int) :
     common_ports = {22, 90, 443, 3306, 8080}
     return int(port in common_ports) * 5
 
-def preprocess_data(df: pd.DataFrame, blacklist: set) -> pd.DataFrame:
-    """ Add features for security relevances based """
-    df['ip_security'] = df['ip'].apply(lambda ip: ip_security(ip, blacklist))
-    df['port_security'] = df['port'].apply(lambda port: port_security(port))
-    df['wazuh_level'] = df['wazuh_level'].astype(int) # Wazuh level between 0-15 should be numerical
-    return df
-
 #=========================== Model Training  ==========================
 
+def score_to_label(score :int) -> str:
+    if score <25: return "benign"
+    if score <50: return "suspicious"
+    if score <75: return "malicious"
+    return "critical"
+
+def events_to_dataframe(events: list[SOCevent], blacklist: set) -> pd.DataFrame:
+    """Convert SOCEvents into a feature DataFrame for LightGBM."""
+    rows = []
+    for e in events:
+        rows.append({
+            "wazuh_level":  e.wazuh_level,                          # Scoring between 0-15
+            "ip_security":  ip_security(e.source_ip, blacklist),    # Scoring between 0-13
+            "port_security": port_security(e.port),                 # Scoring either 0 or 5
+            "severity":     e.severity,                             # Scoring between 0-100 (target variable)
+        })
+    return pd.DataFrame(rows)
+
+
 def train_model(blacklist: set) -> lgb.LGBMRegressor:
-    """ Train simple lightGBM on synthetic data """
-    df = temp_generate_data()
-    df = preprocess_data(df, blacklist)
+    """Train simple LightGBM on synthetic SOCEvents."""
+    events = temp_generate_data()
+    df     = events_to_dataframe(events, blacklist)
 
     X = df[["wazuh_level", "ip_security", "port_security"]]
     y = df["severity"]
@@ -87,46 +101,60 @@ def train_model(blacklist: set) -> lgb.LGBMRegressor:
 
     return model
 
-def score_event(model, blacklist: set, wazuh_level: int, ip: str, port: int) -> int:
-    """Score a single eventusing the trained model — returns severity 0-100"""
+def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
+    """Score a SOCevent using the trained model — updates severity, label and status."""
     features = pd.DataFrame([{
-        "wazuh_level":  wazuh_level,
-        "ip_security":  ip_security(ip, blacklist),
-        "port_security": port_security(port),
+        "wazuh_level":   event.wazuh_level,
+        "ip_security":   ip_security(event.source_ip, blacklist),
+        "port_security": port_security(event.port),
     }])
-    score = model.predict(features)[0]
-    return int(np.clip(score, 0, 100))
 
+    raw_score = model.predict(features)[0]
 
-def temp_generate_data(n : int = 1000) -> pd.DataFrame:
-    """ Generate synthetic data for the training model """
-    np.random.seed(42)
-    data = {
-        'wazuh_level' : np.random.randint(0,16, size=n),
-        'ip'           : [f"{np.random.randint(1,255)}.{np.random.randint(0,255)}.{np.random.randint(0,255)}.{np.random.randint(1,255)}" for _ in range(n)],
-        'port'         : np.random.randint(1,65536, size=n)
-    }
+    event.severity = int(np.clip(raw_score, 0, 100))
+    event.label    = score_to_label(event.severity)
+    event.status   = PipelineStatus.SCORED
 
-    df = pd.DataFrame(data)
-    # Generate a realistic severity label based on the features
-    # This is the "ground truth" we train the model to learn
-    df['severity'] = (
-        (df['wazuh_level'] / 15) * 60                             # wazuh_level is strongest signal (0-60)
-        + df['ip'].apply(lambda ip: ip_security(ip, set())) * 2   # ip contributes up to ~26
-        + df['port'].apply(port_security)                         # port contributes up to 5
-        + np.random.uniform(-5, 5, size=n)                        # small noise
-    ).clip(0, 100).astype(int)
+    return event
 
-    return df
 
 
 #=========================== Test this temp version  ==========================
 
+def temp_generate_data(n: int = 1000) -> list[SOCevent]:
+    """Generate synthetic SOCEvents for training the model """
+    np.random.seed(42)
+
+    events = []
+    for _ in range(n):
+        wazuh_level = int(np.random.randint(0, 16))
+        ip          = f"{np.random.randint(1,255)}.{np.random.randint(0,255)}.{np.random.randint(0,255)}.{np.random.randint(1,255)}"
+        port        = int(np.random.randint(1, 65536))
+
+        # Calculate severity — NOTE: not a real formula, just for synthetic training data
+        severity = int(np.clip(
+            (wazuh_level / 15) * 60
+            + ip_security(ip, set()) * 2
+            + port_security(port)
+            + np.random.uniform(-5, 5),
+            0, 100
+        ))
+
+        events.append(SOCevent(
+            source_ip   = ip,
+            port        = port,
+            wazuh_level = wazuh_level,
+            severity    = severity,
+            status      = PipelineStatus.PENDING,
+        ))
+
+    return events
+
 def temp_test():
     """Temporary test function to run whole pipeline"""
-    print("=" * 55)
+    print("=" * 60)
     print("  Simple LightGBM Severity Model")
-    print("=" * 55)
+    print("=" * 60)
 
     print("\n1. Loading blacklist...")
     blacklist = load_blacklist()
@@ -137,22 +165,21 @@ def temp_test():
 
     print("\n3. Scoring test events...")
     test_events = [
-        {"wazuh_level": 3,  "ip": "192.168.1.50",  "port": 8080},  # internal, low
-        {"wazuh_level": 8,  "ip": "192.168.1.105", "port": 22},    # internal, SSH
-        {"wazuh_level": 10, "ip": "45.33.32.156",  "port": 443},   # external, medium
-        {"wazuh_level": 14, "ip": "185.220.101.1", "port": 22},    # external, high
+        SOCevent(source_ip="192.168.1.50",  port=8080, wazuh_level=3),   # internal, low
+        SOCevent(source_ip="192.168.1.105", port=22,   wazuh_level=8),   # internal, SSH
+        SOCevent(source_ip="45.33.32.156",  port=443,  wazuh_level=10),  # external, medium
+        SOCevent(source_ip="185.220.101.1", port=22,   wazuh_level=14),  # external, high
     ]
 
     print()
-    print(f"  {'wazuh':<8} {'ip':<18} {'port':<8} {'score':<8}")
-    print(f"  {'-'*8} {'-'*18} {'-'*8} {'-'*8} ")
+    print(f"  {'wazuh':<8} {'ip':<18} {'port':<8} {'score':<8} {'label':<12} {'status'}")
+    print(f"  {'-'*8} {'-'*18} {'-'*8} {'-'*8} {'-'*12} {'-'*10}")
 
-    for e in test_events:
-        score = score_event(model, blacklist, e["wazuh_level"], e["ip"], e["port"])
-        print(f"  {e['wazuh_level']:<8} {e['ip']:<18} {e['port']:<8} {score:<8} ")
+    for event in test_events:
+        scored = score_event(model, blacklist, event)
+        print(f"  {scored.wazuh_level:<8} {scored.source_ip:<18} {scored.port:<8} {scored.severity:<8} {scored.label:<12} {scored.status.value}")
 
-    print("\n" + "=" * 55)
-
+    print("\n" + "=" * 60)
 
 if __name__ == "__main__":
     temp_test()
