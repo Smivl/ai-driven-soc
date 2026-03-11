@@ -4,8 +4,6 @@ import subprocess
 import time
 import sys
 
-from services.soc.ingestion.normalizerfixed import normalize_event
-
 
 def inject_line(line: str, container: str, logfile: str) -> bool:
     escaped = line.replace('"', '\\"')
@@ -59,18 +57,18 @@ def feed(
                 skipped += 1
                 continue
 
-            event   = normalize_event(row)
-            raw_log = event["message"]
+            raw_log  = row.get("log", "")
+            category = row.get("category", "unknown")
 
             if dry_run:
-                print(f"  [DRY] [{event['event_type']}] {raw_log[:100]}")
+                print(f"  [DRY] [{category}] {raw_log[:100]}")
                 injected += 1
                 continue
 
             ok = inject_line(raw_log, container, logfile)
             if ok:
                 injected += 1
-                print(f"  [{injected:>6}] [{event['event_type']}] {raw_log[:80]}")
+                print(f"  [{injected:>6}] [{category}] {raw_log[:80]}")
             else:
                 # Stop if Docker is unreachable — no point continuing
                 print("Aborting: Docker injection failed.", file=sys.stderr)

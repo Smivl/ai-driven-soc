@@ -106,6 +106,30 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
     }
 
 
+def normalize_wazuh_alert(alert: dict, source: str = "wazuh_api") -> dict:
+    """Normalize an alert dict returned by the Wazuh REST API into the standard event format."""
+    full_log = alert.get("full_log", "")
+    rule     = alert.get("rule", {})
+
+    src_ip = alert.get("data", {}).get("srcip")
+    if not src_ip and full_log:
+        parsed_src, _ = _parse_ips(full_log)
+        src_ip = parsed_src
+
+    return {
+        "timestamp":      alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+        "event_type":     rule.get("description", "unknown"),
+        "source_ip":      src_ip,
+        "destination_ip": alert.get("agent", {}).get("ip"),
+        "user":           _parse_user(full_log) if full_log else None,
+        "severity":       0,           # filled later by severity_scoring
+        "level":          rule.get("level"),
+        "message":        full_log or rule.get("description", ""),
+        "source":         source,
+        "raw":            alert,
+    }
+
+
 def process_csv(input_file: str, output_file: str) -> int:
     """Normalize the full CSV and write a JSON file. Returns the event count."""
     normalized_events = []
