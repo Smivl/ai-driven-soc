@@ -55,13 +55,31 @@ def port_security(port:int) :
     common_ports = {22, 90, 443, 3306, 8080}
     return int(port in common_ports) * 5
 
-#=========================== Model Training  ==========================
+#=========================== Scoring of events  ==========================
 
 def score_to_label(score :int) -> str:
     if score <25: return "benign"
     if score <50: return "suspicious"
     if score <75: return "malicious"
     return "critical"
+
+def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
+    """Score a SOCevent using the trained model — updates severity, label and status."""
+    features = pd.DataFrame([{
+        "wazuh_level":   event.wazuh_level,
+        "ip_security":   ip_security(event.source_ip, blacklist),
+        "port_security": port_security(event.port),
+    }])
+
+    raw_score = model.predict(features)[0]
+
+    event.severity = int(np.clip(raw_score, 0, 100))
+    event.label    = score_to_label(event.severity)
+    event.status   = PipelineStatus.SCORED
+
+    return event
+
+#=========================== Model Training  ==========================
 
 def events_to_dataframe(events: list[SOCevent], blacklist: set) -> pd.DataFrame:
     """Convert SOCEvents into a feature DataFrame for LightGBM."""
@@ -101,21 +119,7 @@ def train_model(blacklist: set) -> lgb.LGBMRegressor:
 
     return model
 
-def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
-    """Score a SOCevent using the trained model — updates severity, label and status."""
-    features = pd.DataFrame([{
-        "wazuh_level":   event.wazuh_level,
-        "ip_security":   ip_security(event.source_ip, blacklist),
-        "port_security": port_security(event.port),
-    }])
 
-    raw_score = model.predict(features)[0]
-
-    event.severity = int(np.clip(raw_score, 0, 100))
-    event.label    = score_to_label(event.severity)
-    event.status   = PipelineStatus.SCORED
-
-    return event
 
 
 
