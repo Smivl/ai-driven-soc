@@ -1,5 +1,7 @@
 """
-Simple LightGBM model — predicts severity 0-100 from wazuh_level, IP & Port features.
+Simple LightGBM model — predicts severity 0-100 from 
+    - wazuh_level, 
+    - IP & Port features
 """
 
 import numpy as np
@@ -10,7 +12,7 @@ from sklearn.metrics import mean_absolute_error
 import requests
 import ipaddress
 
-from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus
+from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus, Severity
 
 ###### source .venv/bin/activate
 ##### python -m services.soc.log_evaluation.severity_scoring
@@ -57,14 +59,14 @@ def port_security(port:int) :
 
 #=========================== Scoring of events  ==========================
 
-def score_to_label(score :int) -> str:
-    if score <25: return "benign"
-    if score <50: return "suspicious"
-    if score <75: return "malicious"
-    return "critical"
+def score_to_label(score :int) -> Severity:
+    if score <25: return Severity.BENIGN
+    if score <50: return Severity.SUSPICIOUS
+    if score <75: return Severity.MALICIOUS
+    return Severity.CRITICAL
 
 def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
-    """Score a SOCevent using the trained model — updates severity, label and status."""
+    """ Score a SOCevent using the trained model — updates severity, label and status """
     features = pd.DataFrame([{
         "wazuh_level":   event.wazuh_level,
         "ip_security":   ip_security(event.source_ip, blacklist),
@@ -118,10 +120,6 @@ def train_model(blacklist: set) -> lgb.LGBMRegressor:
     print(f"  Trained on {len(X_train)} samples | MAE: {mae:.1f} points")
 
     return model
-
-
-
-
 
 #=========================== Test this temp version  ==========================
 

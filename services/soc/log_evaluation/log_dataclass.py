@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
+import pandas as pd
 
 from enum import Enum
 
@@ -39,14 +40,14 @@ class SOCevent:
     rule_id:        str   = None
 
     # ── From ML ───────────────────────────────────────
-    severity:       int   = None   # 0-100
-    label:          str   = None   # benign/suspicious/malicious/critical
+    severity:       Severity   = None   # 0-100
+    label:          str   = None   
 
     # ── From LLM ─────────────────────────────────────
     explanation:    str   = None
 
     # ── Pipeline tracking ─────────────────────────────
-    status:         str   = "pending"   # pending → scored → explained
+    status:          PipelineStatus   = PipelineStatus.PENDING   # pending -> normalized -> scored -> explained
 
     # Obtain any of the information stored in the class from a log
     def return_value(self, field_name):
@@ -54,3 +55,5 @@ class SOCevent:
     
     def return_dict(self):
         return asdict(self)
+    
+                         
