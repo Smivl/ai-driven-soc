@@ -5,6 +5,9 @@ Usage:
     alerts = client.get_recent_alerts(limit= some number)
 """
 
+###### source .venv/bin/activate
+##### python -m services.soc.ingestion.wazuh_client
+
 import requests
 import urllib3
 import os
@@ -20,9 +23,13 @@ logger = logging.getLogger(__name__)
 
 class WazuhClient:
     def __init__(self):
-        self.base_url  = os.getenv("WAZUH_URL",  "https://localhost:55000")
-        self.username  = os.getenv("WAZUH_USER", "admin") # these are the standard username and password
-        self.password  = os.getenv("WAZUH_PASS", "SecretPassword")
+        self.api_url  = os.getenv("API_URL",  "https://localhost:55000")
+        self.api_user  = os.getenv("API_USER", "admin") # these are the standard username and password
+        self.api_pass  = os.getenv("API_PASS", "SecretPassword")
+
+        self.indexer_url  = os.getenv("INDEXER_URL",  "https://localhost:9200")
+        self.indexer_user = os.getenv("INDEXER_USER", "admin")
+        self.indexer_pass = os.getenv("INDEXER_PASS", "SecretPassword")
 
         # Certificate verification, as Wazuh generates its own certificate
         # Point this at root-ca.pem for proper verification
@@ -48,8 +55,8 @@ class WazuhClient:
             return self._token
 
         r = requests.get(
-            f"{self.base_url}/security/user/authenticate?raw=true",
-            auth=(self.username, self.password),
+            f"{self.api_url}/security/user/authenticate?raw=true",
+            auth=(self.api_user, self.api_pass),
             verify=self.verify,
             timeout=10
         )
@@ -70,18 +77,59 @@ class WazuhClient:
     """
 
     def get_recent_alerts(self, limit: int = 10) -> list:
-  
-        r = requests.get(
-            f"{self.base_url}/manager/logs", # https://documentation.wazuh.com/current/user-manual/api/reference.html#tag/Manager/operation/api.controllers.manager_controller.get_log
-            headers=self._headers(),
-            params={
-                "limit": limit,
-                "sort":  "-timestamp"   # newest first
+        """Fetch recent alerts directly from OpenSearch."""
+        r = requests.post(
+            f"{self.indexer_url}/wazuh-alerts-*/_search",
+            auth=(self.indexer_user, self.indexer_pass),
+            json={
+                "size": limit,
+                "sort": [{"@timestamp": {"order": "desc"}}]
             },
             verify=self.verify,
             timeout=15
         )
-        r.raise_for_status() # will raise an HTTPError if the request has failed
-        alerts = r.json().get("data", {}).get("affected_items", []) # Wazuh's API wraps result in a data object with affected_items
-        logger.info(f"Fetched {len(alerts)} alerts")
-        return alerts
+        r.raise_for_status()
+        hits = r.json().get("hits", {}).get("hits", [])
+        return [hit["_source"] for hit in hits]
+    
+# tests/ingestion/test_wazuh_connection.py
+"""
+Quick connection test — make sure VPN is on before running.
+
+Run from project root:
+    services/backend/.venv/bin/python tests/ingestion/test_wazuh_connection.py
+"""
+import sys
+import os
+sys.path.append("services/ingestion")
+
+
+def test_connection():
+    print("=" * 50)
+    print("  Wazuh Connection Test")
+    print("=" * 50)
+
+    client = WazuhClient()
+
+    # 1. Authenticate
+    print("\n1. Authenticating...")
+    token = client._authenticate()
+    print(f"   Token: {token[:30]}...")
+
+    # 2. Fetch alerts
+    print("\n2. Fetching last 5 alerts...")
+    alerts = client.get_recent_alerts(limit=10)
+    print(f"   Got {len(alerts)} alerts")
+
+    # 3. Print them
+    print()
+    for alert in alerts:
+        level = alert.get("rule", {}).get("level", "?")
+        desc  = alert.get("rule", {}).get("description", "no description")
+        ts    = alert.get("timestamp", "no timestamp")
+        print(f"   [{level}] {desc} | {ts}")
+
+    print("\n" + "=" * 50)
+
+if __name__ == "__main__":
+    test_connection()
