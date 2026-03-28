@@ -88,13 +88,9 @@ class WazuhClient:
         hits = r.json().get("hits", {}).get("hits", [])
         return [hit["_source"] for hit in hits]
     
-    
-
-    
 import sys
 import os
 sys.path.append("services/ingestion")
-
 
 def test_connection():
     print("=" * 50)
@@ -122,6 +118,8 @@ def test_connection():
         print(f"   [{level}] {desc} | {ts}")
 
     print("\n" + "=" * 50)
+
+    print(alerts[0])
 
     normalized = normalize_wazuh_alert(alerts[0])
 
