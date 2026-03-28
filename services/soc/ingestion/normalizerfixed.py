@@ -3,6 +3,8 @@ import json
 import re
 from datetime import datetime, timezone
 
+from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus
+
 
 
 _IP_RE   = re.compile(r'\b(\d{1,3}(?:\.\d{1,3}){3})\b')
@@ -105,29 +107,38 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
         "raw":             row,         # original CSV row preserved
     }
 
-
-def normalize_wazuh_alert(alert: dict, source: str = "wazuh_api") -> dict:
-    """Normalize an alert dict returned by the Wazuh REST API into the standard event format."""
-    full_log = alert.get("full_log", "")
+def normalize_wazuh_alert(alert: dict) -> SOCevent:
+    """Normalize a raw Wazuh alert into a SOCEvent dataclass."""
     rule     = alert.get("rule", {})
+    data     = alert.get("data", {})
+    full_log = alert.get("full_log", "")
 
-    src_ip = alert.get("data", {}).get("srcip")
+    # Try to get source IP from data first, fall back to parsing the raw log
+    src_ip = data.get("srcip")
     if not src_ip and full_log:
         parsed_src, _ = _parse_ips(full_log)
         src_ip = parsed_src
 
-    return {
-        "timestamp":      alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),
-        "event_type":     rule.get("description", "unknown"),
-        "source_ip":      src_ip,
-        "destination_ip": alert.get("agent", {}).get("ip"),
-        "user":           _parse_user(full_log) if full_log else None,
-        "severity":       0,           # filled later by severity_scoring
-        "level":          rule.get("level"),
-        "message":        full_log or rule.get("description", ""),
-        "source":         source,
-        "raw":            alert,
-    }
+    # Try to get destination IP from agent info
+    _, dst_ip = _parse_ips(full_log) if full_log else (None, None)
+
+    return SOCevent(
+        # From the raw log
+        source_ip      = src_ip,
+        destination_ip = dst_ip or alert.get("agent", {}).get("ip"),
+        port           = int(data.get("dstport", 0)) or None,
+        user           = _parse_user(full_log) if full_log else None,
+        event_type     = rule.get("groups", ["unknown"])[0],
+        timestamp      = alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+        raw_log        = full_log or rule.get("description", ""),
+
+        # From Wazuh
+        wazuh_level    = rule.get("level"),
+        rule_id        = rule.get("id"),
+
+        # Pipeline status
+        status         = PipelineStatus.NORMALIZED
+    )
 
 
 def process_csv(input_file: str, output_file: str) -> int:

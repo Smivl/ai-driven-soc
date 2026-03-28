@@ -12,7 +12,8 @@ import requests
 import urllib3
 import os
 import logging
-from datetime import datetime, timezone
+
+from services.soc.ingestion.normalizerfixed import normalize_wazuh_alert
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically
@@ -71,11 +72,6 @@ class WazuhClient:
        # Return auth headers for API calls
         return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token 
 
-    """ 
-        I do not know exactly what the request parameters are for fetching alerts
-        I am assuming its something like this based on the documentation?
-    """
-
     def get_recent_alerts(self, limit: int = 10) -> list:
         """Fetch recent alerts directly from OpenSearch."""
         r = requests.post(
@@ -92,13 +88,9 @@ class WazuhClient:
         hits = r.json().get("hits", {}).get("hits", [])
         return [hit["_source"] for hit in hits]
     
-# tests/ingestion/test_wazuh_connection.py
-"""
-Quick connection test — make sure VPN is on before running.
+    
 
-Run from project root:
-    services/backend/.venv/bin/python tests/ingestion/test_wazuh_connection.py
-"""
+    
 import sys
 import os
 sys.path.append("services/ingestion")
@@ -118,7 +110,7 @@ def test_connection():
 
     # 2. Fetch alerts
     print("\n2. Fetching last 5 alerts...")
-    alerts = client.get_recent_alerts(limit=10)
+    alerts = client.get_recent_alerts(limit=1)
     print(f"   Got {len(alerts)} alerts")
 
     # 3. Print them
@@ -130,6 +122,10 @@ def test_connection():
         print(f"   [{level}] {desc} | {ts}")
 
     print("\n" + "=" * 50)
+
+    normalized = normalize_wazuh_alert(alerts[0])
+
+    print(normalized.return_value("wazuh_level"))
 
 if __name__ == "__main__":
     test_connection()

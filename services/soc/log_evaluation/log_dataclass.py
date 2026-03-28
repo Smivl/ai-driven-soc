@@ -1,21 +1,19 @@
 from dataclasses import dataclass, field, asdict
-from datetime import datetime
-import pandas as pd
 
 from enum import Enum
 
-class Severity(Enum):
+class Scoring(Enum):
     BENIGN     = "benign"
     SUSPICIOUS = "suspicious"
     MALICIOUS  = "malicious"
     CRITICAL   = "critical"
 
 class PipelineStatus(Enum):
-    PENDING   = "pending"    # just ingested
+    PENDING    = "pending"
     NORMALIZED = "normalized"  # log has been normalized
-    SCORED    = "scored"     # ML has scored it
-    EXPLAINED = "explained"  # LLM has explained it
-    RESOLVED  = "resolved"   # SOAR has handled it
+    SCORED     = "scored"     # ML has scored it
+    EXPLAINED  = "explained"  # LLM has explained it
+    RESOLVED   = "resolved"   # SOAR has handled it
 
 @dataclass
 class SOCevent:
@@ -36,11 +34,11 @@ class SOCevent:
     raw_log:        str   = None
 
     # ── From Wazuh ────────────────────────────────────
-    wazuh_level:    int   = None
-    rule_id:        str   = None
+    wazuh_level:    Scoring = None
+    rule_id:        str     = None
 
     # ── From ML ───────────────────────────────────────
-    severity:       Severity   = None   # 0-100
+    severity:       int   = None   # 0-100
     label:          str   = None   
 
     # ── From LLM ─────────────────────────────────────
