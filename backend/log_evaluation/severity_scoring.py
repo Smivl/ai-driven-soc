@@ -14,7 +14,7 @@ from sklearn.metrics import mean_absolute_error
 import requests
 import ipaddress
 
-from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus, Severity
+from log_evaluation.log_dataclass import SOCevent, PipelineStatus, Scoring as Severity
 
 ###### source .venv/bin/activate
 ##### python -m services.soc.log_evaluation.severity_scoring

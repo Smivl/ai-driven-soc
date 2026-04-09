@@ -3,7 +3,7 @@ import json
 import re
 from datetime import datetime, timezone
 
-from services.soc.log_evaluation.log_dataclass import SOCevent, PipelineStatus
+from log_evaluation.log_dataclass import SOCevent, PipelineStatus
 
 
 

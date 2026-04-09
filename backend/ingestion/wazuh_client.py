@@ -13,7 +13,7 @@ import urllib3
 import os
 import logging
 
-from services.soc.ingestion.normalizerfixed import normalize_wazuh_alert
+from ingestion.normalizerfixed import normalize_wazuh_alert
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically

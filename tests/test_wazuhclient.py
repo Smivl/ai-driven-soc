@@ -12,7 +12,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath("."))
 
-from services.soc.ingestion.wazuh_client import WazuhClient
+from ingestion.wazuh_client import WazuhClient
 
 
 # ── Fake data that mimics real OpenSearch responses and API connection ────────────────────────
