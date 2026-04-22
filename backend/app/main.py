@@ -65,7 +65,7 @@ def _ingestion_worker(client: WazuhClient) -> None:
                 event    = normalize_event(alert)   # fast normalization of the event
                 doc_id   = client.store_soc_event(event)  # store in indexer
                 priority = _get_priority_wazuh(event)           # get the priority of the Wazuh scoring for the queue
-                _ingest_queue.put((priority, doc_id, event))
+                _ingest_queue.put((priority, doc_id))
         except Exception as e:
             print("Ingestion error: %s", e)
         _stop.wait(timeout=15)
@@ -76,7 +76,8 @@ def _ingestion_worker(client: WazuhClient) -> None:
 def _scoring_worker(client: WazuhClient, model, blacklist: set) -> None:
     while not _stop.is_set():
         try:
-            priority, doc_id, event = _ingest_queue.get(timeout=1)
+            priority, doc_id = _ingest_queue.get(timeout=1)
+            event = client.get_soc_event(doc_id)
             scored = _get_priority_ml(model, blacklist, event)
             client.update_soc_event(doc_id, PipelineStatus.SCORED,
                 severity = scored.severity,
@@ -116,6 +117,20 @@ async def lifespan(app: FastAPI):
     model     = train_model(blacklist)
 
     _stop.clear()
+
+    # ── Recover any events that were mid-pipeline when the server last stopped ──
+    normalized = client.search_soc_events(status=PipelineStatus.NORMALIZED)
+    for event in normalized:
+        doc_id   = event.rule_id  # or however you're tracking the doc_id
+        priority = _get_priority_wazuh(event)
+        _ingest_queue.put((priority, doc_id))
+
+    scored = client.search_soc_events(status=PipelineStatus.SCORED)
+    for event in scored:
+        doc_id   = event.rule_id
+        priority = _get_priority_ml(event)
+        _explain_queue.put((priority, doc_id))
+
 
     threads = [
         threading.Thread(target=_ingestion_worker,   args=(client,),                  daemon=True),
