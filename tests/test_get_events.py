@@ -1,10 +1,12 @@
 # tests/wazuh_client_test.py
-# tests/ingestion/test_wazuh_client.py
+# tests/ingestion/test_get_events.py
 """
-Tests for WazuhClient — uses mocking so no real server needed.
+Tests for WazuhClient — uses mocking so no real server needed
+
+Tests the retrieving of events
 
 Run from project root:
-    pytest tests/ingestion/test_wazuh_client.py -v
+    pytest tests/test_get_events.py -v
 """
 import pytest
 from unittest.mock import patch, MagicMock
@@ -12,7 +14,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath("."))
 
-from ingestion.wazuh_client import WazuhClient
+from backend.ingestion.wazuh_client import WazuhClient
 
 
 # ── Fake data that mimics real OpenSearch responses and API connection ────────────────────────

@@ -11,7 +11,7 @@ sys.path.insert(0, str(_THIS_DIR))
 sys.path.insert(0, str(_SOC_DIR / "log_evaluation"))
 
 from explanation import generate_explanation
-from normalizerfixed import normalize_wazuh_alert
+from backend.ingestion.normalizer import normalize_wazuh_alert
 from wazuh_client import WazuhClient
 from severity_scoring import load_blacklist, train_model, score_event
 from log_dataclass import SOCevent

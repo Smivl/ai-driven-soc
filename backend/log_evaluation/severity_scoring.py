@@ -14,7 +14,7 @@ from sklearn.metrics import mean_absolute_error
 import requests
 import ipaddress
 
-from log_evaluation.log_dataclass import SOCevent, PipelineStatus, Scoring as Severity
+from backend.log_evaluation.soc_event import SOCevent, PipelineStatus, Scoring as Severity
 
 ###### source .venv/bin/activate
 ##### python -m services.soc.log_evaluation.severity_scoring
@@ -120,7 +120,7 @@ def events_to_dataframe(events: list[SOCevent], blacklist: set) -> pd.DataFrame:
 
 def train_model(blacklist: set) -> lgb.LGBMRegressor:
     """Train simple LightGBM on synthetic SOCEvents."""
-    events = temp_generate_data()
+    events = temp_generate_data() # NOTE : temporary fake data
     df     = events_to_dataframe(events, blacklist)
 
     X = df[["wazuh_level", "source_ip_security", "destination_ip_security", "port_security"]]
