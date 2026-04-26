@@ -10,7 +10,7 @@ from app import state
 from app.api.v1.events import router as events_router
 
 from ingestion.wazuh_client import WazuhClient
-from log_evaluation.severity_scoring import load_blacklist, train_model
+from backend.log_evaluation.rule_scoring import load_blacklist, train_model, load_tor_exits
 from log_evaluation.soc_event import SOCevent, Scoring, PipelineStatus
 from ingestion.normalizer import normalize_event
 from ingestion.explanation import generate_explanation
@@ -114,7 +114,8 @@ def _explanation_worker(client: WazuhClient) -> None:
 async def lifespan(app: FastAPI):
     client    = WazuhClient()
     blacklist = load_blacklist()
-    model     = train_model(blacklist)
+    torexistlist = load_tor_exits()
+    model     = train_model(blacklist, torexistlist)
 
     _stop.clear()
 

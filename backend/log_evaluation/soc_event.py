@@ -3,9 +3,9 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum
 
 class Scoring(Enum):
-    BENIGN     = "benign"
-    SUSPICIOUS = "suspicious"
-    MALICIOUS  = "malicious"
+    LOW        = "low"
+    MEDIUM     = "medium"
+    HIGH       = "high"
     CRITICAL   = "critical"
 
 class PipelineStatus(Enum):
