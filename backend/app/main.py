@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app import state
+from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
 from ingestion.main_loop import run_pipeline_once
 from ingestion.wazuh_client import WazuhClient
@@ -49,6 +50,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(events_router, prefix=settings.API_V1_STR)
 
 
