@@ -1,3 +1,4 @@
+import queue
 import threading
 from contextlib import asynccontextmanager
 
@@ -5,34 +6,52 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app import state
 from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
-from ingestion.main_loop import run_pipeline_once
+from ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.severity_scoring import load_blacklist, train_model
 
 _stop = threading.Event()
 
 
-def _pipeline_worker() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    cache: dict = {}
+    cache_lock = threading.Lock()
+    pq12: queue.PriorityQueue = queue.PriorityQueue()
+    pq23: queue.PriorityQueue = queue.PriorityQueue()
+
     blacklist = load_blacklist()
     model = train_model(blacklist)
     client = WazuhClient()
-    while not _stop.is_set():
-        results = run_pipeline_once(client, model, blacklist, batch_size=10)
-        state.add_events(results)
-        _stop.wait(timeout=15)
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
     _stop.clear()
-    t = threading.Thread(target=_pipeline_worker, daemon=True)
-    t.start()
+    threads = [
+        threading.Thread(
+            target=ingest_worker,
+            args=(client, cache, cache_lock, pq12, _stop),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=score_worker,
+            args=(model, blacklist, cache, cache_lock, pq12, pq23, _stop),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=explain_worker,
+            args=(cache, cache_lock, pq23, _stop),
+            daemon=True,
+        ),
+    ]
+    for t in threads:
+        t.start()
+
     yield
+
     _stop.set()
-    t.join(timeout=10)
+    for t in threads:
+        t.join(timeout=10)
 
 
 app = FastAPI(

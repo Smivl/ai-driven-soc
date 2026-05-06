@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import NotificationPanel from "../components/NotificationPanel";
+import { useEvents } from "../hooks/useEvents";
 import type { Notification } from "../types/notification";
+import type { SOCEvent } from "../types/event";
 import "../App.css";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Severity = "critical" | "high" | "medium" | "low";
 type Status = "open" | "review" | "closed";
 type PlaybookCategory = "Detection" | "Response" | "Notification";
-type ActiveView = "overview" | "client" | "playbooks";
+type ActiveView = "overview" | "client" | "playbooks" | "events";
 
 interface Alert {
   id: string;
@@ -148,6 +150,13 @@ function scoreColor(score: number): string {
   return "var(--severity-low)";
 }
 
+function labelBadgeClass(label: string): string {
+  if (label === "critical")  return "critical";
+  if (label === "malicious") return "high";
+  if (label === "suspicious") return "medium";
+  return "low";
+}
+
 const CATEGORY_COLOR: Record<PlaybookCategory, string> = {
   Detection:    "var(--accent-blue)",
   Response:     "var(--severity-high)",
@@ -222,6 +231,7 @@ interface SidebarProps {
   onSetView: (v: ActiveView) => void;
   selectedClientId: string;
   onSelectClient: (id: string) => void;
+  eventsCount: number;
 }
 
 function Sidebar({
@@ -230,6 +240,7 @@ function Sidebar({
   clientsOpen, onToggleClients,
   activeView, onSetView,
   selectedClientId, onSelectClient,
+  eventsCount,
 }: SidebarProps) {
   return (
     <aside className={`sidebar ${open ? "" : "sidebar-closed"}`}>
@@ -239,6 +250,15 @@ function Sidebar({
           onClick={() => onSetView("overview")}
         >
           Overview
+        </button>
+        <button
+          className={`sidebar-item ${activeView === "events" ? "active" : ""}`}
+          onClick={() => onSetView("events")}
+        >
+          <span className="sidebar-item-label">Live Events</span>
+          {eventsCount > 0 && (
+            <span className="sidebar-item-env">{eventsCount} in pipeline</span>
+          )}
         </button>
       </div>
       <div className="sidebar-divider" />
@@ -562,6 +582,181 @@ function ClientView({ clientId }: { clientId: string }) {
   );
 }
 
+// ── Pipeline badge ─────────────────────────────────────────────────────────────
+const STAGE_LABELS: Record<string, string> = {
+  pending:    "Pending",
+  normalized: "Ingested",
+  scored:     "Scored",
+  explained:  "Explained",
+  resolved:   "Resolved",
+};
+
+function PipelineBadge({ status }: { status: string }) {
+  return (
+    <span className={`pipeline-badge ${status}`}>
+      <span className="pipeline-dot" />
+      {STAGE_LABELS[status] ?? status}
+    </span>
+  );
+}
+
+// ── Events view ────────────────────────────────────────────────────────────────
+function EventsView({ events, isFetching }: { events: SOCEvent[]; isFetching: boolean }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const sorted = [...events].reverse();
+  const selected = sorted.find((e) => e.event_id === selectedId) ?? null;
+
+  const counts = {
+    total:      events.length,
+    normalized: events.filter((e) => e.status === "normalized").length,
+    scored:     events.filter((e) => e.status === "scored").length,
+    explained:  events.filter((e) => e.status === "explained").length,
+  };
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Live Event Pipeline</h1>
+          <p className="page-subtitle">
+            Security events flowing through ingestion → ML scoring → AI explanation. Refreshes every 2s.
+          </p>
+        </div>
+        {isFetching && (
+          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", alignSelf: "center" }}>
+            Refreshing…
+          </span>
+        )}
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span className="stat-label">Total Events</span>
+          <span className="stat-value total">{counts.total}</span>
+          <span className="stat-trend">In memory</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Ingested</span>
+          <span className="stat-value" style={{ color: "var(--accent-blue)", fontSize: "2rem", fontWeight: 700, lineHeight: 1, fontFamily: "'JetBrains Mono', monospace" }}>{counts.normalized}</span>
+          <span className="stat-trend">Awaiting ML score</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Scored</span>
+          <span className="stat-value medium">{counts.scored}</span>
+          <span className="stat-trend">Awaiting explanation</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Explained</span>
+          <span className="stat-value low">{counts.explained}</span>
+          <span className="stat-trend">Pipeline complete</span>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">Event Stream</h2>
+          <span className="card-badge">{counts.total} events</span>
+        </div>
+
+        {sorted.length === 0 ? (
+          <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.85rem" }}>
+            Waiting for events from the pipeline…
+          </div>
+        ) : (
+          <>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Event Type</th>
+                    <th>Source IP</th>
+                    <th>User</th>
+                    <th>Wazuh</th>
+                    <th>Stage</th>
+                    <th>AI Score</th>
+                    <th>Label</th>
+                    <th>Explanation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map((evt) => (
+                    <Fragment key={evt.event_id ?? evt.timestamp}>
+                      <tr
+                        className="clickable-row"
+                        onClick={() => setSelectedId(selectedId === evt.event_id ? null : evt.event_id)}
+                        style={selectedId === evt.event_id ? { background: "var(--bg-elevated)" } : undefined}
+                      >
+                        <td className="td-mono">
+                          {evt.timestamp ? evt.timestamp.slice(0, 19).replace("T", " ") : "—"}
+                        </td>
+                        <td className="td-event">{evt.event_type ?? "—"}</td>
+                        <td className="td-ip">{evt.source_ip ?? "—"}</td>
+                        <td style={{ color: "var(--text-secondary)" }}>{evt.user ?? "—"}</td>
+                        <td className="td-mono">{evt.wazuh_level ?? "—"}</td>
+                        <td><PipelineBadge status={evt.status} /></td>
+                        <td>
+                          {evt.severity != null ? (
+                            <div className="score-bar">
+                              <div className="score-bar-track">
+                                <div
+                                  className="score-bar-fill"
+                                  style={{ width: `${evt.severity}%`, background: scoreColor(evt.severity) }}
+                                />
+                              </div>
+                              <span className="score-label">{evt.severity}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: "var(--text-muted)" }}>—</span>
+                          )}
+                        </td>
+                        <td>
+                          {evt.label ? (
+                            <span className={`badge ${labelBadgeClass(evt.label)}`}>{evt.label}</span>
+                          ) : (
+                            <span style={{ color: "var(--text-muted)" }}>—</span>
+                          )}
+                        </td>
+                        <td style={{ maxWidth: 260 }}>
+                          {evt.explanation ? (
+                            <span style={{ display: "block", fontSize: "0.8rem", color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 240 }}>
+                              {evt.explanation}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                              {evt.status === "explained" ? "—" : "Pending…"}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {selected && (
+              <div className="event-detail">
+                <div>
+                  <p className="event-detail-label">AI Explanation</p>
+                  <p className="event-detail-text">
+                    {selected.explanation ?? "Not yet available — event is still processing."}
+                  </p>
+                </div>
+                <div>
+                  <p className="event-detail-label">Raw Log</p>
+                  <pre className="event-detail-pre">{selected.raw_log ?? "—"}</pre>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Dashboard ──────────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const [time, setTime] = useState(() => new Date().toUTCString().slice(0, 25) + " UTC");
@@ -573,6 +768,8 @@ export default function Dashboard() {
   const [playbookStates, setPlaybookStates]     = useState(DEFAULT_PLAYBOOK_STATES);
   const [notifications, setNotifications]       = useState(INITIAL_NOTIFICATIONS);
   const [notifOpen, setNotifOpen]               = useState(false);
+
+  const { data: liveEvents = [], isFetching: eventsFetching } = useEvents();
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date().toUTCString().slice(0, 25) + " UTC"), 1000);
@@ -606,9 +803,11 @@ export default function Dashboard() {
           clientsOpen={clientsOpen}   onToggleClients={() => setClientsOpen((o) => !o)}
           activeView={activeView}     onSetView={setActiveView}
           selectedClientId={selectedClientId} onSelectClient={handleSelectClient}
+          eventsCount={liveEvents.length}
         />
         <main className="main-content">
           {activeView === "overview"  && <OverviewView  key="overview"         onSelectClient={handleSelectClient} />}
+          {activeView === "events"    && <EventsView    key="events"           events={liveEvents} isFetching={eventsFetching} />}
           {activeView === "playbooks" && <PlaybooksView key="playbooks"        playbookStates={playbookStates} onToggle={handleTogglePlaybook} />}
           {activeView === "client"    && <ClientView    key={selectedClientId} clientId={selectedClientId} />}
         </main>

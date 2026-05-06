@@ -86,7 +86,7 @@ class WazuhClient:
         )
         r.raise_for_status()
         hits = r.json().get("hits", {}).get("hits", [])
-        return [hit["_source"] for hit in hits]
+        return [{"_wazuh_id": hit["_id"], **hit["_source"]} for hit in hits]
     
 import sys
 import os
