@@ -1,12 +1,12 @@
 """
-    Rule-based scoring for security events
+    Rule-based scoring for individual security events
     Uses: Wazuh level, source/destination IP, port, and keyword matching
 """
 
 import ipaddress
 import requests
 
-from backend.log_evaluation.soc_event import SOCevent, PipelineStatus, Scoring
+from backend.log_evaluation.soc_event import SOCevent
 
 ###### source .venv/bin/activate
 ##### python -m backend.log_evaluation.rule_scoring
@@ -87,16 +87,11 @@ def keyword_score(raw_log: str) -> int:
         score += 10
     return score
 
-# ---- Final scoring -----------------------------------------------------------------------
+# ---- Define a score based on the rules 0-100 -----------------------------------------------------------------------
 
-def score_to_label(score: int) -> Scoring:
-    if score < 15: return Scoring.LOW
-    if score < 35: return Scoring.MEDIUM
-    if score < 60: return Scoring.HIGH
-    return Scoring.CRITICAL
-
-def score_event(event: SOCevent, blacklist: set, tor_exits: set) -> SOCevent:
+def score_rules(event: SOCevent, blacklist: set, tor_exits: set):
     """Score a SOCevent using rules only — updates severity, label and status."""
+
     raw_score = (
         wazuh_rule_score(event.wazuh_level or 0)
         + source_ip_score(event.source_ip or "", blacklist, tor_exits)
@@ -104,9 +99,4 @@ def score_event(event: SOCevent, blacklist: set, tor_exits: set) -> SOCevent:
         + port_score(event.port or 0)
         + keyword_score(event.raw_log)
     )
-
-    event.severity = min(int(raw_score), 100)
-    event.label    = score_to_label(event.severity)
-    event.status   = PipelineStatus.SCORED
-    return event
-
+    return raw_score

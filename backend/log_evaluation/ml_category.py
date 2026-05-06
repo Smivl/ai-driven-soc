@@ -85,13 +85,9 @@ def load_and_train(data_dir: str = "data"):
     return vectorizer, model
 
 
-def score_log(event: SOCevent, vectorizer, model):
+def categorise_score_log(event: SOCevent, vectorizer, model):
     # Score log based on the mode;
     X = vectorizer.transform([event.raw_log]).toarray()         # transform only
     probs = model.predict_proba(X)[0]                 # probability per category
-    
-    score = sum(
-        prob * CATEGORY_SEVERITY[cat]
-        for cat, prob in zip(model.classes_, probs)
-    )
-    return score
+
+    return probs
