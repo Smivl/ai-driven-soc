@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import NotificationPanel from "../components/NotificationPanel";
 import { useEvents } from "../hooks/useEvents";
+import { api } from "../lib/api";
 import type { Notification } from "../types/notification";
 import type { SOCEvent } from "../types/event";
 import "../App.css";
@@ -85,44 +86,17 @@ const MOCK_PLAYBOOKS: Playbook[] = [
 ];
 
 const MOCK_CLIENT_STATS: Record<string, ClientStats> = {
-  acme:      { total: 24, critical: 5, high: 8,  medium: 7, low: 4 },
-  techstart: { total:  7, critical: 0, high: 2,  medium: 3, low: 2 },
-  megacorp:  { total: 18, critical: 3, high: 6,  medium: 5, low: 4 },
-  globalbnk: { total: 31, critical: 8, high: 12, medium: 7, low: 4 },
+  acme:      { total: 0, critical: 0, high: 0, medium: 0, low: 0 },
+  techstart: { total: 0, critical: 0, high: 0, medium: 0, low: 0 },
+  megacorp:  { total: 0, critical: 0, high: 0, medium: 0, low: 0 },
+  globalbnk: { total: 0, critical: 0, high: 0, medium: 0, low: 0 },
 };
 
-const MOCK_PRIORITY_ISSUES: PriorityIssue[] = [
-  { id: "C-001", clientId: "globalbnk", event_type: "Malware Signature",    source_ip: "10.0.2.33",     severity: "critical", score: 99, timestamp: "14:32", message: "Known C2 beacon pattern matched in outbound traffic" },
-  { id: "C-002", clientId: "acme",      event_type: "SQL Injection",        source_ip: "198.51.100.14", severity: "critical", score: 97, timestamp: "14:28", message: "SQLi payload detected in login form parameter" },
-  { id: "C-003", clientId: "globalbnk", event_type: "Brute Force",          source_ip: "185.220.101.45",severity: "critical", score: 94, timestamp: "14:19", message: "Multiple failed SSH login attempts" },
-  { id: "C-004", clientId: "megacorp",  event_type: "Privilege Escalation", source_ip: "10.0.0.22",     severity: "critical", score: 91, timestamp: "14:11", message: "User executed sudo with unusual command" },
-  { id: "C-005", clientId: "acme",      event_type: "Ransomware Detected",  source_ip: "10.4.1.8",      severity: "critical", score: 99, timestamp: "13:58", message: "Ransomware signature matched on host filesystem" },
-  { id: "C-006", clientId: "globalbnk", event_type: "Data Exfiltration",    source_ip: "10.1.3.20",     severity: "critical", score: 96, timestamp: "13:44", message: "Large outbound transfer to unknown external host" },
-  { id: "H-001", clientId: "megacorp",  event_type: "Port Scan",            source_ip: "203.0.113.72",  severity: "high",     score: 78, timestamp: "14:28", message: "SYN scan across 1024 ports in under 2 seconds" },
-  { id: "H-002", clientId: "acme",      event_type: "Privilege Escalation", source_ip: "10.0.0.22",     severity: "high",     score: 81, timestamp: "14:11", message: "User executed sudo with unusual command" },
-  { id: "H-003", clientId: "globalbnk", event_type: "Auth Anomaly",         source_ip: "77.88.55.80",   severity: "high",     score: 74, timestamp: "13:58", message: "Multiple accounts accessed from same external IP" },
-  { id: "H-004", clientId: "techstart", event_type: "Suspicious DNS",       source_ip: "10.0.1.15",     severity: "high",     score: 71, timestamp: "13:30", message: "High-frequency queries to newly registered domain" },
-];
+const MOCK_PRIORITY_ISSUES: PriorityIssue[] = [];
 
-const MOCK_ACTIVE_EXECUTIONS: PlaybookExecution[] = [
-  { id: "ex-001", playbookId: "pb1", clientId: "globalbnk", triggeredBy: "Malware Signature",    sourceIp: "10.0.2.33",     startedAt: "14:32:01", status: "running",   action: "Isolating host 10.0.2.33 from the network segment" },
-  { id: "ex-002", playbookId: "pb2", clientId: "acme",      triggeredBy: "Brute Force",           sourceIp: "185.220.101.45",startedAt: "14:30:15", status: "running",   action: "Locking account 'admin' after 12 failed attempts" },
-  { id: "ex-003", playbookId: "pb3", clientId: "megacorp",  triggeredBy: "Privilege Escalation",  sourceIp: "10.0.0.22",     startedAt: "14:11:10", status: "running",   action: "Opening ticket #4821 in ticketing system" },
-  { id: "ex-004", playbookId: "pb5", clientId: "globalbnk", triggeredBy: "Port Scan",             sourceIp: "203.0.113.72",  startedAt: "14:28:55", status: "completed", action: "Added 203.0.113.72 to network blocklist" },
-  { id: "ex-005", playbookId: "pb1", clientId: "acme",      triggeredBy: "Ransomware Detected",   sourceIp: "10.4.1.8",      startedAt: "13:59:00", status: "running",   action: "Isolating host 10.4.1.8 from the network segment" },
-  { id: "ex-006", playbookId: "pb4", clientId: "globalbnk", triggeredBy: "Auth Anomaly",          sourceIp: "77.88.55.80",   startedAt: "13:30:10", status: "failed",    action: "Geo-lookup failed — external API unreachable" },
-];
+const MOCK_ACTIVE_EXECUTIONS: PlaybookExecution[] = [];
 
-const INITIAL_NOTIFICATIONS: Notification[] = [
-  { id: "n-001", type: "critical", title: "New critical alert",  description: "Malware Signature detected on GlobalBank — host 10.0.2.33",   time: "14:32" },
-  { id: "n-002", type: "critical", title: "New critical alert",  description: "SQL Injection attempt on Acme Corp — 198.51.100.14",           time: "14:28" },
-  { id: "n-003", type: "critical", title: "New critical alert",  description: "Brute Force detected on GlobalBank — 185.220.101.45",           time: "14:19" },
-  { id: "n-004", type: "playbook", title: "Playbook triggered",  description: "Auto-Isolate on Ransomware: isolating 10.4.1.8 (Acme Corp)",   time: "13:59" },
-  { id: "n-005", type: "playbook", title: "Playbook completed",  description: "Port Scan Blocklist: 203.0.113.72 added to blocklist",          time: "14:29" },
-  { id: "n-006", type: "warning",  title: "Playbook failed",     description: "Geo-Anomaly Alert: external API unreachable (GlobalBank)",      time: "13:30" },
-  { id: "n-007", type: "warning",  title: "High severity spike", description: "MegaCorp: 6 high-severity alerts in the last hour",             time: "14:00" },
-  { id: "n-008", type: "info",     title: "Session note",        description: "You last signed in yesterday at 18:42",                         time: "09:15" },
-];
+const INITIAL_NOTIFICATIONS: Notification[] = [];
 
 const DEFAULT_PLAYBOOK_STATES: Record<string, Record<string, boolean>> = {
   acme:      { pb1: true,  pb2: true,  pb3: false, pb4: true,  pb5: false },
@@ -131,16 +105,7 @@ const DEFAULT_PLAYBOOK_STATES: Record<string, Record<string, boolean>> = {
   globalbnk: { pb1: true,  pb2: true,  pb3: true,  pb4: true,  pb5: true  },
 };
 
-const MOCK_ALERTS: Alert[] = [
-  { id: "EVT-001", timestamp: "2026-03-11 14:32:07", event_type: "Brute Force",        source_ip: "185.220.101.45", user: "admin",  severity: "critical", score: 94, status: "open",   message: "Multiple failed SSH login attempts detected" },
-  { id: "EVT-002", timestamp: "2026-03-11 14:28:51", event_type: "Port Scan",          source_ip: "203.0.113.72",  user: "-",      severity: "high",     score: 78, status: "review", message: "SYN scan across 1024 ports in under 2 seconds" },
-  { id: "EVT-003", timestamp: "2026-03-11 14:19:33", event_type: "SQL Injection",      source_ip: "198.51.100.14", user: "guest",  severity: "critical", score: 97, status: "open",   message: "SQLi payload detected in login form parameter" },
-  { id: "EVT-004", timestamp: "2026-03-11 14:11:02", event_type: "Privilege Escalation", source_ip: "10.0.0.22",  user: "jsmith", severity: "high",     score: 81, status: "open",   message: "User executed sudo with unusual command" },
-  { id: "EVT-005", timestamp: "2026-03-11 13:58:47", event_type: "Suspicious DNS",     source_ip: "10.0.1.15",    user: "-",      severity: "medium",   score: 55, status: "review", message: "High-frequency DNS queries to newly registered domain" },
-  { id: "EVT-006", timestamp: "2026-03-11 13:44:19", event_type: "File Integrity",     source_ip: "10.0.0.5",     user: "deploy", severity: "medium",   score: 49, status: "closed", message: "/etc/passwd modification detected outside change window" },
-  { id: "EVT-007", timestamp: "2026-03-11 13:30:05", event_type: "Auth Anomaly",       source_ip: "77.88.55.80",  user: "mlee",   severity: "low",      score: 22, status: "closed", message: "Login from new country: RU (usual: US)" },
-  { id: "EVT-008", timestamp: "2026-03-11 13:12:44", event_type: "Malware Signature",  source_ip: "10.0.2.33",    user: "system", severity: "critical", score: 99, status: "open",   message: "Known C2 beacon pattern matched in outbound traffic" },
-];
+const MOCK_ALERTS: Alert[] = [];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function scoreColor(score: number): string {
@@ -601,7 +566,7 @@ function PipelineBadge({ status }: { status: string }) {
 }
 
 // ── Events view ────────────────────────────────────────────────────────────────
-function EventsView({ events, isFetching }: { events: SOCEvent[]; isFetching: boolean }) {
+function EventsView({ events, isFetching, onClear }: { events: SOCEvent[]; isFetching: boolean; onClear: () => void }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const sorted = [...events].reverse();
@@ -623,11 +588,16 @@ function EventsView({ events, isFetching }: { events: SOCEvent[]; isFetching: bo
             Security events flowing through ingestion → ML scoring → AI explanation. Refreshes every 2s.
           </p>
         </div>
-        {isFetching && (
-          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", alignSelf: "center" }}>
-            Refreshing…
-          </span>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {isFetching && (
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+              Refreshing…
+            </span>
+          )}
+          {events.length > 0 && (
+            <button className="btn-edit" onClick={onClear}>Clear</button>
+          )}
+        </div>
       </div>
 
       <div className="stats-grid">
@@ -783,6 +753,10 @@ export default function Dashboard() {
     }));
   }
 
+  async function handleClearEvents() {
+    await api.delete("/api/v1/events");
+  }
+
   function handleSelectClient(clientId: string) {
     setSelectedClientId(clientId);
     setActiveView("client");
@@ -807,7 +781,7 @@ export default function Dashboard() {
         />
         <main className="main-content">
           {activeView === "overview"  && <OverviewView  key="overview"         onSelectClient={handleSelectClient} />}
-          {activeView === "events"    && <EventsView    key="events"           events={liveEvents} isFetching={eventsFetching} />}
+          {activeView === "events"    && <EventsView    key="events"           events={liveEvents} isFetching={eventsFetching} onClear={handleClearEvents} />}
           {activeView === "playbooks" && <PlaybooksView key="playbooks"        playbookStates={playbookStates} onToggle={handleTogglePlaybook} />}
           {activeView === "client"    && <ClientView    key={selectedClientId} clientId={selectedClientId} />}
         </main>

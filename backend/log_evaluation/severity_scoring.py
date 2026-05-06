@@ -32,48 +32,30 @@ def load_blacklist() -> set:
     return ips
 
 
-def source_ip_security(ip:str, blacklist: set) -> int :
-    """ Tells you WHO is attacking you -
-        Convert an IP address into a numerical represenatation that captures its security relevance
-            - Private IPs are less likely to be malicious
-            - IPs in a blacklist of known malicious IPs are more likely to be malicious
-        Higher score means more likely to be malicious
-    """
-
-    # Check if IP is public or private 
-    # - Private IPs are less likely to be malicious
-    try:
-        is_private   = ipaddress.ip_address(ip).is_private
-    except ValueError:
-        is_private   = False
-
-    # Check if it appears in a blacklist of known malicious IPs
-    in_blacklist = ip in blacklist
-
-    return int(in_blacklist) * 10 + int(not is_private) * 3 
-
-def destination_ip_security(ip:str) -> int :
-    """ Tells you WHO is being attacked -
-        Convert an IP address into a numerical represenatation that captures its security relevance
-            - Internal serves are more likely to be critical assets being attacked
-            - Core infrastructure IPs are more likely to be critical assets being attacked
-        Higher score means more critical asset being attacked
-    """
+def source_ip_security(ip: str | None, blacklist: set) -> int:
+    if not ip:
+        return 0
     try:
         is_private = ipaddress.ip_address(ip).is_private
     except ValueError:
         is_private = False
+    in_blacklist = ip in blacklist
+    return int(in_blacklist) * 10 + int(not is_private) * 3
 
-    # Targeting internal infrastructure is more concerning than external
-    is_internal_server = (ip.startswith("10.0.0.") or ip.startswith("192.168.1.1"))
 
-    return (int(is_private) * 3 + int(is_internal_server) * 5)
+def destination_ip_security(ip: str | None) -> int:
+    if not ip:
+        return 0
+    try:
+        is_private = ipaddress.ip_address(ip).is_private
+    except ValueError:
+        is_private = False
+    is_internal_server = ip.startswith("10.0.0.") or ip.startswith("192.168.1.1")
+    return int(is_private) * 3 + int(is_internal_server) * 5
 
-def port_security(port:int) :
-    """ Convert a port number into a numerical representation that captures its security relevance
-            - Common services ports, like for HTTP, SSH, etc. are more likely to be targeted
-        Higher score means more likely to be malicious
-    """
+def port_security(port: int | None) -> int:
+    if port is None:
+        return 0
     common_ports = {22, 90, 443, 3306, 8080}
     return int(port in common_ports) * 5
 

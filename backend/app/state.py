@@ -24,3 +24,8 @@ def get_events(limit: int = 100) -> list[dict]:
     with _lock:
         vals = list(_events.values())
     return vals[-limit:]
+
+
+def clear_events() -> None:
+    with _lock:
+        _events.clear()
