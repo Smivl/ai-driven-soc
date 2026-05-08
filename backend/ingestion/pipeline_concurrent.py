@@ -60,6 +60,8 @@ def score_worker(
                 continue
             score_event(model, blacklist, event)
             state.upsert_event(event.return_dict())
+            for execution in run_playbooks(event):
+                state.add_execution(execution)
             avg_priority = -((event.wazuh_level or 0) + (event.severity or 0)) / 2
             pq23.put((avg_priority, event_id))
         except Exception as e:
@@ -91,8 +93,6 @@ def explain_worker(
             event.explanation = generate_explanation(explanation_input, event.severity or 0)
             event.status = PipelineStatus.EXPLAINED
             state.upsert_event(event.return_dict())
-            for execution in run_playbooks(event):
-                state.add_execution(execution)
             with cache_lock:
                 cache.pop(event_id, None)
         except Exception as e:
