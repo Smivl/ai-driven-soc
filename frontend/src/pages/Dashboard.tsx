@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import NotificationPanel from "../components/NotificationPanel";
 import { useEvents } from "../hooks/useEvents";
+import { usePlaybookExecutions } from "../hooks/usePlaybookExecutions";
 import { api } from "../lib/api";
 import type { Notification } from "../types/notification";
 import type { SOCEvent } from "../types/event";
@@ -94,7 +95,6 @@ const MOCK_CLIENT_STATS: Record<string, ClientStats> = {
 
 const MOCK_PRIORITY_ISSUES: PriorityIssue[] = [];
 
-const MOCK_ACTIVE_EXECUTIONS: PlaybookExecution[] = [];
 
 const INITIAL_NOTIFICATIONS: Notification[] = [];
 
@@ -269,10 +269,10 @@ function Sidebar({
 }
 
 // ── Active playbooks card ──────────────────────────────────────────────────────
-function ActivePlaybooksCard({ clientId }: { clientId?: string }) {
+function ActivePlaybooksCard({ clientId, executions: allExecutions }: { clientId?: string; executions: PlaybookExecution[] }) {
   const executions = clientId
-    ? MOCK_ACTIVE_EXECUTIONS.filter((e) => e.clientId === clientId)
-    : MOCK_ACTIVE_EXECUTIONS;
+    ? allExecutions.filter((e) => e.clientId === clientId)
+    : allExecutions;
 
   if (executions.length === 0) return null;
 
@@ -299,8 +299,8 @@ function ActivePlaybooksCard({ clientId }: { clientId?: string }) {
           </thead>
           <tbody>
             {executions.map((exec) => {
-              const playbook = MOCK_PLAYBOOKS.find((p) => p.id === exec.playbookId)!;
-              const client   = MOCK_CLIENTS.find((c) => c.id === exec.clientId)!;
+              const playbook = MOCK_PLAYBOOKS.find((p) => p.id === exec.playbookId);
+              const client   = MOCK_CLIENTS.find((c) => c.id === exec.clientId);
               return (
                 <tr key={exec.id}>
                   <td>
@@ -309,8 +309,8 @@ function ActivePlaybooksCard({ clientId }: { clientId?: string }) {
                       {exec.status}
                     </span>
                   </td>
-                  {!clientId && <td><span className="td-client">{client.name}</span></td>}
-                  <td className="td-event">{playbook.name}</td>
+                  {!clientId && <td><span className="td-client">{client?.name ?? exec.clientId}</span></td>}
+                  <td className="td-event">{playbook?.name ?? exec.playbookId}</td>
                   <td style={{ color: "var(--text-secondary)", fontSize: "0.83rem" }}>{exec.triggeredBy}</td>
                   <td className="td-ip">{exec.sourceIp}</td>
                   <td style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{exec.action}</td>
@@ -389,9 +389,11 @@ function OverviewView({ onSelectClient }: { onSelectClient: (id: string) => void
 function PlaybooksView({
   playbookStates,
   onToggle,
+  executions,
 }: {
   playbookStates: Record<string, Record<string, boolean>>;
   onToggle: (clientId: string, playbookId: string) => void;
+  executions: PlaybookExecution[];
 }) {
   return (
     <div className="page">
@@ -448,12 +450,13 @@ function PlaybooksView({
           </table>
         </div>
       </div>
+      <ActivePlaybooksCard executions={executions} />
     </div>
   );
 }
 
 // ── Client view ────────────────────────────────────────────────────────────────
-function ClientView({ clientId }: { clientId: string }) {
+function ClientView({ clientId, executions }: { clientId: string; executions: PlaybookExecution[] }) {
   const client = MOCK_CLIENTS.find((c) => c.id === clientId)!;
   const counts = {
     total:    MOCK_ALERTS.length,
@@ -498,7 +501,7 @@ function ClientView({ clientId }: { clientId: string }) {
         </div>
       </div>
 
-      <ActivePlaybooksCard clientId={clientId} />
+      <ActivePlaybooksCard clientId={clientId} executions={executions} />
 
       <div className="card">
         <div className="card-header">
@@ -740,6 +743,7 @@ export default function Dashboard() {
   const [notifOpen, setNotifOpen]               = useState(false);
 
   const { data: liveEvents = [], isFetching: eventsFetching } = useEvents();
+  const { data: playbookExecutions = [] } = usePlaybookExecutions();
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date().toUTCString().slice(0, 25) + " UTC"), 1000);
@@ -782,8 +786,8 @@ export default function Dashboard() {
         <main className="main-content">
           {activeView === "overview"  && <OverviewView  key="overview"         onSelectClient={handleSelectClient} />}
           {activeView === "events"    && <EventsView    key="events"           events={liveEvents} isFetching={eventsFetching} onClear={handleClearEvents} />}
-          {activeView === "playbooks" && <PlaybooksView key="playbooks"        playbookStates={playbookStates} onToggle={handleTogglePlaybook} />}
-          {activeView === "client"    && <ClientView    key={selectedClientId} clientId={selectedClientId} />}
+          {activeView === "playbooks" && <PlaybooksView key="playbooks"        playbookStates={playbookStates} onToggle={handleTogglePlaybook} executions={playbookExecutions} />}
+          {activeView === "client"    && <ClientView    key={selectedClientId} clientId={selectedClientId} executions={playbookExecutions} />}
         </main>
       </div>
       <NotificationPanel

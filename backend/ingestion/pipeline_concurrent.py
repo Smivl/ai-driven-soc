@@ -4,6 +4,7 @@ import uuid
 
 from ingestion.explanation import generate_explanation
 from ingestion.normalizerfixed import normalize_wazuh_alert
+from ingestion.playbooks import run_playbooks
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
@@ -90,6 +91,8 @@ def explain_worker(
             event.explanation = generate_explanation(explanation_input, event.severity or 0)
             event.status = PipelineStatus.EXPLAINED
             state.upsert_event(event.return_dict())
+            for execution in run_playbooks(event):
+                state.add_execution(execution)
             with cache_lock:
                 cache.pop(event_id, None)
         except Exception as e:
