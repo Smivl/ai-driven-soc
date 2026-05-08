@@ -1,7 +1,12 @@
 import csv
 import json
+import os
 import re
+import sys
 from datetime import datetime, timezone
+
+if __name__ == "__main__":
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from log_evaluation.log_dataclass import SOCevent, PipelineStatus
 
@@ -135,6 +140,8 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
         # From Wazuh
         wazuh_level    = rule.get("level"),
         rule_id        = rule.get("id"),
+        frequency      = rule.get("frequency"),
+        timeframe      = rule.get("timeframe"),
 
         # Pipeline status
         status         = PipelineStatus.NORMALIZED
@@ -157,7 +164,8 @@ def process_csv(input_file: str, output_file: str) -> int:
 
 
 if __name__ == "__main__":
+    _repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     process_csv(
-        input_file="data/SIEVE_00_100K.csv",
-        output_file="data/normalized_events.json",
+        input_file=os.path.join(_repo, "data", "SIEVE_00_100K.csv"),
+        output_file=os.path.join(_repo, "data", "normalized_events.json"),
     )

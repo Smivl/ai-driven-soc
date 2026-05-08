@@ -35,6 +35,8 @@ class SOCevent:
     # ── From Wazuh ────────────────────────────────────
     wazuh_level:    Scoring = None
     rule_id:        str     = None
+    frequency:      str     = None
+    timeframe:      str     = None
 
     # ── From ML ───────────────────────────────────────
     severity:       int   = None   # 0-100
