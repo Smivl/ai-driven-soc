@@ -127,6 +127,8 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
     # Try to get destination IP from agent info
     _, dst_ip = _parse_ips(full_log) if full_log else (None, None)
 
+    #print("rule keys:", list(rule.keys()))
+    print("mitre keys:", list(rule.get("mitre", {})))
     return SOCevent(
         # From the raw log
         source_ip      = src_ip,
@@ -140,8 +142,11 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
         # From Wazuh
         wazuh_level    = rule.get("level"),
         rule_id        = rule.get("id"),
-        frequency      = rule.get("frequency"),
+        frequency      = int(rule["frequency"]) if rule.get("frequency") is not None else None,
         timeframe      = rule.get("timeframe"),
+        mitre_id       = rule.get("mitre", {}).get("id"),
+        mitre_tactic   = rule.get("mitre", {}).get("tactic"),
+        mitre_technique= rule.get("mitre", {}).get("technique"),
 
         # Pipeline status
         status         = PipelineStatus.NORMALIZED

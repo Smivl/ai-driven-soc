@@ -31,7 +31,7 @@ def ingest_worker(
                 with cache_lock:
                     cache[event.event_id] = event
                 state.upsert_event(event.return_dict())
-                print("Event ID %s\nFrequency: %s\nTimeframe: %s", event.event_id,event.frequency, event.timeframe)
+                print(f"Event ID {event.event_id}\nLevel: {event.wazuh_level}\nMitre ID: {event.mitre_id}\nTactic: {event.mitre_tactic}\nTechnique: {event.mitre_technique}\n")
                 pq12.put((-(event.wazuh_level or 0), event.event_id))
         except Exception as e:
             print(f"[ingest_worker] error: {e}")
