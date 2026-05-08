@@ -18,32 +18,32 @@ _PLAYBOOKS = [
     {
         "id": "pb1",
         "name": "Auto-Isolate on Ransomware",
-        "condition": lambda e: (e.event_type or "").lower() in ("malware", "ransomware") and (e.severity or 0) > 70,
+        "condition": lambda e: (e.severity or 0) >= 50,
         "action": lambda e: f"Isolation logged: host contacted by {e.source_ip or 'unknown'}",
     },
     {
         "id": "pb2",
         "name": "Brute Force Lockout",
-        "condition": lambda e: "auth" in (e.event_type or "").lower() and (e.severity or 0) > 50,
+        "condition": lambda e: (e.event_type or "").lower() in ("pam", "sshd", "authentication") and (e.severity or 0) >= 20,
         "action": lambda e: f"Locked user '{e.user or 'unknown'}' — brute force from {e.source_ip or 'unknown'}",
     },
     {
         "id": "pb3",
         "name": "Critical Alert Ticket",
-        "condition": lambda e: (e.severity or 0) >= 75,
+        "condition": lambda e: (e.severity or 0) >= 25,
         "action": lambda e: f"Ticket created: {e.event_type or 'unknown'} severity {e.severity} from {e.source_ip or 'unknown'}",
     },
     {
         "id": "pb4",
         "name": "Geo-Anomaly Alert",
-        "condition": lambda e: _is_external_ip(e.source_ip) and (e.severity or 0) > 60,
+        "condition": lambda e: _is_external_ip(e.source_ip) and (e.severity or 0) >= 20,
         "action": lambda e: f"Geo-anomaly alert: {e.source_ip} is external, severity {e.severity}",
     },
     {
         "id": "pb5",
         "name": "Port Scan Blocklist",
-        "condition": lambda e: "scan" in (e.event_type or "").lower() and (e.severity or 0) > 25,
-        "action": lambda e: f"Logged block: {e.source_ip or 'unknown'} flagged for port scan",
+        "condition": lambda e: (e.event_type or "").lower() in ("apache", "web", "http") and (e.severity or 0) >= 20,
+        "action": lambda e: f"Logged block: {e.source_ip or 'unknown'} flagged for suspicious web activity",
     },
 ]
 
