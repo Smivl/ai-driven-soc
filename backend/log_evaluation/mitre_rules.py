@@ -10,12 +10,6 @@ RULES = [
         "category":   "authentication-failed",
         "threshold":  20,
         "window_s":   30,
-        "actions": [
-            "Block source IP at firewall (24h)",
-            "Lock targeted accounts",
-            "Check for any auth-success from same IP in window",
-            "Enable MFA on targeted service",
-        ],
     },
     {   # T1110 slow
         "id":         "T1110-slow-brute-force",
