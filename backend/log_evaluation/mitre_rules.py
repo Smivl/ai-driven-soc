@@ -60,6 +60,7 @@ RULES = [
         "threshold":  3,
         "window_s":   60,
     },
+    
     # ── Multi-category rules ──────────────────────────────────────────────────
 
     { # T1048

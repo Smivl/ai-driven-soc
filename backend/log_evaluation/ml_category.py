@@ -2,8 +2,6 @@
     Find the probability of a raw log being in a certain category
 """
 
-import lightgbm as lgb
-
 import pandas as pd
 import lightgbm as lgb
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -54,7 +52,7 @@ CATEGORY_SEVERITY = {
 
 # ---- Train and use model -----------------------------------------------------------------------
 
-def load_and_train(data_dir: str = "data"):
+def load_and_train_category(data_dir: str = "data"):
     dfs = []
     for i in range(6):  
         path = f"{data_dir}/SIEVE_{i:02d}_100K.csv"

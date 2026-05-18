@@ -1,11 +1,10 @@
-from dataclasses import dataclass, field, asdict
-
+from dataclasses import dataclass, asdict
 from enum import Enum
 
 class Scoring(Enum):
-    LOW        = "low"
-    MEDIUM     = "medium"
-    HIGH       = "high"
+    BENIGN     = "benign"
+    SUSPICIOUS = "suspicious"
+    MALICIOUS  = "malicious"
     CRITICAL   = "critical"
 
 class PipelineStatus(Enum):
@@ -36,8 +35,16 @@ class SOCevent:
     # ── From Wazuh ────────────────────────────────────
     wazuh_level:    Scoring = None
     rule_id:        str     = None
+    frequency:      int     = None
+    timeframe:      int     = None
+    mitre_id:       list    = None
+    mitre_tactic:   list    = None
+    mitre_technique:list    = None
 
-    # ── From ML ───────────────────────────────────────
+    # ── From category ML ───────────────────────────────
+    category:       str = None
+
+    # ── From severity ML ───────────────────────────────
     severity:       int   = None   # 0-100
     label:          str   = None   
 
@@ -45,6 +52,7 @@ class SOCevent:
     explanation:    str   = None
 
     # ── Pipeline tracking ─────────────────────────────
+    event_id:        str             = None
     status:          PipelineStatus   = PipelineStatus.PENDING   # pending -> normalized -> scored -> explained
 
     # Obtain any of the information stored in the class from a log
@@ -52,6 +60,7 @@ class SOCevent:
         return getattr(self, field_name, None)
     
     def return_dict(self):
-        return asdict(self)
+        d = asdict(self)
+        return {k: (v.value if isinstance(v, Enum) else v) for k, v in d.items()}
     
                          

@@ -1,9 +1,15 @@
 import csv
 import json
+import os
 import re
+import sys
 from datetime import datetime, timezone
 
-from backend.log_evaluation.soc_event import SOCevent, PipelineStatus
+if __name__ == "__main__":
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from log_evaluation.soc_event import SOCevent, PipelineStatus
+from log_evaluation.ml_category import categorise_score_log
 
 
 
@@ -107,7 +113,7 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
         "raw":             row,         # original CSV row preserved
     }
 
-def normalize_wazuh_alert(alert: dict) -> SOCevent:
+def normalize_wazuh_alert(category_model,category_vectorizer,alert: dict) -> SOCevent:
     """Normalize a raw Wazuh alert into a SOCEvent dataclass."""
     rule     = alert.get("rule", {})
     data     = alert.get("data", {})
@@ -122,7 +128,9 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
     # Try to get destination IP from agent info
     _, dst_ip = _parse_ips(full_log) if full_log else (None, None)
 
-    return SOCevent(
+    #print("rule keys:", list(rule.keys()))
+    print("mitre keys:", list(rule.get("mitre", {})))
+    event = SOCevent(
         # From the raw log
         source_ip      = src_ip,
         destination_ip = dst_ip or alert.get("agent", {}).get("ip"),
@@ -135,10 +143,21 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
         # From Wazuh
         wazuh_level    = rule.get("level"),
         rule_id        = rule.get("id"),
+        frequency      = int(rule["frequency"]) if rule.get("frequency") is not None else None,
+        timeframe      = rule.get("timeframe"),
+        mitre_id       = rule.get("mitre", {}).get("id"),
+        mitre_tactic   = rule.get("mitre", {}).get("tactic"),
+        mitre_technique= rule.get("mitre", {}).get("technique"),
 
         # Pipeline status
         status         = PipelineStatus.NORMALIZED
     )
+    # Let ML model categorise the event for sequence detection 
+    probs = categorise_score_log(event, category_vectorizer, category_model)
+    predicted_label = category_model.classes_[probs.argmax()]
+    event.category = predicted_label
+
+    return event
 
 
 def process_csv(input_file: str, output_file: str) -> int:
@@ -157,7 +176,32 @@ def process_csv(input_file: str, output_file: str) -> int:
 
 
 if __name__ == "__main__":
-    process_csv(
-        input_file="data/SIEVE_00_100K.csv",
-        output_file="data/normalized_events.json",
-    )
+    test_alert = {
+        "timestamp": "2024-01-15T02:00:01+00:00",
+        "full_log": "Failed password for root from 10.0.0.99 port 22 ssh2",
+        "rule": {
+            "id": "5710",
+            "level": 10,
+            "description": "sshd: Attempt to login using a non-existent user",
+            "groups": ["authentication_failed", "ssh"],
+            "mitre": {
+                "id": ["T1110"],
+                "tactic": ["Credential Access"],
+                "technique": ["Brute Force"]
+            }
+        },
+        "data": {
+            "srcip": "10.0.0.99",
+            "dstport": "22"
+        },
+        "agent": {
+            "ip": "192.168.1.10"
+        }
+    }
+
+    from log_evaluation.ml_category import load_and_train_category
+    category_vectorizer, category_model = load_and_train_category()
+
+    event = normalize_wazuh_alert(category_model,category_vectorizer,test_alert)
+   
+    print(event)

@@ -8,9 +8,8 @@ def score_to_label(score: int) -> Scoring:
     if score < 60: return Scoring.HIGH
     return Scoring.CRITICAL
 
-def score_event(event: SOCevent, blacklist: set, tor_exits: set) -> SOCevent:
-
-    raw_score = score_rules(event,blacklist,tor_exits)
+def score_event(event: SOCevent, blacklist: set, torexitslist: set) -> SOCevent:
+    raw_score      = score_rules(event, blacklist, torexitslist)
     event.severity = min(int(raw_score), 100)
     event.label    = score_to_label(event.severity)
     event.status   = PipelineStatus.SCORED
