@@ -42,6 +42,7 @@ def ingest_worker(
 
 
 def score_worker(
+    threat_engine,
     sequence_vectorizer, 
     sequence_model,
     blacklist: set,
@@ -63,14 +64,22 @@ def score_worker(
             if event is None:
                 continue
 
-            # ----- Score event and raise warning if > 70 --------------------------------------------
+            # ----- Score event  --------------------------------------------
             score_event(event, blacklist, torexitslist)
             
 
             # ----- Put the event in sequence detection, also when warning is raised -----------------
 
 
-            state.upsert_event(event.return_dict())
+            # ----- Compare the ML Mitre to Wazuh Mitre -----------------
+
+
+            # ----- Generate a alert object, either because severity score is really high or it is a sequence attack 
+
+            # (----- Feedback loop for ML? -----------------)
+
+
+            state.upsert_event(event.return_dict()) # Instead of seperate logs, continue with the alerts for LLM
             avg_priority = -((event.wazuh_level or 0) + (event.severity or 0)) / 2
             pq23.put((avg_priority, event_id))
         except Exception as e:

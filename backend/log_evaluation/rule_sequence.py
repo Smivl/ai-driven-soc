@@ -93,7 +93,7 @@ class ThreatEngine:
         dq        = self._windows[(ip, cat)]
 
         # Trim stale events
-        while dq and dq[0] < cutoff:
+        while dq and dq[0][0] < cutoff:
             dq.popleft()
 
         # Count is simply how many events from this IP in this category are within the window
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     from datetime import datetime, timedelta
     from backend.log_evaluation.soc_event import SOCevent
 
-    vectorizer, model = load_and_train()
+    vectorizer, model = load_and_train_sequence()
 
     # Test sequences
     test_cases = [
