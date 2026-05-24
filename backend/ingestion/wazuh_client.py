@@ -13,7 +13,7 @@ import urllib3
 import os
 import logging
 
-from ingestion.normalizerfixed import normalize_wazuh_alert
+from backend.ingestion.normalizerfixed import normalize_wazuh_alert
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically
@@ -124,6 +124,78 @@ def test_connection():
     normalized = normalize_wazuh_alert(alerts[0])
 
     print(normalized.return_value("wazuh_level"))
+
+    # Add to wazuh_client.py
+
+def create_anomaly_detector(self, detector_config: dict) -> str:
+    """
+    Create an OpenSearch anomaly detector.
+    Returns the detector_id.
+    
+    Example:
+        detector_id = client.create_anomaly_detector(FAILED_LOGINS_DETECTOR)
+    """
+    r = requests.post(
+        f"{self.indexer_url}/_plugins/_anomaly_detection/detectors",
+        auth=(self.indexer_user, self.indexer_pass),
+        json=detector_config,
+        verify=self.verify,
+        timeout=15
+    )
+    r.raise_for_status()
+    detector_id = r.json()["_id"]
+    logger.info("Created anomaly detector %s", detector_id)
+    return detector_id
+
+def start_anomaly_detector(self, detector_id: str) -> None:
+    r = requests.post(
+        f"{self.indexer_url}/_plugins/_anomaly_detection/detectors/{detector_id}/_start",
+        auth=(self.indexer_user, self.indexer_pass),
+        verify=self.verify,
+        timeout=15
+    )
+    r.raise_for_status()
+    logger.info("Started anomaly detector %s", detector_id)
+
+def stop_anomaly_detector(self, detector_id: str) -> None:
+    r = requests.post(
+        f"{self.indexer_url}/_plugins/_anomaly_detection/detectors/{detector_id}/_stop",
+        auth=(self.indexer_user, self.indexer_pass),
+        verify=self.verify,
+        timeout=15
+    )
+    r.raise_for_status()
+
+def get_anomaly_results(self, detector_id: str, limit: int = 50) -> list:
+    """Fetch recent anomaly results for a detector."""
+    r = requests.post(
+        f"{self.indexer_url}/_plugins/_anomaly_detection/detectors/{detector_id}/results/_search",
+        auth=(self.indexer_user, self.indexer_pass),
+        json={
+            "size": limit,
+            "sort": [{"data_start_time": {"order": "desc"}}],
+            "query": {
+                "range": {"anomaly_grade": {"gt": 0}}  # only actual anomalies
+            }
+        },
+        verify=self.verify,
+        timeout=15
+    )
+    r.raise_for_status()
+    hits = r.json().get("hits", {}).get("hits", [])
+    return [hit["_source"] for hit in hits]
+
+def list_anomaly_detectors(self) -> list:
+    r = requests.post(
+        f"{self.indexer_url}/_plugins/_anomaly_detection/detectors/_search",
+        auth=(self.indexer_user, self.indexer_pass),
+        json={"size": 50, "query": {"match_all": {}}},
+        verify=self.verify,
+        timeout=15
+    )
+    r.raise_for_status()
+    hits = r.json().get("hits", {}).get("hits", [])
+    return [{"id": h["_id"], **h["_source"]} for h in hits]
 
 if __name__ == "__main__":
     test_connection()

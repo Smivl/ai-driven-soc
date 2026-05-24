@@ -70,11 +70,12 @@ def score_to_label(score :int) -> Severity:
 def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
     """ Score a SOCevent using the trained model — updates severity, label and status """
     features = pd.DataFrame([{
-        "wazuh_level":   event.wazuh_level,
-        "source_ip_security":   source_ip_security(event.source_ip, blacklist),
-        "destination_ip_security":   destination_ip_security(event.destination_ip),
-        "port_security": port_security(event.port),
-    }])
+    "wazuh_level": event.wazuh_level,
+    "source_ip_security": source_ip_security(event.source_ip, blacklist),
+    "destination_ip_security": destination_ip_security(event.destination_ip),
+    "port_security": port_security(event.port),
+    "mitre_risk": mitre_risk_score(event.mitre_id),
+}])
 
     raw_score = model.predict(features)[0]
 
@@ -84,6 +85,40 @@ def score_event(model, blacklist: set, event: SOCevent) -> SOCevent:
 
     return event
 
+#=========================== MITRE feature  ==========================
+
+HIGH_RISK_MITRE = {
+    "T1486",  # Data Encrypted for Impact
+    "T1059",  # Command and Scripting Interpreter
+    "T1105",  # Ingress Tool Transfer
+    "T1078",  # Valid Accounts
+    "T1190",  # Exploit Public-Facing Application
+}
+
+MEDIUM_RISK_MITRE = {
+    "T1110",  # Brute Force
+    "T1021",  # Remote Services
+    "T1046",  # Network Service Scanning
+}
+
+def mitre_risk_score(mitre_ids: list | None) -> int:
+    """
+    Convert MITRE ATT&CK IDs into a numeric risk score.
+    """
+    if not mitre_ids:
+        return 0
+    score = 0
+
+    for mitre_id in mitre_ids:
+        if mitre_id in HIGH_RISK_MITRE:
+            score += 15
+        elif mitre_id in MEDIUM_RISK_MITRE:
+            score += 8
+        else:
+            score += 3
+
+    return min(score, 40)
+
 #=========================== Model Training  ==========================
 
 def events_to_dataframe(events: list[SOCevent], blacklist: set) -> pd.DataFrame:
@@ -91,12 +126,13 @@ def events_to_dataframe(events: list[SOCevent], blacklist: set) -> pd.DataFrame:
     rows = []
     for e in events:
         rows.append({
-            "wazuh_level":  e.wazuh_level,                                        # Scoring between 0-15
-            "source_ip_security":  source_ip_security(e.source_ip, blacklist),    # Scoring between 0-13
-            "destination_ip_security": destination_ip_security(e.destination_ip), # Scoring between 0-8
-            "port_security": port_security(e.port),                               # Scoring either 0 or 5
-            "severity":     e.severity,                                           # Scoring between 0-100 (target variable)
-        })
+    "wazuh_level": e.wazuh_level,
+    "source_ip_security": source_ip_security(e.source_ip, blacklist),
+    "destination_ip_security": destination_ip_security(e.destination_ip),
+    "port_security": port_security(e.port),
+    "mitre_risk": mitre_risk_score(e.mitre_id),
+    "severity": e.severity,
+})
     return pd.DataFrame(rows)
 
 
@@ -105,7 +141,15 @@ def train_model(blacklist: set) -> lgb.LGBMRegressor:
     events = temp_generate_data()
     df     = events_to_dataframe(events, blacklist)
 
-    X = df[["wazuh_level", "source_ip_security", "destination_ip_security", "port_security"]]
+    X = df[
+    [
+        "wazuh_level",
+        "source_ip_security",
+        "destination_ip_security",
+        "port_security",
+        "mitre_risk"
+    ]
+]
     y = df["severity"]
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -136,26 +180,42 @@ def temp_generate_data(n: int = 1000) -> list[SOCevent]:
         wazuh_level = int(np.random.randint(0, 16))
         source_ip          = f"{np.random.randint(1,255)}.{np.random.randint(0,255)}.{np.random.randint(0,255)}.{np.random.randint(1,255)}"
         destination_ip = f"{np.random.randint(1,255)}.{np.random.randint(0,255)}.{np.random.randint(0,255)}.{np.random.randint(1,255)}"
-        port        = int(np.random.randint(1, 65536))
+        port = int(np.random.randint(1, 65536))
+
+        possible_mitre = [
+            ["T1486"],
+            ["T1059"],
+            ["T1110"],
+            ["T1021"],
+            ["T1046"],
+            ["T1078"],
+            None
+        ]
+
+        mitre_ids = possible_mitre[np.random.randint(0, len(possible_mitre))]
+
+
 
         # Calculate severity — NOTE: not a real formula, just for synthetic training data
         severity = int(np.clip(
-            (wazuh_level / 15) * 60
-            + source_ip_security(source_ip, set()) * 2
-            + destination_ip_security(destination_ip) * 2
-            + port_security(port)
-            + np.random.uniform(-5, 5),
-            0, 100
-        ))
+    (wazuh_level / 15) * 50
+    + source_ip_security(source_ip, set()) * 2
+    + destination_ip_security(destination_ip) * 2
+    + port_security(port)
+    + mitre_risk_score(mitre_ids)
+    + np.random.uniform(-5, 5),
+    0, 100
+))
 
         events.append(SOCevent(
-            source_ip        = source_ip,
-            destination_ip   = destination_ip,
-            port             = port,
-            wazuh_level      = wazuh_level,
-            severity         = severity,
-            status            = PipelineStatus.PENDING,
-        ))
+    source_ip        = source_ip,
+    destination_ip   = destination_ip,
+    port             = port,
+    wazuh_level      = wazuh_level,
+    mitre_id         = mitre_ids,
+    severity         = severity,
+    status           = PipelineStatus.PENDING,
+))
 
     return events
 
@@ -173,16 +233,72 @@ def temp_test():
     model = train_model(blacklist)
 
     print("\n3. Scoring test events...")
+    
     test_events = [
-        SOCevent(source_ip="192.168.1.50",  destination_ip="10.0.0.1",    port=8080,  wazuh_level=3),   # internal, low,     web
-        SOCevent(source_ip="192.168.1.105", destination_ip="10.0.0.1",    port=22,    wazuh_level=8),   # internal, medium,  SSH
-        SOCevent(source_ip="45.33.32.156",  destination_ip="10.0.0.5",    port=443,   wazuh_level=10),  # external, medium,  HTTPS
-        SOCevent(source_ip="185.220.101.1", destination_ip="10.0.0.5",    port=22,    wazuh_level=14),  # external, high,    SSH known bad
-        SOCevent(source_ip="10.0.0.25",     destination_ip="10.0.0.20",   port=3306,  wazuh_level=6),   # internal, medium,  MySQL
-        SOCevent(source_ip="198.51.100.77", destination_ip="10.0.0.5",    port=80,    wazuh_level=5),   # external, low,     HTTP
-        SOCevent(source_ip="172.16.0.10",   destination_ip="10.0.0.1",    port=443,   wazuh_level=2),   # internal, low,     HTTPS
-        SOCevent(source_ip="91.108.4.1",    destination_ip="10.0.0.5",    port=22,    wazuh_level=12),  # external, high,    SSH
-    ]
+    SOCevent(
+        source_ip="192.168.1.50",
+        destination_ip="10.0.0.1",
+        port=8080,
+        wazuh_level=3,
+        mitre_id=["T1046"],   # Network Service Scanning
+    ),   # internal, low, web scan
+
+    SOCevent(
+        source_ip="192.168.1.105",
+        destination_ip="10.0.0.1",
+        port=22,
+        wazuh_level=8,
+        mitre_id=["T1021"],   # Remote Services
+    ),   # internal, medium, SSH lateral movement
+
+    SOCevent(
+        source_ip="45.33.32.156",
+        destination_ip="10.0.0.5",
+        port=443,
+        wazuh_level=10,
+        mitre_id=["T1190"],   # Exploit Public-Facing Application
+    ),   # external, medium, HTTPS exploit attempt
+
+    SOCevent(
+        source_ip="185.220.101.1",
+        destination_ip="10.0.0.5",
+        port=22,
+        wazuh_level=14,
+        mitre_id=["T1078", "T1059"],   # Valid Accounts + Command Execution
+    ),   # external, high, SSH known bad
+
+    SOCevent(
+        source_ip="10.0.0.25",
+        destination_ip="10.0.0.20",
+        port=3306,
+        wazuh_level=6,
+        mitre_id=["T1021"],   # Remote Services
+    ),   # internal, medium, MySQL access
+
+    SOCevent(
+        source_ip="198.51.100.77",
+        destination_ip="10.0.0.5",
+        port=80,
+        wazuh_level=5,
+        mitre_id=["T1046"],   # Network Scanning
+    ),   # external, low, HTTP recon
+
+    SOCevent(
+        source_ip="172.16.0.10",
+        destination_ip="10.0.0.1",
+        port=443,
+        wazuh_level=2,
+        mitre_id=None,
+    ),   # internal, low, normal HTTPS traffic
+
+    SOCevent(
+        source_ip="91.108.4.1",
+        destination_ip="10.0.0.5",
+        port=22,
+        wazuh_level=12,
+        mitre_id=["T1110", "T1078"],   # Brute Force + Valid Accounts
+    ),   # external, high, SSH brute force
+]
 
     print()
     print(f"  {'wazuh':<8} {'source ip':<18} {'destination ip':<18} {'port':<8} {'score':<8} {'label':<12} {'status'}")
