@@ -1,4 +1,4 @@
-# detectors/configs.py  ← portable, version-controllable
+# backend.ingestion.configs
 
 FAILED_LOGINS_DETECTOR = {
     "name": "failed-logins-anomaly",
