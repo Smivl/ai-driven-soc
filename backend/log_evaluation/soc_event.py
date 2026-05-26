@@ -1,6 +1,8 @@
 from dataclasses import dataclass, asdict
 from enum import Enum
 
+from log_evaluation.rule_individual import score_rules
+
 class Scoring(Enum):
     BENIGN     = "benign"
     SUSPICIOUS = "suspicious"
@@ -13,6 +15,12 @@ class PipelineStatus(Enum):
     SCORED     = "scored"     # ML has scored it
     EXPLAINED  = "explained"  # LLM has explained it
     RESOLVED   = "resolved"   # SOAR has handled it
+
+def score_to_label(score: int) -> Scoring:
+    if score < 15: return Scoring.BENIGN
+    if score < 35: return Scoring.SUSPICIOUS
+    if score < 60: return Scoring.MALICIOUS
+    return Scoring.CRITICAL
 
 @dataclass
 class SOCevent:
@@ -62,5 +70,12 @@ class SOCevent:
     def return_dict(self):
         d = asdict(self)
         return {k: (v.value if isinstance(v, Enum) else v) for k, v in d.items()}
+    
+    @staticmethod
+    def score_event(event, blacklist: set, torexitslist: set) -> None:
+        raw_score = score_rules(event, blacklist, torexitslist)
+        event.severity = min(int(raw_score), 100)
+        event.label = score_to_label(event.severity)
+        event.status = PipelineStatus.SCORED
     
                          

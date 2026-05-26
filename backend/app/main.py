@@ -11,7 +11,7 @@ from app.api.v1.events import router as events_router
 from ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
 from ingestion.wazuh_client import WazuhClient
 
-from log_evaluation.rule_sequence import load_and_train_sequence, ThreatEngine
+from log_evaluation.rule_sequence import ThreatEngine
 from log_evaluation.ml_category import load_and_train_category
 from log_evaluation.rule_individual import load_blacklist, load_tor_exits
 
@@ -27,9 +27,8 @@ async def lifespan(app: FastAPI):
 
     blacklist = load_blacklist()
     torexitslist = load_tor_exits()
+    # Load model to categorise log using ML
     category_vectorizer, category_model = load_and_train_category()
-
-    sequence_vectorizer, sequence_model = load_and_train_sequence()
 
     client = WazuhClient()
 
@@ -44,7 +43,7 @@ async def lifespan(app: FastAPI):
         ),
         threading.Thread(
             target=score_worker,
-            args=( threat_engine, sequence_vectorizer, sequence_model, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
+            args=( threat_engine, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
             daemon=True,
         ),
         threading.Thread(

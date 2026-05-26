@@ -6,7 +6,7 @@ from ingestion.explanation import generate_explanation
 from ingestion.normalizerfixed import normalize_wazuh_alert
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
-from log_evaluation.severity_scoring import score_event
+from log_evaluation.rule_sequence import ThreatEngine
 from app import state
 # Instant warning is raised when the individual scoring is over 70
 INDIVIDUAL_ALERT_THRESHOLD = 70
@@ -42,9 +42,7 @@ def ingest_worker(
 
 
 def score_worker(
-    threat_engine,
-    sequence_vectorizer, 
-    sequence_model,
+    threat_engine: ThreatEngine,
     blacklist: set,
     torexitslist: set,
     cache: dict,
@@ -64,17 +62,24 @@ def score_worker(
             if event is None:
                 continue
 
+            """
+               Using a ML version of the sequence attack detection, 
+               in order to find alerts rule-based detection cannot raise
+            """
+
             # ----- Score event  --------------------------------------------
-            score_event(event, blacklist, torexitslist)
-            
+            SOCevent.score_event(event, blacklist, torexitslist)
+
+            # Maybe if critical, we send over to explain worker, but also include in the sequence detection
 
             # ----- Put the event in sequence detection, also when warning is raised -----------------
-
+           threat_engine.add_event()
 
             # ----- Compare the ML Mitre to Wazuh Mitre -----------------
 
 
             # ----- Generate a alert object, either because severity score is really high or it is a sequence attack 
+
 
             # (----- Feedback loop for ML? -----------------)
 

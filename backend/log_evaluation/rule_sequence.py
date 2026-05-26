@@ -47,120 +47,8 @@ class Alert:
             f"  At      : {self.triggered_at.isoformat()}",
         ]
         return "\n".join(lines)
-
-
-# ── Engine ────────────────────────────────────────────────────────────────────
-
-class ThreatEngine:
-    def __init__(self):
-        # (ip, category) -> deque of timestamps
-        self._windows: dict[tuple, deque] = defaultdict(deque)
-        # track fired rules to avoid duplicate alerts in same window
-        self._fired= {}
-
-
-    def process(self, event: SOCevent) -> List[Alert]:
-        if not event.source_ip or not event.label or not event.timestamp:
-            return []
-
-        now = _parse_ts(event.timestamp)
-        ip  = event.source_ip
-        cat = event.label
-
-        # Push event into its window
-        self._windows[(ip, cat)].append(now)
-
-        alerts = []
-        for rule in RULES:
-            alert = self.check_rule(rule, ip, now)
-            alerts.append(alert)
-
-        return alerts
-
-    def check_rule(self, rule: dict, ip: str, now: datetime) -> Optional[Alert]:
-        window_s = rule["window_s"]
-        cutoff   = now - timedelta(seconds=window_s)
-        rule_key = (ip, rule["id"])
-
-        if "multi_category" in rule:
-            return self.check_multi_rule(rule, ip, now, cutoff, rule_key)
-        else:
-            return self.check_single_rule(rule, ip, now, cutoff, rule_key)
-
-    def check_single_rule(self, rule: dict, ip: str, now: datetime, cutoff: datetime, rule_key: tuple) -> Optional[Alert]:
-        cat       = rule["category"] # pulls the category it checking for now
-        threshold = rule["threshold"] # how many times this category must pass for a possible attack
-        dq        = self._windows[(ip, cat)]
-
-        # Trim stale events
-        while dq and dq[0][0] < cutoff:
-            dq.popleft()
-
-        # Count is simply how many events from this IP in this category are within the window
-        count = len(dq)
-
-        # Optional: port diversity guard
-        if "min_unique_ports" in rule:
-            # We don't track ports in the window here — that would need event storage.
-            # Simple heuristic: connection-failed bursts without port data still fire.
-            pass
-
-        if count < threshold:
-            return None
-
-        if rule_key in self._fired:
-            return None
-        
-        self._fired[rule_key] = now
-        return Alert(
-                    label=rule["label"],
-                    mitre=rule["mitre"],
-                    source_ip=ip,
-                    count=count,
-                    window_s=rule["window_s"],
-                    triggered_at=now,
-                )
-
-    def check_multi_rule(self, rule: dict, ip: str, now: datetime, cutoff: datetime, rule_key: tuple) -> Optional[Alert]:
-        total = 0
-
-        sequence_events = []
-        for cat, sub_threshold in rule["multi_category"].items():
-            dq = self._windows[(ip, cat)]
-            while dq and dq[0][0] < cutoff:
-                dq.popleft()
-            if len(dq) < sub_threshold:
-                return None
-            total += len(dq)
-            sequence_events.extend(ev for _, ev in dq)  # collect events
-
-        # sort by timestamp
-        sequence_events.sort(key=lambda e: e.timestamp)
-
-        return Alert(
-            label=rule["label"],
-            mitre=rule["mitre"],
-            source_ip=ip,
-            count=total,
-            window_s=rule["window_s"],
-            triggered_at=now,
-            sequence=sequence_events,
-        )
-
-
-# ── Timestamp parser ──────────────────────────────────────────────────────────
-
-def _parse_ts(ts) -> datetime:
-    if isinstance(ts, datetime):
-        return ts
-    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
-        try:
-            return datetime.strptime(ts, fmt)
-        except ValueError:
-            continue
-    raise ValueError(f"Cannot parse timestamp: {ts!r}")
-
-# ── Machine Learning part ──────────────────────────────────────────────────────────
+    
+# ── Machine Learning init ──────────────────────────────────────────────────────────
 
 def load_and_train_sequence(data_dir: str = "data"):
 
@@ -191,45 +79,87 @@ def load_and_train_sequence(data_dir: str = "data"):
 
     return vectorizer, model
 
-# ── Quick smoke test ──────────────────────────────────────────────────────────
 
-if __name__ == "__main__":
-    from datetime import datetime, timedelta
-    from backend.log_evaluation.soc_event import SOCevent
+# ── Engine ────────────────────────────────────────────────────────────────────
 
-    vectorizer, model = load_and_train_sequence()
+class ThreatEngine:
 
-    # Test sequences
-    test_cases = [
-        # Brute force — many auth failures
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed "
-        "authentication-failed authentication-failed authentication-failed ",
+    # different sliding windows to check for attacks
+    WINDOW_SECONDS = 60 * 30
+    MIN_EVENTS = 5 
 
-        # Exfiltration — file reads + network
-        "file-read file-read file-read file-read file-read file-read "
-        "file-read file-read network-traffic network-traffic network-traffic "
-        "network-traffic file-write file-write",
+    def __init__(self,vectorizer,model):
+        self.vectorizer = vectorizer
+        self.model = model
+        # ip -> deque of (timestamp, event) — one deque per IP, all windows share it
+        self.buffer: dict[str, deque] = defaultdict(deque)
 
-        # Benign
-        "authentication-success http-request-success file-read "
-        "connection-opened user-session-open process-info",
-    ]
 
-    for seq in test_cases:
-        X    = vectorizer.transform([seq])
-        X_df = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
-        probs = model.predict_proba(X_df)[0]
+    def add_event(self, event: SOCevent) -> List[Alert]:
+        if not event.source_ip or not event.label or not event.timestamp:
+            return []
 
-        print(f"Sequence: {seq[:60]}...")
-        for label, prob in sorted(zip(model.classes_, probs), key=lambda x: -x[1]):
-            bar = "█" * int(prob * 20)
-            print(f"  {label:<25} {prob:.0%}  {bar}")
-        print()
+        now = _parse_ts(event.timestamp)
+        ip  = event.source_ip
+
+        # Add to buffer
+        self.buffer[ip].append((now, event))
+
+        max_cutoff = now - timedelta(seconds=self.WINDOWS[-1]["seconds"])
+        while self.buffer[ip] and self.buffer[ip][0][0] < max_cutoff:
+            self.buffer[ip].popleft()
+
+        # Run ML on each window
+        alerts = []
+        
+        cutoff  = now - timedelta(WINDOW_SECONDS)
+        in_window = [e for ts, e in self.buffer[ip] if ts >= cutoff]
+
+            if len(in_window) < self.MIN_EVENTS:
+                continue   # not enough events yet
+
+            seq_text = " ".join(e.label for e in in_window if e.label)
+            ml_label, ml_conf = self._predict(seq_text)
+
+            if ml_label == "benign" or ml_conf < 0.70:
+                continue   # not confident enough
+
+            alerts.append(Alert(
+                label         = ml_label,
+                mitre         = "ML",
+                source_ip     = ip,
+                count         = len(in_window),
+                window_s      = window["seconds"],
+                triggered_at  = now,
+                sequence      = in_window,
+            ))
+
+        return alerts
+
+    def _predict(self, seq_text: str) -> tuple[str, float]:
+        X     = self.vectorizer.transform([seq_text])
+        X_df  = pd.DataFrame(X.toarray(), columns=self.vectorizer.get_feature_names_out())
+        probs = self.model.predict_proba(X_df)[0]
+        label = self.model.classes_[probs.argmax()]
+        conf  = float(probs.max())
+        return label, conf
+        
+
+        
+
+# ── Timestamp parser ──────────────────────────────────────────────────────────
+
+def _parse_ts(ts) -> datetime:
+    if isinstance(ts, datetime):
+        return ts
+    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+        try:
+            return datetime.strptime(ts, fmt)
+        except ValueError:
+            continue
+    raise ValueError(f"Cannot parse timestamp: {ts!r}")
+
+
 
     
 
