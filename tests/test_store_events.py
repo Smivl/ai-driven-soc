@@ -15,7 +15,7 @@ import os
 sys.path.insert(0, os.path.abspath("."))
 
 from backend.ingestion.wazuh_client import WazuhClient
-from backend.log_evaluation.soc_event import SOCevent, Scoring, PipelineStatus
+from backend.log_evaluation.classes.soc_event import SOCevent, Scoring, PipelineStatus
 
 # ── Fake data that mimics real OpenSearch responses and Events  ────────────────────────
 

@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import  List, Optional
 
-from backend.log_evaluation.soc_event import SOCevent
+from backend.log_evaluation.classes.soc_event import SOCevent
 from backend.log_evaluation.mitre_rules import RULES
 
 import pandas as pd
@@ -64,7 +64,10 @@ def load_and_train_sequence(data_dir: str = "data"):
         sequences, labels, test_size=0.2, random_state=42  # sequences not logs
     )
 
-    vectorizer = TfidfVectorizer(max_features=1000)
+    vectorizer = TfidfVectorizer(
+    max_features=5000,
+    ngram_range=(1,3)
+    )
     X_train_vec = vectorizer.fit_transform(X_train)
     X_test_vec  = vectorizer.transform(X_test)
 
@@ -85,7 +88,11 @@ def load_and_train_sequence(data_dir: str = "data"):
 class ThreatEngine:
 
     # different sliding windows to check for attacks
-    WINDOW_SECONDS = 60 * 30
+    WINDOWS = [
+        {"name": "fast",   "seconds": 30}, # half a minute
+        {"name": "medium", "seconds": 300}, # 5 min
+        {"name": "slow",   "seconds": 1800}, # 30 min
+    ]
     MIN_EVENTS = 5 
 
     def __init__(self,vectorizer,model):
@@ -96,7 +103,7 @@ class ThreatEngine:
 
 
     def add_event(self, event: SOCevent) -> List[Alert]:
-        if not event.source_ip or not event.label or not event.timestamp:
+        if not event.source_ip or not event.category or not event.timestamp:
             return []
 
         now = _parse_ts(event.timestamp)
@@ -111,14 +118,14 @@ class ThreatEngine:
 
         # Run ML on each window
         alerts = []
-        
-        cutoff  = now - timedelta(WINDOW_SECONDS)
-        in_window = [e for ts, e in self.buffer[ip] if ts >= cutoff]
+        for window in self.WINDOWS:
+            cutoff  = now - timedelta(seconds=window["seconds"])
+            in_window = [e for ts, e in self.buffer[ip] if ts >= cutoff]
 
             if len(in_window) < self.MIN_EVENTS:
                 continue   # not enough events yet
 
-            seq_text = " ".join(e.label for e in in_window if e.label)
+            seq_text = " ".join(e.category for e in in_window if e.category)
             ml_label, ml_conf = self._predict(seq_text)
 
             if ml_label == "benign" or ml_conf < 0.70:

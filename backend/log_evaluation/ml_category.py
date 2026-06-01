@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from backend.log_evaluation.soc_event import SOCevent
+from backend.log_evaluation.classes.soc_event import SOCevent
 
 ###### source .venv/bin/activate
 ##### python -m backend.log_evaluation.ML_scoring

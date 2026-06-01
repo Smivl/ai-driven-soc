@@ -1,5 +1,5 @@
 import requests
-from log_evaluation.soc_event import SOCevent
+from backend.log_evaluation.classes.soc_event import SOCevent
 
 
 OLLAMA_URL = "http://localhost:11434/api/generate"

@@ -6,7 +6,7 @@
 import ipaddress
 import requests
 
-from backend.log_evaluation.soc_event import SOCevent
+from backend.log_evaluation.classes.soc_event import SOCevent
 
 ###### source .venv/bin/activate
 ##### python -m backend.log_evaluation.rule_scoring

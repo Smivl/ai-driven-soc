@@ -14,7 +14,7 @@ import os
 import logging
 import uuid
 
-from backend.log_evaluation.soc_event import *
+from backend.log_evaluation.classes.soc_event import *
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically

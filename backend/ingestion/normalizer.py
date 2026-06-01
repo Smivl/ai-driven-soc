@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from log_evaluation.soc_event import SOCevent, PipelineStatus
+from backend.log_evaluation.classes.soc_event import SOCevent, PipelineStatus
 from log_evaluation.ml_category import categorise_score_log
 
 
@@ -50,8 +50,9 @@ _USER_PATTERNS = [
 ]
 
 
-def _parse_timestamp(log: str) -> str:
-    """Extract and normalise a timestamp from the raw log string."""
+from datetime import datetime, timezone
+
+def _parse_timestamp(log: str) -> datetime | None:
     for pattern, fmt in _TS_PATTERNS:
         m = pattern.search(log)
         if not m:
@@ -60,22 +61,28 @@ def _parse_timestamp(log: str) -> str:
             if fmt is None:
                 # Special multi-group cases
                 if pattern.pattern.startswith('date='):
-                    dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", '%Y-%m-%d %H:%M:%S')
+                    dt = datetime.strptime(
+                        f"{m.group(1)} {m.group(2)}",
+                        '%Y-%m-%d %H:%M:%S')
                 elif 'At' in pattern.pattern:
-                    dt = datetime.strptime(f"{m.group(2)} {m.group(1)}", '%d/%m/%Y %H:%M:%S')
+                    dt = datetime.strptime(
+                        f"{m.group(2)} {m.group(1)}",
+                        '%d/%m/%Y %H:%M:%S')
                 else:
                     continue
             else:
                 raw = m.group(1)
                 dt = datetime.strptime(raw, fmt)
+
                 # Syslog lines without a year default to the current year
                 if dt.year == 1900:
                     dt = dt.replace(year=datetime.now().year)
-            return dt.replace(tzinfo=timezone.utc).isoformat()
+
+            return dt.replace(tzinfo=timezone.utc)
         except ValueError:
             continue
-
-    return datetime.now(timezone.utc).isoformat()
+    return None
+ 
 
 
 def _parse_ips(log: str) -> tuple[str | None, str | None]:

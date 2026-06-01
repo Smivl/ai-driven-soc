@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
-from ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
-from ingestion.wazuh_client import WazuhClient
+from backend.ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
+from backend.ingestion.wazuh_client import WazuhClient
 
-from log_evaluation.rule_sequence import ThreatEngine
-from log_evaluation.ml_category import load_and_train_category
-from log_evaluation.rule_individual import load_blacklist, load_tor_exits
+from backend.log_evaluation.correlator import Correlator
+from backend.log_evaluation.ml_category import load_and_train_category
+from backend.log_evaluation.rule_individual import load_blacklist, load_tor_exits
 
 _stop = threading.Event()
 
@@ -27,12 +27,11 @@ async def lifespan(app: FastAPI):
 
     blacklist = load_blacklist()
     torexitslist = load_tor_exits()
-    # Load model to categorise log using ML
     category_vectorizer, category_model = load_and_train_category()
 
-    client = WazuhClient()
+    correlator = Correlator(active_alerts={})
 
-    threat_engine = ThreatEngine()
+    client = WazuhClient()
 
     _stop.clear()
     threads = [
@@ -43,7 +42,7 @@ async def lifespan(app: FastAPI):
         ),
         threading.Thread(
             target=score_worker,
-            args=( threat_engine, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
+            args=( correlator, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
             daemon=True,
         ),
         threading.Thread(

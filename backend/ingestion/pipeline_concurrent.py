@@ -2,11 +2,11 @@ import queue
 import threading
 import uuid
 
-from ingestion.explanation import generate_explanation
-from ingestion.normalizerfixed import normalize_wazuh_alert
-from ingestion.wazuh_client import WazuhClient
-from log_evaluation.log_dataclass import PipelineStatus, SOCevent
-from log_evaluation.rule_sequence import ThreatEngine
+from backend.ingestion.explanation import generate_explanation
+from backend.ingestion.normalizerfixed import normalize_wazuh_alert
+from backend.ingestion.wazuh_client import WazuhClient
+from backend.log_evaluation.log_dataclass import PipelineStatus, SOCevent
+from backend.log_evaluation.correlator import Correlator
 from app import state
 # Instant warning is raised when the individual scoring is over 70
 INDIVIDUAL_ALERT_THRESHOLD = 70
@@ -42,7 +42,7 @@ def ingest_worker(
 
 
 def score_worker(
-    threat_engine: ThreatEngine,
+    correlator: Correlator,
     blacklist: set,
     torexitslist: set,
     cache: dict,
@@ -62,26 +62,7 @@ def score_worker(
             if event is None:
                 continue
 
-            """
-               Using a ML version of the sequence attack detection, 
-               in order to find alerts rule-based detection cannot raise
-            """
-
-            # ----- Score event  --------------------------------------------
-            SOCevent.score_event(event, blacklist, torexitslist)
-
-            # Maybe if critical, we send over to explain worker, but also include in the sequence detection
-
-            # ----- Put the event in sequence detection, also when warning is raised -----------------
-           threat_engine.add_event()
-
-            # ----- Compare the ML Mitre to Wazuh Mitre -----------------
-
-
-            # ----- Generate a alert object, either because severity score is really high or it is a sequence attack 
-
-
-            # (----- Feedback loop for ML? -----------------)
+            
 
 
             state.upsert_event(event.return_dict()) # Instead of seperate logs, continue with the alerts for LLM

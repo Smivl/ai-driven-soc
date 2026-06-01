@@ -1,7 +1,12 @@
 from dataclasses import dataclass, asdict
 from enum import Enum
+import datetime
 
-from log_evaluation.rule_individual import score_rules
+
+""""
+    This class represents data from the seperate logs pulled from Wazuh. 
+    A log is normalised and put in this objects format.
+"""
 
 class Scoring(Enum):
     BENIGN     = "benign"
@@ -37,7 +42,7 @@ class SOCevent:
     port:           int   = None
     user:           str   = None
     event_type:     str   = None
-    timestamp:      str   = None
+    timestamp:      datetime   = None
     raw_log:        str   = None
 
     # ── From Wazuh ────────────────────────────────────
@@ -71,11 +76,5 @@ class SOCevent:
         d = asdict(self)
         return {k: (v.value if isinstance(v, Enum) else v) for k, v in d.items()}
     
-    @staticmethod
-    def score_event(event, blacklist: set, torexitslist: set) -> None:
-        raw_score = score_rules(event, blacklist, torexitslist)
-        event.severity = min(int(raw_score), 100)
-        event.label = score_to_label(event.severity)
-        event.status = PipelineStatus.SCORED
     
                          
