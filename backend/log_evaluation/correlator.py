@@ -8,55 +8,102 @@ from backend.log_evaluation.classes.soc_event import SOCevent
 ###### source .venv/bin/activate
 ##### python -m backend.log_evaluation.correlator
 
+MIN_SCORE = 65  # Minimum score threshold to bind an event to an existing alert
+
+
 @dataclass
 class Correlator: 
     # Primary index : alert_id -> Alert
     active_alerts: dict[str, Alert] = field(default_factory=dict)
 
-    # Secondary index : mitre_id -> set of alert_ids
+    # Secondary indexes : 
+    # mitre_id -> set of alert_ids
     mitre_index: dict[str, set[str]] = field(default_factory=dict)
-
-    # Tertiary index : source_ip -> set of alert_ids
+    # source_ip -> set of alert_ids
     source_ip_index: dict[str,set[str]] = field(default_factory=dict)
+    # user -> set of alert_ids
+    user_index: dict[str, set[str]] = field(default_factory=dict)
+    # destination_ip -> set of alert_ids
+    dest_ip_index: dict[str, set[str]] = field(default_factory=dict)
+
+    def correlation_score(self, alert: Alert, event: SOCevent) -> int:
+        score = 0
+
+        # Source IP check
+        if event.source_ip and alert.alert_id in self.source_ip_index.get(event.source_ip, set()):
+            score += 40
+        
+        # MITRE ID check 
+        if event.mitre_id:
+            for m_id in event.mitre_id:
+                if alert.alert_id in self.mitre_index.get(m_id, set()):
+                    score += 40
+                    break  
+        
+        # User Alignment (Optimized if you track alert.users set, otherwise using events list)
+        if event.user and alert.alert_id in self.user_index.get(event.user, set()):
+            score += 35
+        
+        # Destination IP check
+        if event.destination_ip and alert.alert_id in self.dest_ip_index.get(event.destination_ip, set()):
+            score += 15
+        
+        # Velocity/Frequency check
+        if event.frequency and alert.event_count > 0:
+            score += min(20, event.frequency * 5)
+
+        return score
 
     def correlate_event(self, event: SOCevent) -> Alert:
         event_mitre_ids = set(event.mitre_id) if event.mitre_id else set()
         
-        # All alert IDs that match the event's source IP
-        ip_matches = self._ip_to_alert_ids.get(event.source_ip, set())
-        
-        # All alert IDs that match ANY of the event's MITRE IDs
+        # Gather ALL potential matches across all dimensions
+        ip_matches = self.source_ip_index.get(event.source_ip, set())
         mitre_matches = set()
         for mitre_id in event_mitre_ids:
-            mitre_matches.update(self._mitre_to_alert_ids.get(mitre_id, set()))
-            
-        # Only check alerts that share BOTH the IP and at least one MITRE ID.
-        candidate_alert_ids = ip_matches.intersection(mitre_matches)
+            mitre_matches.update(self.mitre_index.get(mitre_id, set()))
+
+        user_matches = self.user_index.get(event.user, set()) if event.user else set()
+        dest_matches = self.dest_ip_index.get(event.destination_ip, set()) if event.destination_ip else set()
+
+        #  Get every alert that matches even ONE of these attributes
+        candidate_alert_ids = ip_matches.union(mitre_matches, user_matches, dest_matches)
         
+        best_alert = None
+        highest_score = MIN_SCORE  # Set your minimum score threshold to bind an event to an alert
+        
+        # Evaluate all potential candidate alerts
         for alert_id in candidate_alert_ids:
             alert = self.active_alerts[alert_id]
-            # Double check the intersection, then append
-            if event_mitre_ids.intersection(alert.mitre_id):
-                alert.add_event(event)
-                
-                # Update indexes because the alert might have gained new mitre_ids from this event
-                for mitre_id in event_mitre_ids:
-                    self._mitre_to_alert_ids[mitre_id].add(alert.alert_id)
-                return alert
+            score = self.correlation_score(alert, event)
+            
+            if score > highest_score:
+                highest_score = score
+                best_alert = alert
 
-        # If no matching alert is found, create a new one
+        # If we found a high-scoring matching alert, attach the event to it
+        if best_alert:
+            best_alert.add_event(event)
+            
+            # Update indexes because the alert might have adopted new traits from this event
+            if event.source_ip:
+                self.source_ip_index.setdefault(event.source_ip, set()).add(best_alert.alert_id)
+            for mitre_id in event_mitre_ids:
+                self.mitre_index.setdefault(mitre_id, set()).add(best_alert.alert_id)
+                
+            return best_alert
+
+        # If no alerts scored above the threshold create new alert
         alert = Alert.new_alert(event)
         
-        # Update Primary Index
+        # Update Indexes
         self.active_alerts[alert.alert_id] = alert
         
-        # Update IP Index
         if event.source_ip:
-            self._ip_to_alert_ids[event.source_ip].add(alert.alert_id)
+            self.source_ip_index.setdefault(event.source_ip, set()).add(alert.alert_id)
             
-        # Update MITRE Index
         for mitre_id in event_mitre_ids:
-            self._mitre_to_alert_ids[mitre_id].add(alert.alert_id)
+            self.mitre_index.setdefault(mitre_id, set()).add(alert.alert_id)
             
         return alert
     
@@ -86,6 +133,20 @@ class Correlator:
                     self._mitre_to_alert_ids[mitre_id].discard(alert_id)
                     if not self._mitre_to_alert_ids[mitre_id]:
                         del self._mitre_to_alert_ids[mitre_id]
+            
+            # Clean up DestIP index
+            for dest_ip in alert.destination_ips:
+                if dest_ip in self._dest_ip_to_alert_ids:
+                    self._dest_ip_to_alert_ids[dest_ip].discard(alert_id)
+                    if not self._dest_ip_to_alert_ids[dest_ip]:
+                        del self._dest_ip_to_alert_ids[dest_ip]
+            
+            # Clean up user index
+            for user in alert.users:
+                if user in self._user_to_alert_ids:
+                    self._user_to_alert_ids[user].discard(alert_id)
+                    if not self._user_to_alert_ids[user]:
+                        del self._user_to_alert_ids[user]
             
             # Clean up Primary Index
             del self.active_alerts[alert_id]
