@@ -12,8 +12,7 @@ from backend.ingestion.pipeline_concurrent import explain_worker, ingest_worker,
 from backend.ingestion.wazuh_client import WazuhClient
 
 from backend.log_evaluation.correlator import Correlator
-from backend.log_evaluation.ml_category import load_and_train_category
-from backend.log_evaluation.rule_individual import load_blacklist, load_tor_exits
+from backend.log_evaluation.classes.alert import load_blacklist, load_tor_exits, Alert
 
 _stop = threading.Event()
 
@@ -27,7 +26,6 @@ async def lifespan(app: FastAPI):
 
     blacklist = load_blacklist()
     torexitslist = load_tor_exits()
-    category_vectorizer, category_model = load_and_train_category()
 
     correlator = Correlator(active_alerts={})
 
@@ -37,17 +35,17 @@ async def lifespan(app: FastAPI):
     threads = [
         threading.Thread(
             target=ingest_worker,
-            args=(category_model, category_vectorizer, client, cache, cache_lock, pq12, _stop),
+            args=(client, cache, cache_lock, pq12, _stop),
             daemon=True,
         ),
         threading.Thread(
             target=score_worker,
-            args=( correlator, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
+            args=( client, correlator, blacklist, torexitslist, cache, cache_lock, pq12, pq23, _stop),
             daemon=True,
         ),
         threading.Thread(
             target=explain_worker,
-            args=(cache, cache_lock, pq23, _stop),
+            args=( client, correlator, cache, cache_lock, pq23, _stop),
             daemon=True,
         ),
     ]

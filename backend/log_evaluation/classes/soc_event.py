@@ -54,11 +54,9 @@ class SOCevent:
     mitre_tactic:   list    = None
     mitre_technique:list    = None
 
-    # ── From category ML ───────────────────────────────
-    category:       str = None
 
     # ── From severity ML ───────────────────────────────
-    severity:       int   = None   # 0-100
+    severity:       int   = None   
     label:          str   = None   
 
     # ── From LLM ─────────────────────────────────────
@@ -66,6 +64,7 @@ class SOCevent:
 
     # ── Pipeline tracking ─────────────────────────────
     event_id:        str             = None
+    alert_id:        str             = None
     status:          PipelineStatus   = PipelineStatus.PENDING   # pending -> normalized -> scored -> explained
 
     # Obtain any of the information stored in the class from a log

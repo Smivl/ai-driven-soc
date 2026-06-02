@@ -144,6 +144,10 @@ class Alert:
 
     status: str = "active"
 
+    score: int = None 
+
+    explanation: str = None
+
     @classmethod
     def new_alert(cls, event: SOCevent):
         now = event.timestamp if event.timestamp else datetime.now()
@@ -212,13 +216,18 @@ class Alert:
         if self.first_seen and 0 <= self.first_seen.hour < 4:
             raw_score += 15
 
-        # Micro Evidence (Max child signature score)
         if self.events:
-            max_child_score = max(score_rules(e, blacklist, tor_exits) for e in self.events)
-            raw_score += max_child_score
+                # Look up event.severity directly—no expensive functions or loops!
+                highest_event_score = max(e.severity for e in self.events if e.severity is not None)
+                
+                # Factor in volume: add 1 point per additional event, capped at 40
+                volume_bonus = min(40, (len(self.events) - 1))
+                
+                raw_score += (highest_event_score + volume_bonus)
 
         # TRANSFORM TO 0-100 SCALE
         
         normalized_score = int((raw_score / MAX_RAW_RATING) * 100)
         
-        return min(100, max(0, normalized_score))
+        self.score = min(100, max(0, normalized_score))
+        return self.score

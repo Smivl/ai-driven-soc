@@ -120,7 +120,7 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
         "raw":             row,         # original CSV row preserved
     }
 
-def normalize_wazuh_alert(category_model,category_vectorizer,alert: dict) -> SOCevent:
+def normalize_wazuh_alert(alert: dict) -> SOCevent:
     """Normalize a raw Wazuh alert into a SOCEvent dataclass."""
     rule     = alert.get("rule", {})
     data     = alert.get("data", {})
@@ -159,10 +159,6 @@ def normalize_wazuh_alert(category_model,category_vectorizer,alert: dict) -> SOC
         # Pipeline status
         status         = PipelineStatus.NORMALIZED
     )
-    # Let ML model categorise the event for sequence detection 
-    probs = categorise_score_log(event, category_vectorizer, category_model)
-    predicted_label = category_model.classes_[probs.argmax()]
-    event.category = predicted_label
 
     return event
 
