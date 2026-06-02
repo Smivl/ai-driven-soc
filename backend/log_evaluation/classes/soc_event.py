@@ -9,11 +9,6 @@ import ipaddress
     A log is normalised and put in this objects format.
 """
 
-class Scoring(Enum):
-    BENIGN     = "benign"
-    SUSPICIOUS = "suspicious"
-    MALICIOUS  = "malicious"
-    CRITICAL   = "critical"
 
 class PipelineStatus(Enum):
     PENDING    = "pending"
@@ -21,12 +16,6 @@ class PipelineStatus(Enum):
     SCORED     = "scored"     # ML has scored it
     EXPLAINED  = "explained"  # LLM has explained it
     RESOLVED   = "resolved"   # SOAR has handled it
-
-def score_to_label(score: int) -> Scoring:
-    if score < 15: return Scoring.BENIGN
-    if score < 35: return Scoring.SUSPICIOUS
-    if score < 60: return Scoring.MALICIOUS
-    return Scoring.CRITICAL
 
 # ── Individual scoring ──────────────────────────────────────────────────────────
 
@@ -81,16 +70,6 @@ def keyword_score(raw_log: str) -> int:
         score += 10
     return score
 
-def score_rules(event: SOCevent, blacklist: set[str], tor_exits: set[str]) -> int:
-    """Score a individual SOCevent using signature rules and intelligence matrices."""
-    return (
-        wazuh_rule_score(event.wazuh_level or 0)
-        + source_ip_score(event.source_ip or "", blacklist, tor_exits)
-        + destination_ip_score(event.destination_ip or "")
-        + port_score(event.port or 0)
-        + keyword_score(event.raw_log)
-    )
-
 @dataclass
 class SOCevent:
     """
@@ -110,7 +89,7 @@ class SOCevent:
     raw_log:        str   = None
 
     # ── From Wazuh ────────────────────────────────────
-    wazuh_level:    Scoring = None
+    wazuh_level:    int     = None
     rule_id:        str     = None
     frequency:      int     = None
     timeframe:      int     = None

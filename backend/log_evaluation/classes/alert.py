@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import requests
-import ipaddress
 
 from backend.log_evaluation.classes.soc_event import SOCevent
 
 import datetime
+import uuid
 
 """"
     This class represents a correlated object that is shown in the UI.
@@ -15,12 +15,8 @@ import datetime
         - Calculating overall threat score based on the events and external intelligence
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-import uuid
-
- # We define 200 raw points as a catastrophic
-MAX_RAW_RATING = 200
+# We define 220 raw points as a catastrophic
+MAX_RAW_RATING = 220
 
 # ── Threat lists  ──────────────────────────────────────────────────────────
 
@@ -131,7 +127,7 @@ class Alert:
         self.mitre_tactic.update(event.mitre_tactic or [])
         self.mitre_technique.update(event.mitre_technique or [])
     
-    def score(self, blacklist: set[str], tor_exits: set[str]) -> int:
+    def compute_score(self, blacklist: set[str], tor_exits: set[str]) -> int:
         """
         Calculates the normalized threat score from 0 to 100 for the UI.
         """

@@ -77,7 +77,7 @@ class Correlator:
             alert = self.active_alerts[alert_id]
             score = self.correlation_score(alert, event)
             
-            if score > highest_score:
+            if score >= highest_score:
                 highest_score = score
                 best_alert = alert
 
@@ -126,36 +126,36 @@ class Correlator:
             
             # Clean up IP index
             for ip in alert.source_ips:
-                if ip in self._ip_to_alert_ids:
-                    self._ip_to_alert_ids[ip].discard(alert_id)
-                    if not self._ip_to_alert_ids[ip]:
-                        del self._ip_to_alert_ids[ip]
+                if ip in self.source_ip_index:
+                    self.source_ip_index[ip].discard(alert_id)
+                    if not self.source_ip_index[ip]:
+                        del self.source_ip_index[ip]
                         
             # Clean up MITRE index
             for mitre_id in alert.mitre_id:
-                if mitre_id in self._mitre_to_alert_ids:
-                    self._mitre_to_alert_ids[mitre_id].discard(alert_id)
-                    if not self._mitre_to_alert_ids[mitre_id]:
-                        del self._mitre_to_alert_ids[mitre_id]
+                if mitre_id in self.mitre_index:
+                    self.mitre_index[mitre_id].discard(alert_id)
+                    if not self.mitre_index[mitre_id]:
+                        del self.mitre_index[mitre_id]
             
             # Clean up DestIP index
             for dest_ip in alert.destination_ips:
-                if dest_ip in self._dest_ip_to_alert_ids:
-                    self._dest_ip_to_alert_ids[dest_ip].discard(alert_id)
-                    if not self._dest_ip_to_alert_ids[dest_ip]:
-                        del self._dest_ip_to_alert_ids[dest_ip]
+                if dest_ip in self.destination_ip_index:
+                    self.destination_ip_index[dest_ip].discard(alert_id)
+                    if not self.destination_ip_index[dest_ip]:
+                        del self.destination_ip_index[dest_ip]
             
             # Clean up user index
             for user in alert.users:
-                if user in self._user_to_alert_ids:
-                    self._user_to_alert_ids[user].discard(alert_id)
-                    if not self._user_to_alert_ids[user]:
-                        del self._user_to_alert_ids[user]
+                if user in self.user_index:
+                    self.user_index[user].discard(alert_id)
+                    if not self.user_index[user]:
+                        del self.user_index[user]
             
             # Clean up Primary Index
             del self.active_alerts[alert_id]
             
         return expired_alerts
 
-    def return_active_alerts(self) -> set[Alert]:
-            return set(self.active_alerts.values())
+    def return_active_alerts(self) -> list[Alert]:
+        return list(self.active_alerts.values())

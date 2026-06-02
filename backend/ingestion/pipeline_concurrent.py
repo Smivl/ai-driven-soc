@@ -73,7 +73,7 @@ def score_worker(
             assigned_alert: Alert = correlator.correlate_event(event)
 
             # Calculate the live aggregate 0-100 severity UI score for the Alert
-            ui_severity_score = assigned_alert.score(blacklist, torexitslist)
+            ui_severity_score = assigned_alert.compute_score(blacklist, torexitslist)
 
             client.update_soc_event( # Update the individual SOCevent with its severity score and assigned Alert ID 
                 doc_id=event.event_id,
