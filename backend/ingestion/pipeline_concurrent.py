@@ -90,7 +90,13 @@ def score_worker(
             # Periodically handle alert timeouts and status updates in correlator
             now = datetime.datetime.now()
             timeout_delta = datetime.timedelta(minutes=30)
-            correlator.update_alerts(current_time=now, alert_timeout=timeout_delta)
+            expired_alerts = correlator.update_alerts(current_time=now, alert_timeout=timeout_delta)
+
+            for alert in expired_alerts:
+                # Update status to cold/archived
+                alert.status = "archived" 
+                client.store_soc_alert(alert) 
+                print(f"[Archive] Alert {alert.alert_id} expired from memory and committed to OpenSearch.")
 
             #  Pass the Alert ID forward to the LLM Explainer instead of single logs
             pq23.put((-ui_severity_score, assigned_alert.alert_id))
