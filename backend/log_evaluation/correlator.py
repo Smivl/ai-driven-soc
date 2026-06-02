@@ -90,6 +90,10 @@ class Correlator:
                 self.source_ip_index.setdefault(event.source_ip, set()).add(best_alert.alert_id)
             for mitre_id in event_mitre_ids:
                 self.mitre_index.setdefault(mitre_id, set()).add(best_alert.alert_id)
+            for user in best_alert.users:
+                self.user_index.setdefault(user, set()).add(best_alert.alert_id)
+            for dest_ip in best_alert.destination_ips:
+                self.dest_ip_index.setdefault(dest_ip, set()).add(best_alert.alert_id)
                 
             return best_alert
 
