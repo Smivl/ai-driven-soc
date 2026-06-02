@@ -60,69 +60,6 @@ def load_tor_exits() -> set[str]:
         return set()
 
 
-# ── Individual scoring ──────────────────────────────────────────────────────────
-
-def wazuh_rule_score(level: int) -> int:
-    if level >= 12: return 30
-    if level >= 8:  return 20
-    if level >= 4:  return 10
-    return 0
-
-def source_ip_score(ip: str, blacklist: set[str], tor_exits: set[str]) -> int:
-    if not ip:
-        return 0
-    try:
-        is_private = ipaddress.ip_address(ip).is_private
-    except ValueError:
-        is_private = False
-        
-    return (
-        int(ip in blacklist)    * 40 +  # known malicious — hard boost
-        int(ip in tor_exits)    * 15 +  # anonymization
-        int(not is_private)     * 5     # external IP
-    )
-
-def destination_ip_score(ip: str) -> int:
-    if not ip:
-        return 0
-    try:
-        is_private = ipaddress.ip_address(ip).is_private
-    except ValueError:
-        is_private = False
-    is_core = ip.startswith("10.0.0.") or ip.startswith("192.168.1.1")
-    return int(is_private) * 3 + int(is_core) * 5
-
-def port_score(port: int) -> int:
-    sensitive_ports = {22, 23, 3306, 5432, 6379, 27017}  # SSH, Telnet, DBs
-    common_ports    = {80, 443, 8080}
-    if port in sensitive_ports: return 10
-    if port in common_ports:    return 3
-    return 0
-
-def keyword_score(raw_log: str) -> int:
-    """Boost score for known-bad keywords in the raw log text."""
-    log = raw_log.lower() if raw_log else ""
-    score = 0
-    if any(kw in log for kw in ["malware", "trojan", "ransomware", "virus", "rootkit", "backdoor"]):
-        score += 50
-    if any(kw in log for kw in ["failed password", "authentication failure", "invalid user"]):
-        score += 15
-    if any(kw in log for kw in ["privilege escalation", "sudo", "root"]):
-        score += 20
-    if any(kw in log for kw in ["deleted", "removed", "dropped"]):
-        score += 10
-    return score
-
-def score_rules(event: SOCevent, blacklist: set[str], tor_exits: set[str]) -> int:
-    """Score a individual SOCevent using signature rules and intelligence matrices."""
-    return (
-        wazuh_rule_score(event.wazuh_level or 0)
-        + source_ip_score(event.source_ip or "", blacklist, tor_exits)
-        + destination_ip_score(event.destination_ip or "")
-        + port_score(event.port or 0)
-        + keyword_score(event.raw_log)
-    )
-
 # ── Alert ──────────────────────────────────────────────────────────
 @dataclass
 class Alert:

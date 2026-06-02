@@ -67,8 +67,7 @@ def score_worker(
                 continue
 
             # Run the static rules on the individual log
-            event_static_score = score_rules(event, blacklist, torexitslist)
-            event.severity = event_static_score
+            event.score_rules(blacklist, torexitslist)
 
             # Correlate the event into an Alert 
             assigned_alert: Alert = correlator.correlate_event(event)
