@@ -9,7 +9,6 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.log_evaluation.classes.soc_event import SOCevent, PipelineStatus
-from log_evaluation.ml_category import categorise_score_log
 
 
 
@@ -141,7 +140,7 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
         # From the raw log
         source_ip      = src_ip,
         destination_ip = dst_ip or alert.get("agent", {}).get("ip"),
-        port           = int(data.get("dstport", 0)) or None,
+        port           = int(p) if (p := data.get("dstport", "").strip()) and p.isdigit() else None,
         user           = _parse_user(full_log) if full_log else None,
         event_type     = rule.get("groups", ["unknown"])[0],
         timestamp      = alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),

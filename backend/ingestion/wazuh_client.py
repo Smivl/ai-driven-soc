@@ -178,7 +178,7 @@ class WazuhClient:
 
         # Serialize any Enum values that might be passed in
         for key, val in patch.items():
-            if isinstance(val, (Scoring, PipelineStatus)):
+            if isinstance(val, ( PipelineStatus)):
                 patch[key] = val.value
 
         r = requests.post(
@@ -196,7 +196,6 @@ class WazuhClient:
         """Rebuild a SOCevent from a raw OpenSearch _source dict"""
 
         # Convert string values back to Enums safely
-        raw_level  = source.get("wazuh_level")
         raw_status = source.get("status")
 
         return SOCevent(
@@ -207,7 +206,7 @@ class WazuhClient:
             event_type     = source.get("event_type"),
             timestamp      = source.get("timestamp"),
             raw_log        = source.get("raw_log"),
-            wazuh_level    = Scoring(raw_level)         if raw_level  else None,
+            wazuh_level    = source.get("wazuh_level"),
             rule_id        = source.get("rule_id"),
             severity       = source.get("severity"),
             label          = source.get("label"),
