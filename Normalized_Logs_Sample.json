@@ -1,0 +1,3152 @@
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923439+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "146.130.242.194",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 146.130.242.194 port 26023 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 146.130.242.194 port 26023 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923447+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "116.201.105.78",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 116.201.105.78 port 63906 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 116.201.105.78 port 63906 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923455+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "165.210.116.112",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 165.210.116.112 port 12297 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 165.210.116.112 port 12297 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923463+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "210.59.207.132",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 210.59.207.132 port 48196 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 210.59.207.132 port 48196 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923470+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "72.230.108.146",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 72.230.108.146 port 7182 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 72.230.108.146 port 7182 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923478+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "64.85.222.31",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 64.85.222.31 port 36206 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 64.85.222.31 port 36206 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923486+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "214.85.186.149",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 214.85.186.149 port 14512 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 214.85.186.149 port 14512 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923494+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "46.108.248.59",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 46.108.248.59 port 35646 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 46.108.248.59 port 35646 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923502+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "135.220.71.151",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 135.220.71.151 port 51920 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 135.220.71.151 port 51920 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923510+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "74.176.40.227",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 74.176.40.227 port 57079 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 74.176.40.227 port 57079 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923517+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "80.20.210.187",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 80.20.210.187 port 18223 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 80.20.210.187 port 18223 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923527+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "96.164.82.211",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 96.164.82.211 port 1825 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 96.164.82.211 port 1825 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923535+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "213.200.221.237",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 213.200.221.237 port 45594 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 213.200.221.237 port 45594 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923542+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "14.103.145.138",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 14.103.145.138 port 9834 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 14.103.145.138 port 9834 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923550+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "73.145.33.231",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 73.145.33.231 port 38619 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 73.145.33.231 port 38619 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923559+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "9.194.253.167",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 9.194.253.167 port 56772 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 9.194.253.167 port 56772 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923569+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "84.211.206.26",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 84.211.206.26 port 35448 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 84.211.206.26 port 35448 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923577+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "141.155.58.7",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 141.155.58.7 port 37753 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 141.155.58.7 port 37753 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923585+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "20.149.240.34",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 20.149.240.34 port 43048 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 20.149.240.34 port 43048 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923594+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "13.97.58.149",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 13.97.58.149 port 41203 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 13.97.58.149 port 41203 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923602+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "16.128.157.167",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 16.128.157.167 port 3045 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 16.128.157.167 port 3045 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923610+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "7.243.193.30",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 7.243.193.30 port 10545 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 7.243.193.30 port 10545 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-07T07:01:17.923617+00:00",
+    "event_type": "authentication-failed",
+    "source_ip": "49.110.173.253",
+    "destination_ip": null,
+    "user": "root",
+    "severity": 0,
+    "message": "Failed password for root from 49.110.173.253 port 10841 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-failed",
+      "log": "Failed password for root from 49.110.173.253 port 10841 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-20T13:44:54+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "205.246.209.37",
+    "destination_ip": null,
+    "user": "kenneth99",
+    "severity": 0,
+    "message": "Mar 20 13:44:54 person sshd[3290]: Accepted password for kenneth99 from 205.246.209.37 port 53875 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 20 13:44:54 person sshd[3290]: Accepted password for kenneth99 from 205.246.209.37 port 53875 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-05T15:10:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "129.131.5.121",
+    "destination_ip": null,
+    "user": "jo49",
+    "severity": 0,
+    "message": "Mar 05 15:10:59 modern sshd[9599]: Accepted password for jo49 from 129.131.5.121 port 16519 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 05 15:10:59 modern sshd[9599]: Accepted password for jo49 from 129.131.5.121 port 16519 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-14T12:22:39+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "129.238.39.92",
+    "destination_ip": null,
+    "user": "angelafinley",
+    "severity": 0,
+    "message": "Oct 14 12:22:39 price sshd[1542]: Accepted password for angelafinley from 129.238.39.92 port 7621 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 14 12:22:39 price sshd[1542]: Accepted password for angelafinley from 129.238.39.92 port 7621 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-09T07:17:11+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "135.97.88.152",
+    "destination_ip": null,
+    "user": "kelsey97",
+    "severity": 0,
+    "message": "Aug 09 07:17:11 person sshd[1282]: Accepted password for kelsey97 from 135.97.88.152 port 45200 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 09 07:17:11 person sshd[1282]: Accepted password for kelsey97 from 135.97.88.152 port 45200 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-27T18:02:14+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "117.111.236.17",
+    "destination_ip": null,
+    "user": "ecarpenter",
+    "severity": 0,
+    "message": "Nov 27 18:02:14 serve sshd[9942]: Accepted password for ecarpenter from 117.111.236.17 port 27117 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 27 18:02:14 serve sshd[9942]: Accepted password for ecarpenter from 117.111.236.17 port 27117 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-23T18:25:03+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "27.97.152.20",
+    "destination_ip": null,
+    "user": "carolyn38",
+    "severity": 0,
+    "message": "Sep 23 18:25:03 policy sshd[1839]: Accepted password for carolyn38 from 27.97.152.20 port 32936 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 23 18:25:03 policy sshd[1839]: Accepted password for carolyn38 from 27.97.152.20 port 32936 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-07-14T02:31:42+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "109.157.103.155",
+    "destination_ip": null,
+    "user": "thompsonmegan",
+    "severity": 0,
+    "message": "Jul 14 02:31:42 each sshd[7635]: Accepted password for thompsonmegan from 109.157.103.155 port 6504 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 14 02:31:42 each sshd[7635]: Accepted password for thompsonmegan from 109.157.103.155 port 6504 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-19T07:11:36+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "86.127.26.146",
+    "destination_ip": null,
+    "user": "andrewreyes",
+    "severity": 0,
+    "message": "Feb 19 07:11:36 continue sshd[2932]: Accepted password for andrewreyes from 86.127.26.146 port 29847 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 19 07:11:36 continue sshd[2932]: Accepted password for andrewreyes from 86.127.26.146 port 29847 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-01T15:03:34+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "155.113.166.245",
+    "destination_ip": null,
+    "user": "gmeyer",
+    "severity": 0,
+    "message": "Nov 01 15:03:34 kid sshd[3413]: Accepted password for gmeyer from 155.113.166.245 port 47636 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 01 15:03:34 kid sshd[3413]: Accepted password for gmeyer from 155.113.166.245 port 47636 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-05T19:42:06+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "13.78.6.70",
+    "destination_ip": null,
+    "user": "ltran",
+    "severity": 0,
+    "message": "Aug 05 19:42:06 test sshd[6802]: Accepted password for ltran from 13.78.6.70 port 21748 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 05 19:42:06 test sshd[6802]: Accepted password for ltran from 13.78.6.70 port 21748 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-04-23T17:04:28+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "63.56.36.171",
+    "destination_ip": null,
+    "user": "carlos30",
+    "severity": 0,
+    "message": "Apr 23 17:04:28 beyond sshd[7533]: Accepted password for carlos30 from 63.56.36.171 port 35456 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 23 17:04:28 beyond sshd[7533]: Accepted password for carlos30 from 63.56.36.171 port 35456 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-12T15:16:54+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "98.48.5.172",
+    "destination_ip": null,
+    "user": "alejandracurry",
+    "severity": 0,
+    "message": "Dec 12 15:16:54 recognize sshd[2444]: Accepted password for alejandracurry from 98.48.5.172 port 3530 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 12 15:16:54 recognize sshd[2444]: Accepted password for alejandracurry from 98.48.5.172 port 3530 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-04-09T22:21:22+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "170.227.95.158",
+    "destination_ip": null,
+    "user": "michael87",
+    "severity": 0,
+    "message": "Apr 09 22:21:22 something sshd[6285]: Accepted password for michael87 from 170.227.95.158 port 23751 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 09 22:21:22 something sshd[6285]: Accepted password for michael87 from 170.227.95.158 port 23751 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-11T21:09:48+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "12.215.209.224",
+    "destination_ip": null,
+    "user": "jonathanvega",
+    "severity": 0,
+    "message": "Mar 11 21:09:48 thousand sshd[1806]: Accepted password for jonathanvega from 12.215.209.224 port 20469 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 11 21:09:48 thousand sshd[1806]: Accepted password for jonathanvega from 12.215.209.224 port 20469 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-10T05:34:23+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "210.156.54.237",
+    "destination_ip": null,
+    "user": "tina54",
+    "severity": 0,
+    "message": "Sep 10 05:34:23 fund sshd[1818]: Accepted password for tina54 from 210.156.54.237 port 4805 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 10 05:34:23 fund sshd[1818]: Accepted password for tina54 from 210.156.54.237 port 4805 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-23T20:54:03+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "5.156.201.164",
+    "destination_ip": null,
+    "user": "jessicamitchell",
+    "severity": 0,
+    "message": "Mar 23 20:54:03 argue sshd[3526]: Accepted password for jessicamitchell from 5.156.201.164 port 4728 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 23 20:54:03 argue sshd[3526]: Accepted password for jessicamitchell from 5.156.201.164 port 4728 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-17T08:41:07+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "132.244.235.236",
+    "destination_ip": null,
+    "user": "catherine14",
+    "severity": 0,
+    "message": "May 17 08:41:07 push sshd[3242]: Accepted password for catherine14 from 132.244.235.236 port 61858 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 17 08:41:07 push sshd[3242]: Accepted password for catherine14 from 132.244.235.236 port 61858 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-03T00:16:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "73.26.137.252",
+    "destination_ip": null,
+    "user": "brittany03",
+    "severity": 0,
+    "message": "Aug 03 00:16:59 where sshd[3449]: Accepted password for brittany03 from 73.26.137.252 port 19244 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 03 00:16:59 where sshd[3449]: Accepted password for brittany03 from 73.26.137.252 port 19244 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-25T01:21:07+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "125.214.141.75",
+    "destination_ip": null,
+    "user": "joseph93",
+    "severity": 0,
+    "message": "Feb 25 01:21:07 business sshd[3897]: Accepted password for joseph93 from 125.214.141.75 port 11184 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 25 01:21:07 business sshd[3897]: Accepted password for joseph93 from 125.214.141.75 port 11184 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-15T01:01:02+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "103.62.68.98",
+    "destination_ip": null,
+    "user": "phuynh",
+    "severity": 0,
+    "message": "Aug 15 01:01:02 rise sshd[9956]: Accepted password for phuynh from 103.62.68.98 port 13250 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 15 01:01:02 rise sshd[9956]: Accepted password for phuynh from 103.62.68.98 port 13250 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-24T12:01:21+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "103.2.227.178",
+    "destination_ip": null,
+    "user": "ricardodean",
+    "severity": 0,
+    "message": "May 24 12:01:21 perhaps sshd[5538]: Accepted password for ricardodean from 103.2.227.178 port 6826 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 24 12:01:21 perhaps sshd[5538]: Accepted password for ricardodean from 103.2.227.178 port 6826 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-10T15:32:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "24.144.98.84",
+    "destination_ip": null,
+    "user": "ashleylee",
+    "severity": 0,
+    "message": "Aug 10 15:32:32 power sshd[9235]: Accepted password for ashleylee from 24.144.98.84 port 16938 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 10 15:32:32 power sshd[9235]: Accepted password for ashleylee from 24.144.98.84 port 16938 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-04-25T08:18:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "204.125.148.62",
+    "destination_ip": null,
+    "user": "kennethcontreras",
+    "severity": 0,
+    "message": "Apr 25 08:18:35 entire sshd[4784]: Accepted password for kennethcontreras from 204.125.148.62 port 12702 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 25 08:18:35 entire sshd[4784]: Accepted password for kennethcontreras from 204.125.148.62 port 12702 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-17T21:43:17+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "95.176.180.239",
+    "destination_ip": null,
+    "user": "victoriaprice",
+    "severity": 0,
+    "message": "Feb 17 21:43:17 talk sshd[5998]: Accepted password for victoriaprice from 95.176.180.239 port 15600 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 17 21:43:17 talk sshd[5998]: Accepted password for victoriaprice from 95.176.180.239 port 15600 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-01-18T21:08:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "12.12.203.188",
+    "destination_ip": null,
+    "user": "elizabethhardy",
+    "severity": 0,
+    "message": "Jan 18 21:08:35 idea sshd[6769]: Accepted password for elizabethhardy from 12.12.203.188 port 34034 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 18 21:08:35 idea sshd[6769]: Accepted password for elizabethhardy from 12.12.203.188 port 34034 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-19T09:14:36+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "131.6.61.75",
+    "destination_ip": null,
+    "user": "fsheppard",
+    "severity": 0,
+    "message": "Oct 19 09:14:36 exactly sshd[3620]: Accepted password for fsheppard from 131.6.61.75 port 1925 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 19 09:14:36 exactly sshd[3620]: Accepted password for fsheppard from 131.6.61.75 port 1925 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-12T03:09:04+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "67.130.106.29",
+    "destination_ip": null,
+    "user": "gregorycollins",
+    "severity": 0,
+    "message": "Mar 12 03:09:04 former sshd[1122]: Accepted password for gregorycollins from 67.130.106.29 port 13705 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 12 03:09:04 former sshd[1122]: Accepted password for gregorycollins from 67.130.106.29 port 13705 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-01-23T22:13:27+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "137.248.247.198",
+    "destination_ip": null,
+    "user": "nicholas73",
+    "severity": 0,
+    "message": "Jan 23 22:13:27 deep sshd[9257]: Accepted password for nicholas73 from 137.248.247.198 port 24697 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 23 22:13:27 deep sshd[9257]: Accepted password for nicholas73 from 137.248.247.198 port 24697 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-04T08:27:02+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "112.128.35.35",
+    "destination_ip": null,
+    "user": "ashley95",
+    "severity": 0,
+    "message": "Sep 04 08:27:02 may sshd[6668]: Accepted password for ashley95 from 112.128.35.35 port 44218 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 04 08:27:02 may sshd[6668]: Accepted password for ashley95 from 112.128.35.35 port 44218 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T09:38:58+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "64.157.128.122",
+    "destination_ip": null,
+    "user": "robin23",
+    "severity": 0,
+    "message": "Sep 05 09:38:58 society sshd[7688]: Accepted password for robin23 from 64.157.128.122 port 40737 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 05 09:38:58 society sshd[7688]: Accepted password for robin23 from 64.157.128.122 port 40737 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-20T14:13:26+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "134.126.250.229",
+    "destination_ip": null,
+    "user": "davisjennifer",
+    "severity": 0,
+    "message": "May 20 14:13:26 main sshd[7257]: Accepted password for davisjennifer from 134.126.250.229 port 56529 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 20 14:13:26 main sshd[7257]: Accepted password for davisjennifer from 134.126.250.229 port 56529 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-02T11:18:14+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "86.126.191.39",
+    "destination_ip": null,
+    "user": "anthony06",
+    "severity": 0,
+    "message": "Dec 02 11:18:14 actually sshd[7775]: Accepted password for anthony06 from 86.126.191.39 port 1613 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 02 11:18:14 actually sshd[7775]: Accepted password for anthony06 from 86.126.191.39 port 1613 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-18T07:20:33+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "137.6.55.91",
+    "destination_ip": null,
+    "user": "jaime05",
+    "severity": 0,
+    "message": "Nov 18 07:20:33 class sshd[1712]: Accepted password for jaime05 from 137.6.55.91 port 38323 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 18 07:20:33 class sshd[1712]: Accepted password for jaime05 from 137.6.55.91 port 38323 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-19T09:03:40+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "12.150.54.216",
+    "destination_ip": null,
+    "user": "romeroshaun",
+    "severity": 0,
+    "message": "Nov 19 09:03:40 him sshd[4788]: Accepted password for romeroshaun from 12.150.54.216 port 65327 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 19 09:03:40 him sshd[4788]: Accepted password for romeroshaun from 12.150.54.216 port 65327 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-16T08:01:26+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "77.64.246.48",
+    "destination_ip": null,
+    "user": "millerjessica",
+    "severity": 0,
+    "message": "Jun 16 08:01:26 effect sshd[2540]: Accepted password for millerjessica from 77.64.246.48 port 27550 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 16 08:01:26 effect sshd[2540]: Accepted password for millerjessica from 77.64.246.48 port 27550 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-08T07:13:44+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "65.160.81.235",
+    "destination_ip": null,
+    "user": "kari75",
+    "severity": 0,
+    "message": "Oct 08 07:13:44 develop sshd[5903]: Accepted password for kari75 from 65.160.81.235 port 58950 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 08 07:13:44 develop sshd[5903]: Accepted password for kari75 from 65.160.81.235 port 58950 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-17T22:44:20+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "51.149.121.235",
+    "destination_ip": null,
+    "user": "kristen57",
+    "severity": 0,
+    "message": "Feb 17 22:44:20 question sshd[1938]: Accepted password for kristen57 from 51.149.121.235 port 61471 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 17 22:44:20 question sshd[1938]: Accepted password for kristen57 from 51.149.121.235 port 61471 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-29T22:27:19+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "105.75.82.182",
+    "destination_ip": null,
+    "user": "justinlee",
+    "severity": 0,
+    "message": "Nov 29 22:27:19 about sshd[1913]: Accepted password for justinlee from 105.75.82.182 port 63972 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 29 22:27:19 about sshd[1913]: Accepted password for justinlee from 105.75.82.182 port 63972 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-17T05:09:31+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "26.53.155.52",
+    "destination_ip": null,
+    "user": "chapmanjames",
+    "severity": 0,
+    "message": "Feb 17 05:09:31 whose sshd[4001]: Accepted password for chapmanjames from 26.53.155.52 port 51180 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 17 05:09:31 whose sshd[4001]: Accepted password for chapmanjames from 26.53.155.52 port 51180 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-12T11:58:43+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "162.209.210.229",
+    "destination_ip": null,
+    "user": "susancox",
+    "severity": 0,
+    "message": "Mar 12 11:58:43 fight sshd[3611]: Accepted password for susancox from 162.209.210.229 port 37146 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 12 11:58:43 fight sshd[3611]: Accepted password for susancox from 162.209.210.229 port 37146 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-22T09:26:57+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "2.173.190.227",
+    "destination_ip": null,
+    "user": "stephanie73",
+    "severity": 0,
+    "message": "Aug 22 09:26:57 behind sshd[6339]: Accepted password for stephanie73 from 2.173.190.227 port 57586 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 22 09:26:57 behind sshd[6339]: Accepted password for stephanie73 from 2.173.190.227 port 57586 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-08T17:05:37+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "216.42.115.26",
+    "destination_ip": null,
+    "user": "erinhill",
+    "severity": 0,
+    "message": "Aug 08 17:05:37 magazine sshd[2869]: Accepted password for erinhill from 216.42.115.26 port 45262 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 08 17:05:37 magazine sshd[2869]: Accepted password for erinhill from 216.42.115.26 port 45262 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-17T08:57:49+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "49.244.72.252",
+    "destination_ip": null,
+    "user": "chadlucas",
+    "severity": 0,
+    "message": "Oct 17 08:57:49 blood sshd[9150]: Accepted password for chadlucas from 49.244.72.252 port 62992 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 17 08:57:49 blood sshd[9150]: Accepted password for chadlucas from 49.244.72.252 port 62992 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-17T22:29:31+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "101.39.31.51",
+    "destination_ip": null,
+    "user": "stephensmith",
+    "severity": 0,
+    "message": "Jun 17 22:29:31 book sshd[8687]: Accepted password for stephensmith from 101.39.31.51 port 27503 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 17 22:29:31 book sshd[8687]: Accepted password for stephensmith from 101.39.31.51 port 27503 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-10T08:12:10+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "183.53.21.118",
+    "destination_ip": null,
+    "user": "ashley07",
+    "severity": 0,
+    "message": "Jun 10 08:12:10 million sshd[1994]: Accepted password for ashley07 from 183.53.21.118 port 57194 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 10 08:12:10 million sshd[1994]: Accepted password for ashley07 from 183.53.21.118 port 57194 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-03T18:16:48+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "212.167.149.46",
+    "destination_ip": null,
+    "user": "jenkinsjohn",
+    "severity": 0,
+    "message": "Sep 03 18:16:48 common sshd[9270]: Accepted password for jenkinsjohn from 212.167.149.46 port 47224 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 03 18:16:48 common sshd[9270]: Accepted password for jenkinsjohn from 212.167.149.46 port 47224 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-10T18:27:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "61.55.116.68",
+    "destination_ip": null,
+    "user": "gina64",
+    "severity": 0,
+    "message": "Feb 10 18:27:59 stock sshd[8060]: Accepted password for gina64 from 61.55.116.68 port 12876 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 10 18:27:59 stock sshd[8060]: Accepted password for gina64 from 61.55.116.68 port 12876 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-27T19:30:04+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "44.34.99.98",
+    "destination_ip": null,
+    "user": "ramirezmargaret",
+    "severity": 0,
+    "message": "Oct 27 19:30:04 central sshd[1911]: Accepted password for ramirezmargaret from 44.34.99.98 port 26739 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 27 19:30:04 central sshd[1911]: Accepted password for ramirezmargaret from 44.34.99.98 port 26739 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-27T14:34:21+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "162.90.231.24",
+    "destination_ip": null,
+    "user": "brianroy",
+    "severity": 0,
+    "message": "Mar 27 14:34:21 join sshd[5714]: Accepted password for brianroy from 162.90.231.24 port 10863 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 27 14:34:21 join sshd[5714]: Accepted password for brianroy from 162.90.231.24 port 10863 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-07T09:08:56+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "165.83.52.237",
+    "destination_ip": null,
+    "user": "cheyenne64",
+    "severity": 0,
+    "message": "Dec 07 09:08:56 nice sshd[2846]: Accepted password for cheyenne64 from 165.83.52.237 port 19719 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 07 09:08:56 nice sshd[2846]: Accepted password for cheyenne64 from 165.83.52.237 port 19719 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-24T10:37:26+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "28.234.158.178",
+    "destination_ip": null,
+    "user": "ebaker",
+    "severity": 0,
+    "message": "Aug 24 10:37:26 friend sshd[8536]: Accepted password for ebaker from 28.234.158.178 port 35472 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 24 10:37:26 friend sshd[8536]: Accepted password for ebaker from 28.234.158.178 port 35472 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-20T18:05:14+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "181.42.200.101",
+    "destination_ip": null,
+    "user": "martin34",
+    "severity": 0,
+    "message": "May 20 18:05:14 church sshd[3731]: Accepted password for martin34 from 181.42.200.101 port 18885 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 20 18:05:14 church sshd[3731]: Accepted password for martin34 from 181.42.200.101 port 18885 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T03:51:06+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "2.35.96.247",
+    "destination_ip": null,
+    "user": "jonestammy",
+    "severity": 0,
+    "message": "May 30 03:51:06 less sshd[4434]: Accepted password for jonestammy from 2.35.96.247 port 64950 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 30 03:51:06 less sshd[4434]: Accepted password for jonestammy from 2.35.96.247 port 64950 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-16T13:50:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "23.14.125.4",
+    "destination_ip": null,
+    "user": "peggymurray",
+    "severity": 0,
+    "message": "May 16 13:50:32 hour sshd[6858]: Accepted password for peggymurray from 23.14.125.4 port 36114 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 16 13:50:32 hour sshd[6858]: Accepted password for peggymurray from 23.14.125.4 port 36114 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-13T16:25:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "208.28.118.239",
+    "destination_ip": null,
+    "user": "zdean",
+    "severity": 0,
+    "message": "Aug 13 16:25:32 job sshd[3043]: Accepted password for zdean from 208.28.118.239 port 36632 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 13 16:25:32 job sshd[3043]: Accepted password for zdean from 208.28.118.239 port 36632 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-10T22:18:31+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "212.133.182.84",
+    "destination_ip": null,
+    "user": "mitchellmichael",
+    "severity": 0,
+    "message": "Aug 10 22:18:31 hospital sshd[7560]: Accepted password for mitchellmichael from 212.133.182.84 port 64940 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 10 22:18:31 hospital sshd[7560]: Accepted password for mitchellmichael from 212.133.182.84 port 64940 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-11T15:26:14+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "101.201.250.235",
+    "destination_ip": null,
+    "user": "pateljoshua",
+    "severity": 0,
+    "message": "Oct 11 15:26:14 upon sshd[4726]: Accepted password for pateljoshua from 101.201.250.235 port 50061 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 11 15:26:14 upon sshd[4726]: Accepted password for pateljoshua from 101.201.250.235 port 50061 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-17T01:41:18+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "166.248.85.96",
+    "destination_ip": null,
+    "user": "ebaker",
+    "severity": 0,
+    "message": "Mar 17 01:41:18 most sshd[8052]: Accepted password for ebaker from 166.248.85.96 port 60751 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 17 01:41:18 most sshd[8052]: Accepted password for ebaker from 166.248.85.96 port 60751 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-16T08:35:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "56.25.103.98",
+    "destination_ip": null,
+    "user": "howardrobert",
+    "severity": 0,
+    "message": "Dec 16 08:35:13 public sshd[8546]: Accepted password for howardrobert from 56.25.103.98 port 22531 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 16 08:35:13 public sshd[8546]: Accepted password for howardrobert from 56.25.103.98 port 22531 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-28T05:38:12+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "146.171.138.47",
+    "destination_ip": null,
+    "user": "debrarussell",
+    "severity": 0,
+    "message": "Sep 28 05:38:12 push sshd[6103]: Accepted password for debrarussell from 146.171.138.47 port 62819 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 28 05:38:12 push sshd[6103]: Accepted password for debrarussell from 146.171.138.47 port 62819 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-08T20:10:28+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "154.108.221.59",
+    "destination_ip": null,
+    "user": "james22",
+    "severity": 0,
+    "message": "May 08 20:10:28 term sshd[1386]: Accepted password for james22 from 154.108.221.59 port 3222 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 08 20:10:28 term sshd[1386]: Accepted password for james22 from 154.108.221.59 port 3222 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-03-23T17:56:50+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "87.160.169.255",
+    "destination_ip": null,
+    "user": "wallacejonathan",
+    "severity": 0,
+    "message": "Mar 23 17:56:50 player sshd[3625]: Accepted password for wallacejonathan from 87.160.169.255 port 12756 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 23 17:56:50 player sshd[3625]: Accepted password for wallacejonathan from 87.160.169.255 port 12756 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-04T05:04:44+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "162.217.106.249",
+    "destination_ip": null,
+    "user": "marklivingston",
+    "severity": 0,
+    "message": "Sep 04 05:04:44 especially sshd[3476]: Accepted password for marklivingston from 162.217.106.249 port 32340 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 04 05:04:44 especially sshd[3476]: Accepted password for marklivingston from 162.217.106.249 port 32340 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-10T05:30:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "192.159.89.178",
+    "destination_ip": null,
+    "user": "thomasbarnett",
+    "severity": 0,
+    "message": "Feb 10 05:30:13 upon sshd[2842]: Accepted password for thomasbarnett from 192.159.89.178 port 48201 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 10 05:30:13 upon sshd[2842]: Accepted password for thomasbarnett from 192.159.89.178 port 48201 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-17T20:35:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "110.227.205.152",
+    "destination_ip": null,
+    "user": "rachel57",
+    "severity": 0,
+    "message": "Jun 17 20:35:59 child sshd[3456]: Accepted password for rachel57 from 110.227.205.152 port 8506 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 17 20:35:59 child sshd[3456]: Accepted password for rachel57 from 110.227.205.152 port 8506 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-10T02:44:04+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "8.196.195.254",
+    "destination_ip": null,
+    "user": "kyoung",
+    "severity": 0,
+    "message": "Oct 10 02:44:04 individual sshd[8956]: Accepted password for kyoung from 8.196.195.254 port 10633 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 10 02:44:04 individual sshd[8956]: Accepted password for kyoung from 8.196.195.254 port 10633 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-10T01:52:33+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "7.18.235.125",
+    "destination_ip": null,
+    "user": "watsonkenneth",
+    "severity": 0,
+    "message": "Aug 10 01:52:33 call sshd[5066]: Accepted password for watsonkenneth from 7.18.235.125 port 52101 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 10 01:52:33 call sshd[5066]: Accepted password for watsonkenneth from 7.18.235.125 port 52101 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-08-13T12:56:09+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "55.224.86.34",
+    "destination_ip": null,
+    "user": "oklein",
+    "severity": 0,
+    "message": "Aug 13 12:56:09 star sshd[7556]: Accepted password for oklein from 55.224.86.34 port 46967 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 13 12:56:09 star sshd[7556]: Accepted password for oklein from 55.224.86.34 port 46967 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-15T23:11:19+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "222.3.95.39",
+    "destination_ip": null,
+    "user": "richardflowers",
+    "severity": 0,
+    "message": "Jun 15 23:11:19 now sshd[4121]: Accepted password for richardflowers from 222.3.95.39 port 46538 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 15 23:11:19 now sshd[4121]: Accepted password for richardflowers from 222.3.95.39 port 46538 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-19T22:42:26+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "94.112.240.195",
+    "destination_ip": null,
+    "user": "ritalopez",
+    "severity": 0,
+    "message": "Feb 19 22:42:26 Mr sshd[5135]: Accepted password for ritalopez from 94.112.240.195 port 5634 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 19 22:42:26 Mr sshd[5135]: Accepted password for ritalopez from 94.112.240.195 port 5634 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-10-07T09:46:11+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 07 09:46:11 kitchen sshd[13646]: [ID 700180 auth.notice] User mwood",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 07 09:46:11 kitchen sshd[13646]: [ID 700180 auth.notice] User mwood",
+      "null": [
+        " coming from 111.132.190.201",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-12T12:10:16+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 12 12:10:16 challenge sshd[10207]: [ID 733849 auth.notice] User aprilbryant",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 12 12:10:16 challenge sshd[10207]: [ID 733849 auth.notice] User aprilbryant",
+      "null": [
+        " coming from 104.29.218.98",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-23T17:30:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 23 17:30:13 pass sshd[15528]: [ID 719190 auth.notice] User evelyn28",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 23 17:30:13 pass sshd[15528]: [ID 719190 auth.notice] User evelyn28",
+      "null": [
+        " coming from 79.119.214.162",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-25T11:09:05+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 25 11:09:05 shake sshd[19331]: [ID 795965 auth.notice] User samanthaali",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 25 11:09:05 shake sshd[19331]: [ID 795965 auth.notice] User samanthaali",
+      "null": [
+        " coming from 192.111.129.240",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-28T11:55:37+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 28 11:55:37 surface sshd[10055]: [ID 793907 auth.notice] User carmen30",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 28 11:55:37 surface sshd[10055]: [ID 793907 auth.notice] User carmen30",
+      "null": [
+        " coming from 97.220.72.187",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-07T13:31:42+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 07 13:31:42 ball sshd[16532]: [ID 702108 auth.notice] User tinagallagher",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 07 13:31:42 ball sshd[16532]: [ID 702108 auth.notice] User tinagallagher",
+      "null": [
+        " coming from 106.7.231.75",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-11T05:11:29+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 11 05:11:29 wonder sshd[11028]: [ID 701758 auth.notice] User shawngreene",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 11 05:11:29 wonder sshd[11028]: [ID 701758 auth.notice] User shawngreene",
+      "null": [
+        " coming from 94.168.22.208",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-26T00:12:40+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 26 00:12:40 walk sshd[10521]: [ID 746742 auth.notice] User tnorris",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 26 00:12:40 walk sshd[10521]: [ID 746742 auth.notice] User tnorris",
+      "null": [
+        " coming from 205.173.16.73",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-11T13:05:37+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 11 13:05:37 always sshd[14194]: [ID 774158 auth.notice] User waderobert",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 11 13:05:37 always sshd[14194]: [ID 774158 auth.notice] User waderobert",
+      "null": [
+        " coming from 207.64.65.239",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-03T11:39:53+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 03 11:39:53 hair sshd[14357]: [ID 748111 auth.notice] User mharris",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 03 11:39:53 hair sshd[14357]: [ID 748111 auth.notice] User mharris",
+      "null": [
+        " coming from 94.109.196.55",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-18T11:52:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 18 11:52:32 bit sshd[15049]: [ID 728378 auth.notice] User rgraham",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 18 11:52:32 bit sshd[15049]: [ID 728378 auth.notice] User rgraham",
+      "null": [
+        " coming from 116.1.172.3",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-15T13:54:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 15 13:54:32 vote sshd[13793]: [ID 794099 auth.notice] User samantha66",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 15 13:54:32 vote sshd[13793]: [ID 794099 auth.notice] User samantha66",
+      "null": [
+        " coming from 179.199.178.172",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-17T02:56:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 17 02:56:59 instead sshd[11514]: [ID 712754 auth.notice] User kevinsaunders",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 17 02:56:59 instead sshd[11514]: [ID 712754 auth.notice] User kevinsaunders",
+      "null": [
+        " coming from 138.87.152.98",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-11-25T07:44:27+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Nov 25 07:44:27 process sshd[14927]: [ID 796642 auth.notice] User irobinson",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 25 07:44:27 process sshd[14927]: [ID 796642 auth.notice] User irobinson",
+      "null": [
+        " coming from 71.251.18.231",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-27T15:59:39+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 27 15:59:39 response sshd[19517]: [ID 724233 auth.notice] User jessicafarley",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 27 15:59:39 response sshd[19517]: [ID 724233 auth.notice] User jessicafarley",
+      "null": [
+        " coming from 95.93.129.172",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-10T23:36:02+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 10 23:36:02 quality sshd[12295]: [ID 704050 auth.notice] User zoe99",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 10 23:36:02 quality sshd[12295]: [ID 704050 auth.notice] User zoe99",
+      "null": [
+        " coming from 57.184.122.24",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-03T20:49:02+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 03 20:49:02 field sshd[11371]: [ID 709003 auth.notice] User jessica41",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 03 20:49:02 field sshd[11371]: [ID 709003 auth.notice] User jessica41",
+      "null": [
+        " coming from 140.28.134.168",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-10T05:26:19+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 10 05:26:19 myself sshd[18509]: [ID 711882 auth.notice] User xwashington",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 10 05:26:19 myself sshd[18509]: [ID 711882 auth.notice] User xwashington",
+      "null": [
+        " coming from 155.104.196.231",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-02T13:22:04+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 02 13:22:04 whole sshd[16886]: [ID 702873 auth.notice] User utorres",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 02 13:22:04 whole sshd[16886]: [ID 702873 auth.notice] User utorres",
+      "null": [
+        " coming from 151.124.1.197",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-12T14:33:50+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 12 14:33:50 training sshd[14544]: [ID 752323 auth.notice] User jhall",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 12 14:33:50 training sshd[14544]: [ID 752323 auth.notice] User jhall",
+      "null": [
+        " coming from 92.81.188.214",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-26T20:11:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 26 20:11:13 across sshd[19803]: [ID 764455 auth.notice] User wallen",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 26 20:11:13 across sshd[19803]: [ID 764455 auth.notice] User wallen",
+      "null": [
+        " coming from 155.11.121.189",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-15T07:12:15+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 15 07:12:15 structure sshd[12727]: [ID 706837 auth.notice] User bradley13",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 15 07:12:15 structure sshd[12727]: [ID 706837 auth.notice] User bradley13",
+      "null": [
+        " coming from 117.206.61.149",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-28T17:00:40+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 28 17:00:40 environmental sshd[14405]: [ID 738510 auth.notice] User gharris",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 28 17:00:40 environmental sshd[14405]: [ID 738510 auth.notice] User gharris",
+      "null": [
+        " coming from 87.227.130.118",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-12T15:44:11+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 12 15:44:11 present sshd[19745]: [ID 739789 auth.notice] User mconway",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 12 15:44:11 present sshd[19745]: [ID 739789 auth.notice] User mconway",
+      "null": [
+        " coming from 149.120.37.122",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-08T19:55:10+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 08 19:55:10 nor sshd[15148]: [ID 791110 auth.notice] User carol92",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 08 19:55:10 nor sshd[15148]: [ID 791110 auth.notice] User carol92",
+      "null": [
+        " coming from 62.180.132.29",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-04T19:50:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 04 19:50:35 place sshd[11517]: [ID 719937 auth.notice] User edward32",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 04 19:50:35 place sshd[11517]: [ID 719937 auth.notice] User edward32",
+      "null": [
+        " coming from 113.15.152.75",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-08-11T00:17:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Aug 11 00:17:59 court sshd[19549]: [ID 753799 auth.notice] User williamkoch",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 11 00:17:59 court sshd[19549]: [ID 753799 auth.notice] User williamkoch",
+      "null": [
+        " coming from 95.91.220.172",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-21T12:47:08+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 21 12:47:08 cause sshd[13553]: [ID 708079 auth.notice] User christinesmith",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 21 12:47:08 cause sshd[13553]: [ID 708079 auth.notice] User christinesmith",
+      "null": [
+        " coming from 182.74.108.207",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-11-12T11:12:33+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Nov 12 11:12:33 actually sshd[18462]: [ID 713407 auth.notice] User tracyshaffer",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 12 11:12:33 actually sshd[18462]: [ID 713407 auth.notice] User tracyshaffer",
+      "null": [
+        " coming from 204.14.119.220",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-05T01:08:41+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 05 01:08:41 wife sshd[19540]: [ID 738093 auth.notice] User bayala",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 05 01:08:41 wife sshd[19540]: [ID 738093 auth.notice] User bayala",
+      "null": [
+        " coming from 168.41.6.204",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-14T13:20:41+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 14 13:20:41 put sshd[16121]: [ID 795275 auth.notice] User lanerichard",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 14 13:20:41 put sshd[16121]: [ID 795275 auth.notice] User lanerichard",
+      "null": [
+        " coming from 74.7.66.152",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-19T08:31:38+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 19 08:31:38 baby sshd[11994]: [ID 774093 auth.notice] User heatherkey",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 19 08:31:38 baby sshd[11994]: [ID 774093 auth.notice] User heatherkey",
+      "null": [
+        " coming from 131.131.7.41",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-19T19:00:17+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 19 19:00:17 degree sshd[14172]: [ID 719724 auth.notice] User wagnerkristen",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 19 19:00:17 degree sshd[14172]: [ID 719724 auth.notice] User wagnerkristen",
+      "null": [
+        " coming from 68.183.38.117",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-18T17:31:19+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 18 17:31:19 way sshd[10919]: [ID 727381 auth.notice] User hmckinney",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 18 17:31:19 way sshd[10919]: [ID 727381 auth.notice] User hmckinney",
+      "null": [
+        " coming from 101.71.188.37",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-31T03:38:34+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 31 03:38:34 property sshd[16562]: [ID 746520 auth.notice] User osanders",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 31 03:38:34 property sshd[16562]: [ID 746520 auth.notice] User osanders",
+      "null": [
+        " coming from 117.207.190.191",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-10T12:52:12+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 10 12:52:12 yard sshd[15032]: [ID 789217 auth.notice] User efisher",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 10 12:52:12 yard sshd[15032]: [ID 789217 auth.notice] User efisher",
+      "null": [
+        " coming from 114.157.111.252",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-08-06T03:39:34+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Aug 06 03:39:34 but sshd[14340]: [ID 761085 auth.notice] User brandon24",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Aug 06 03:39:34 but sshd[14340]: [ID 761085 auth.notice] User brandon24",
+      "null": [
+        " coming from 132.48.85.61",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-14T23:05:18+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 14 23:05:18 ago sshd[18848]: [ID 773254 auth.notice] User pmendez",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 14 23:05:18 ago sshd[18848]: [ID 773254 auth.notice] User pmendez",
+      "null": [
+        " coming from 147.222.253.202",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-13T11:47:48+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 13 11:47:48 subject sshd[10552]: [ID 775811 auth.notice] User michelesimmons",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 13 11:47:48 subject sshd[10552]: [ID 775811 auth.notice] User michelesimmons",
+      "null": [
+        " coming from 173.66.21.109",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-11T08:49:08+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 11 08:49:08 lead sshd[19724]: [ID 783736 auth.notice] User kingsharon",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 11 08:49:08 lead sshd[19724]: [ID 783736 auth.notice] User kingsharon",
+      "null": [
+        " coming from 102.30.85.228",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-04T20:08:00+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 04 20:08:00 no sshd[15552]: [ID 751087 auth.notice] User xsolomon",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 04 20:08:00 no sshd[15552]: [ID 751087 auth.notice] User xsolomon",
+      "null": [
+        " coming from 144.195.114.203",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-11-09T12:47:00+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Nov 09 12:47:00 feel sshd[19123]: [ID 717760 auth.notice] User annachase",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 09 12:47:00 feel sshd[19123]: [ID 717760 auth.notice] User annachase",
+      "null": [
+        " coming from 161.9.247.114",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-03T16:17:11+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 03 16:17:11 others sshd[17627]: [ID 716779 auth.notice] User lmiller",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 03 16:17:11 others sshd[17627]: [ID 716779 auth.notice] User lmiller",
+      "null": [
+        " coming from 46.29.140.8",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-16T15:05:46+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 16 15:05:46 teacher sshd[17093]: [ID 782582 auth.notice] User wilsonedwin",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 16 15:05:46 teacher sshd[17093]: [ID 782582 auth.notice] User wilsonedwin",
+      "null": [
+        " coming from 14.114.133.127",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-23T09:56:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 23 09:56:13 happen sshd[18452]: [ID 778246 auth.notice] User kimberlymatthews",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 23 09:56:13 happen sshd[18452]: [ID 778246 auth.notice] User kimberlymatthews",
+      "null": [
+        " coming from 181.19.42.13",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-20T23:59:53+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 20 23:59:53 stuff sshd[10210]: [ID 762871 auth.notice] User taylorstacy",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 20 23:59:53 stuff sshd[10210]: [ID 762871 auth.notice] User taylorstacy",
+      "null": [
+        " coming from 216.140.150.248",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-15T18:49:31+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 15 18:49:31 nice sshd[11102]: [ID 722044 auth.notice] User cromero",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 15 18:49:31 nice sshd[11102]: [ID 722044 auth.notice] User cromero",
+      "null": [
+        " coming from 17.17.195.93",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-01T09:31:42+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 01 09:31:42 improve sshd[13476]: [ID 761744 auth.notice] User ericblack",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 01 09:31:42 improve sshd[13476]: [ID 761744 auth.notice] User ericblack",
+      "null": [
+        " coming from 203.213.119.191",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-28T13:28:23+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 28 13:28:23 little sshd[13424]: [ID 744640 auth.notice] User shawnrobinson",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 28 13:28:23 little sshd[13424]: [ID 744640 auth.notice] User shawnrobinson",
+      "null": [
+        " coming from 97.249.147.244",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-15T05:04:52+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 15 05:04:52 brother sshd[11183]: [ID 727819 auth.notice] User kevin23",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 15 05:04:52 brother sshd[11183]: [ID 727819 auth.notice] User kevin23",
+      "null": [
+        " coming from 7.109.240.42",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-06T07:57:40+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 06 07:57:40 middle sshd[17088]: [ID 719006 auth.notice] User lespinoza",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 06 07:57:40 middle sshd[17088]: [ID 719006 auth.notice] User lespinoza",
+      "null": [
+        " coming from 17.40.104.212",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-21T16:44:23+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 21 16:44:23 PM sshd[16699]: [ID 741053 auth.notice] User samantha66",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 21 16:44:23 PM sshd[16699]: [ID 741053 auth.notice] User samantha66",
+      "null": [
+        " coming from 37.244.204.90",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-07T17:26:24+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 07 17:26:24 inside sshd[14282]: [ID 786785 auth.notice] User ismith",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 07 17:26:24 inside sshd[14282]: [ID 786785 auth.notice] User ismith",
+      "null": [
+        " coming from 128.217.228.248",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-19T04:48:07+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 19 04:48:07 catch sshd[19155]: [ID 794807 auth.notice] User fperez",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 19 04:48:07 catch sshd[19155]: [ID 794807 auth.notice] User fperez",
+      "null": [
+        " coming from 34.201.191.153",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-11-17T11:57:44+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Nov 17 11:57:44 human sshd[10341]: [ID 713257 auth.notice] User lopezrobert",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 17 11:57:44 human sshd[10341]: [ID 713257 auth.notice] User lopezrobert",
+      "null": [
+        " coming from 44.46.157.96",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-27T19:58:44+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 27 19:58:44 far sshd[12961]: [ID 756840 auth.notice] User tiffany89",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 27 19:58:44 far sshd[12961]: [ID 756840 auth.notice] User tiffany89",
+      "null": [
+        " coming from 104.104.97.202",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-26T17:16:28+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "May 26 17:16:28 blood sshd[16855]: [ID 719607 auth.notice] User espinozagina",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 26 17:16:28 blood sshd[16855]: [ID 719607 auth.notice] User espinozagina",
+      "null": [
+        " coming from 91.82.227.235",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-29T02:00:05+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 29 02:00:05 day sshd[10050]: [ID 780374 auth.notice] User ptorres",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 29 02:00:05 day sshd[10050]: [ID 780374 auth.notice] User ptorres",
+      "null": [
+        " coming from 163.116.63.61",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-06T11:45:25+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 06 11:45:25 concern sshd[14648]: [ID 762957 auth.notice] User xsmith",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 06 11:45:25 concern sshd[14648]: [ID 762957 auth.notice] User xsmith",
+      "null": [
+        " coming from 199.134.130.125",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-01T19:00:21+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "May 01 19:00:21 throughout sshd[14860]: [ID 738782 auth.notice] User yrivas",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 01 19:00:21 throughout sshd[14860]: [ID 738782 auth.notice] User yrivas",
+      "null": [
+        " coming from 31.108.129.196",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-11T13:02:15+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 11 13:02:15 million sshd[10771]: [ID 724732 auth.notice] User vbeck",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 11 13:02:15 million sshd[10771]: [ID 724732 auth.notice] User vbeck",
+      "null": [
+        " coming from 39.136.194.255",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-09T13:12:41+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 09 13:12:41 parent sshd[14130]: [ID 703706 auth.notice] User amber51",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 09 13:12:41 parent sshd[14130]: [ID 703706 auth.notice] User amber51",
+      "null": [
+        " coming from 56.222.244.91",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-08T17:15:20+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 08 17:15:20 keep sshd[11950]: [ID 771049 auth.notice] User elee",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 08 17:15:20 keep sshd[11950]: [ID 771049 auth.notice] User elee",
+      "null": [
+        " coming from 212.152.149.56",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-09T18:24:22+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jan 09 18:24:22 thought sshd[15057]: [ID 772970 auth.notice] User robbinsbrooke",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 09 18:24:22 thought sshd[15057]: [ID 772970 auth.notice] User robbinsbrooke",
+      "null": [
+        " coming from 211.187.65.124",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-14T00:27:08+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 14 00:27:08 teach sshd[15621]: [ID 787408 auth.notice] User yfitzgerald",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 14 00:27:08 teach sshd[15621]: [ID 787408 auth.notice] User yfitzgerald",
+      "null": [
+        " coming from 112.235.254.248",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-30T19:09:09+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 30 19:09:09 community sshd[13419]: [ID 732668 auth.notice] User wyattglass",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 30 19:09:09 community sshd[13419]: [ID 732668 auth.notice] User wyattglass",
+      "null": [
+        " coming from 19.153.90.83",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-17T15:26:39+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 17 15:26:39 peace sshd[17769]: [ID 742707 auth.notice] User jsmith",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 17 15:26:39 peace sshd[17769]: [ID 742707 auth.notice] User jsmith",
+      "null": [
+        " coming from 174.5.185.200",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-10T13:53:39+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 10 13:53:39 study sshd[14380]: [ID 714790 auth.notice] User olivertheresa",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 10 13:53:39 study sshd[14380]: [ID 714790 auth.notice] User olivertheresa",
+      "null": [
+        " coming from 198.52.208.139",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-24T16:05:36+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 24 16:05:36 get sshd[10671]: [ID 745620 auth.notice] User meganlee",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 24 16:05:36 get sshd[10671]: [ID 745620 auth.notice] User meganlee",
+      "null": [
+        " coming from 43.185.204.137",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-08T16:03:16+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "May 08 16:03:16 pretty sshd[19602]: [ID 729097 auth.notice] User vpatterson",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 08 16:03:16 pretty sshd[19602]: [ID 729097 auth.notice] User vpatterson",
+      "null": [
+        " coming from 203.106.12.234",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-16T08:33:52+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Oct 16 08:33:52 will sshd[18104]: [ID 751044 auth.notice] User tonya58",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Oct 16 08:33:52 will sshd[18104]: [ID 751044 auth.notice] User tonya58",
+      "null": [
+        " coming from 103.154.0.203",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-29T03:23:01+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 29 03:23:01 none sshd[19106]: [ID 754555 auth.notice] User alicia64",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 29 03:23:01 none sshd[19106]: [ID 754555 auth.notice] User alicia64",
+      "null": [
+        " coming from 94.95.49.170",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-08T05:16:32+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 08 05:16:32 small sshd[10132]: [ID 789836 auth.notice] User glenndevin",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 08 05:16:32 small sshd[10132]: [ID 789836 auth.notice] User glenndevin",
+      "null": [
+        " coming from 128.120.111.255",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-15T04:13:55+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 15 04:13:55 answer sshd[11136]: [ID 777122 auth.notice] User oreilly",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 15 04:13:55 answer sshd[11136]: [ID 777122 auth.notice] User oreilly",
+      "null": [
+        " coming from 183.186.203.85",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-28T14:02:15+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 28 14:02:15 product sshd[17151]: [ID 748537 auth.notice] User stantonwanda",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 28 14:02:15 product sshd[17151]: [ID 748537 auth.notice] User stantonwanda",
+      "null": [
+        " coming from 6.50.60.248",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-13T11:03:28+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 13 11:03:28 eye sshd[10976]: [ID 700378 auth.notice] User adrienne06",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 13 11:03:28 eye sshd[10976]: [ID 700378 auth.notice] User adrienne06",
+      "null": [
+        " coming from 154.104.64.26",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-28T06:52:43+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 28 06:52:43 write sshd[11446]: [ID 708718 auth.notice] User robin01",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 28 06:52:43 write sshd[11446]: [ID 708718 auth.notice] User robin01",
+      "null": [
+        " coming from 129.192.220.237",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-27T05:13:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 27 05:13:35 home sshd[17398]: [ID 775266 auth.notice] User tina76",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 27 05:13:35 home sshd[17398]: [ID 775266 auth.notice] User tina76",
+      "null": [
+        " coming from 128.170.62.250",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-09-27T13:40:08+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Sep 27 13:40:08 person sshd[10169]: [ID 780720 auth.notice] User david64",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 27 13:40:08 person sshd[10169]: [ID 780720 auth.notice] User david64",
+      "null": [
+        " coming from 29.9.207.43",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-26T08:11:00+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "May 26 08:11:00 tough sshd[10897]: [ID 751406 auth.notice] User carolynpeterson",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 26 08:11:00 tough sshd[10897]: [ID 751406 auth.notice] User carolynpeterson",
+      "null": [
+        " coming from 166.216.71.50",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-03-07T05:50:25+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Mar 07 05:50:25 check sshd[12690]: [ID 741092 auth.notice] User jennifercastaneda",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Mar 07 05:50:25 check sshd[12690]: [ID 741092 auth.notice] User jennifercastaneda",
+      "null": [
+        " coming from 110.201.205.132",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-09T00:15:56+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "May 09 00:15:56 writer sshd[16551]: [ID 728607 auth.notice] User ikim",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 09 00:15:56 writer sshd[16551]: [ID 728607 auth.notice] User ikim",
+      "null": [
+        " coming from 57.137.189.146",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-10T13:45:15+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 10 13:45:15 spend sshd[12959]: [ID 718964 auth.notice] User ericoneal",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 10 13:45:15 spend sshd[12959]: [ID 718964 auth.notice] User ericoneal",
+      "null": [
+        " coming from 91.33.112.37",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-15T17:17:28+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 15 17:17:28 medical sshd[13021]: [ID 751895 auth.notice] User brosario",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 15 17:17:28 medical sshd[13021]: [ID 751895 auth.notice] User brosario",
+      "null": [
+        " coming from 128.26.209.36",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-07T17:20:39+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jul 07 17:20:39 wrong sshd[15730]: [ID 726031 auth.notice] User progers",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 07 17:20:39 wrong sshd[15730]: [ID 726031 auth.notice] User progers",
+      "null": [
+        " coming from 79.94.55.222",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-04-04T05:31:33+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Apr 04 05:31:33 have sshd[14479]: [ID 744896 auth.notice] User dtaylor",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 04 05:31:33 have sshd[14479]: [ID 744896 auth.notice] User dtaylor",
+      "null": [
+        " coming from 28.29.126.234",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-02-08T09:40:46+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Feb 08 09:40:46 matter sshd[10103]: [ID 766564 auth.notice] User jacob56",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 08 09:40:46 matter sshd[10103]: [ID 766564 auth.notice] User jacob56",
+      "null": [
+        " coming from 211.71.119.54",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-30T17:31:19+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 30 17:31:19 hundred sshd[15227]: [ID 741170 auth.notice] User cwalls",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 30 17:31:19 hundred sshd[15227]: [ID 741170 auth.notice] User cwalls",
+      "null": [
+        " coming from 174.104.128.56",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-02T20:30:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 02 20:30:35 young sshd[18244]: [ID 735850 auth.notice] User justin74",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 02 20:30:35 young sshd[18244]: [ID 735850 auth.notice] User justin74",
+      "null": [
+        " coming from 60.199.141.184",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-12-06T05:49:18+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Dec 06 05:49:18 event sshd[16057]: [ID 735132 auth.notice] User tpearson",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 06 05:49:18 event sshd[16057]: [ID 735132 auth.notice] User tpearson",
+      "null": [
+        " coming from 32.51.194.228",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-29T13:46:59+00:00",
+    "event_type": "authentication-success",
+    "source_ip": null,
+    "destination_ip": null,
+    "user": null,
+    "severity": 0,
+    "message": "Jun 29 13:46:59 ability sshd[19072]: [ID 723740 auth.notice] User garygraham",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 29 13:46:59 ability sshd[19072]: [ID 723740 auth.notice] User garygraham",
+      "null": [
+        " coming from 18.22.52.3",
+        "  -  authenticated."
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-07T15:01:29+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "43.163.176.168",
+    "destination_ip": null,
+    "user": "jeffrey01",
+    "severity": 0,
+    "message": "Jan 07 15:01:29 consider auth|security:info sshd[106566]: Accepted publickey for jeffrey01 from 43.163.176.168 port 53178 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 07 15:01:29 consider auth|security:info sshd[106566]: Accepted publickey for jeffrey01 from 43.163.176.168 port 53178 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-07-08T19:21:41+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "136.56.50.19",
+    "destination_ip": null,
+    "user": "rhondarangel",
+    "severity": 0,
+    "message": "Jul 08 19:21:41 true auth|security:info sshd[655016]: Accepted publickey for rhondarangel from 136.56.50.19 port 23306 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 08 19:21:41 true auth|security:info sshd[655016]: Accepted publickey for rhondarangel from 136.56.50.19 port 23306 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-03T22:29:18+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "87.147.220.108",
+    "destination_ip": null,
+    "user": "hannah76",
+    "severity": 0,
+    "message": "Nov 03 22:29:18 itself auth|security:info sshd[534038]: Accepted publickey for hannah76 from 87.147.220.108 port 6462 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 03 22:29:18 itself auth|security:info sshd[534038]: Accepted publickey for hannah76 from 87.147.220.108 port 6462 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-01-22T05:43:35+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "83.0.196.93",
+    "destination_ip": null,
+    "user": "williamroberts",
+    "severity": 0,
+    "message": "Jan 22 05:43:35 clear auth|security:info sshd[614934]: Accepted publickey for williamroberts from 83.0.196.93 port 3371 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jan 22 05:43:35 clear auth|security:info sshd[614934]: Accepted publickey for williamroberts from 83.0.196.93 port 3371 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-01T01:01:01+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "93.137.33.58",
+    "destination_ip": null,
+    "user": "ricky36",
+    "severity": 0,
+    "message": "Dec 01 01:01:01 east auth|security:info sshd[470062]: Accepted publickey for ricky36 from 93.137.33.58 port 48036 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 01 01:01:01 east auth|security:info sshd[470062]: Accepted publickey for ricky36 from 93.137.33.58 port 48036 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-19T11:39:45+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "117.105.231.226",
+    "destination_ip": null,
+    "user": "jerry25",
+    "severity": 0,
+    "message": "Jun 19 11:39:45 enjoy auth|security:info sshd[852159]: Accepted publickey for jerry25 from 117.105.231.226 port 44989 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 19 11:39:45 enjoy auth|security:info sshd[852159]: Accepted publickey for jerry25 from 117.105.231.226 port 44989 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-05-15T13:34:29+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "43.31.204.184",
+    "destination_ip": null,
+    "user": "bowmangregory",
+    "severity": 0,
+    "message": "May 15 13:34:29 save auth|security:info sshd[643175]: Accepted publickey for bowmangregory from 43.31.204.184 port 16129 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "May 15 13:34:29 save auth|security:info sshd[643175]: Accepted publickey for bowmangregory from 43.31.204.184 port 16129 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-09-12T13:58:10+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "171.159.76.53",
+    "destination_ip": null,
+    "user": "lindastanton",
+    "severity": 0,
+    "message": "Sep 12 13:58:10 need auth|security:info sshd[632180]: Accepted publickey for lindastanton from 171.159.76.53 port 31307 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Sep 12 13:58:10 need auth|security:info sshd[632180]: Accepted publickey for lindastanton from 171.159.76.53 port 31307 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-04-17T19:27:48+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "1.103.240.103",
+    "destination_ip": null,
+    "user": "nathanpeters",
+    "severity": 0,
+    "message": "Apr 17 19:27:48 everything auth|security:info sshd[195502]: Accepted publickey for nathanpeters from 1.103.240.103 port 21126 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Apr 17 19:27:48 everything auth|security:info sshd[195502]: Accepted publickey for nathanpeters from 1.103.240.103 port 21126 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-02-07T20:17:13+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "67.231.70.156",
+    "destination_ip": null,
+    "user": "morriscarly",
+    "severity": 0,
+    "message": "Feb 07 20:17:13 player auth|security:info sshd[842010]: Accepted publickey for morriscarly from 67.231.70.156 port 60618 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Feb 07 20:17:13 player auth|security:info sshd[842010]: Accepted publickey for morriscarly from 67.231.70.156 port 60618 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-07-02T17:04:25+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "176.32.243.57",
+    "destination_ip": null,
+    "user": "hthomas",
+    "severity": 0,
+    "message": "Jul 02 17:04:25 indicate auth|security:info sshd[638377]: Accepted publickey for hthomas from 176.32.243.57 port 50033 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jul 02 17:04:25 indicate auth|security:info sshd[638377]: Accepted publickey for hthomas from 176.32.243.57 port 50033 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-06-28T23:04:12+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "38.207.12.178",
+    "destination_ip": null,
+    "user": "halljonathan",
+    "severity": 0,
+    "message": "Jun 28 23:04:12 class auth|security:info sshd[827492]: Accepted publickey for halljonathan from 38.207.12.178 port 50122 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Jun 28 23:04:12 class auth|security:info sshd[827492]: Accepted publickey for halljonathan from 38.207.12.178 port 50122 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-04T22:51:01+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "60.223.150.254",
+    "destination_ip": null,
+    "user": "goodwindaniel",
+    "severity": 0,
+    "message": "Dec 04 22:51:01 break auth|security:info sshd[581268]: Accepted publickey for goodwindaniel from 60.223.150.254 port 12771 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 04 22:51:01 break auth|security:info sshd[581268]: Accepted publickey for goodwindaniel from 60.223.150.254 port 12771 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-12-07T11:27:12+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "115.65.23.25",
+    "destination_ip": null,
+    "user": "carlawalton",
+    "severity": 0,
+    "message": "Dec 07 11:27:12 long auth|security:info sshd[721361]: Accepted publickey for carlawalton from 115.65.23.25 port 60542 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Dec 07 11:27:12 long auth|security:info sshd[721361]: Accepted publickey for carlawalton from 115.65.23.25 port 60542 ssh2"
+    }
+  },
+  {
+    "timestamp": "2026-11-13T06:10:36+00:00",
+    "event_type": "authentication-success",
+    "source_ip": "168.137.130.16",
+    "destination_ip": null,
+    "user": "qryan",
+    "severity": 0,
+    "message": "Nov 13 06:10:36 safe auth|security:info sshd[909950]: Accepted publickey for qryan from 168.137.130.16 port 20112 ssh2",
+    "source": "csv_dataset",
+    "raw": {
+      "category": "authentication-success",
+      "log": "Nov 13 06:10:36 safe auth|security:info sshd[909950]: Accepted publickey for qryan from 168.137.130.16 port 20112 ssh2"
+    }
+  }
