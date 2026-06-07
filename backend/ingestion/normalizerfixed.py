@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from log_evaluation.log_dataclass import SOCevent, PipelineStatus
+from backend.log_evaluation.log_dataclass import SOCevent, PipelineStatus
 
 
 
