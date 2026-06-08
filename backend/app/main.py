@@ -7,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1.auth import router as auth_router
+from app.api.v1.alerts import router as alerts_router
 from app.api.v1.events import router as events_router
+from app.api.v1.playbook_executions import router as playbook_executions_router
 from backend.ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
 from backend.ingestion.wazuh_client import WazuhClient
 
@@ -75,7 +77,9 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(alerts_router, prefix=settings.API_V1_STR)
 app.include_router(events_router, prefix=settings.API_V1_STR)
+app.include_router(playbook_executions_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

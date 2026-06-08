@@ -43,7 +43,7 @@ _PLAYBOOKS = [
         "id": "pb5",
         "name": "Port Scan Blocklist",
         "condition": lambda e: (e.event_type or "").lower() in ("apache", "web", "http") and (e.severity or 0) >= 20,
-        "action": lambda e: f"Logged block: {e.source_ip or 'unknown'} flagged for suspicious web activity",
+        "action": lambda e: f"iptables -A INPUT -s {e.source_ip or 'unknown'} -j DROP",
     },
 ]
 

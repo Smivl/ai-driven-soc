@@ -9,6 +9,7 @@ from backend.ingestion.wazuh_client import WazuhClient
 from backend.log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from backend.log_evaluation.correlator import Correlator
 from backend.log_evaluation.classes.alert import score_rules, Alert
+from backend.ingestion.playbooks import run_playbooks
 from app import state
 # Instant warning is raised when the individual scoring is over 70
 INDIVIDUAL_ALERT_THRESHOLD = 70
@@ -96,6 +97,12 @@ def score_worker(
                 alert.status = "archived" 
                 client.store_soc_alert(alert) 
                 print(f"[Archive] Alert {alert.alert_id} expired from memory and committed to OpenSearch.")
+
+            state.upsert_alert(assigned_alert.to_dict())
+
+            executions = run_playbooks(event)
+            if executions:
+                state.add_playbook_executions(executions)
 
             #  Pass the Alert ID forward to the LLM Explainer instead of single logs
             pq23.put((-ui_severity_score, assigned_alert.alert_id))

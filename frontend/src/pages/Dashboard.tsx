@@ -2,36 +2,54 @@ import { useEffect, useState } from "react";
 import "../App.css";
 
 type Severity = "critical" | "high" | "medium" | "low";
-type Status = "open" | "review" | "closed";
 
-interface Alert {
-  id: string;
-  timestamp: string;
-  event_type: string;
-  source_ip: string;
-  user: string;
-  severity: Severity;
-  score: number;
-  status: Status;
-  message: string;
+interface BackendAlert {
+  alert_id: string;
+  first_seen: string | null;
+  last_seen: string | null;
+  score: number | null;
+  status: string;
+  event_count: number;
+  source_ips: string[];
+  destination_ips: string[];
+  users: string[];
+  mitre_id: string[];
+  mitre_tactic: string[];
+  mitre_technique: string[];
+  explanation: string | null;
 }
 
-const MOCK_ALERTS: Alert[] = [
-  { id: "EVT-001", timestamp: "2026-03-11 14:32:07", event_type: "Brute Force", source_ip: "185.220.101.45", user: "admin", severity: "critical", score: 94, status: "open", message: "Multiple failed SSH login attempts detected" },
-  { id: "EVT-002", timestamp: "2026-03-11 14:28:51", event_type: "Port Scan", source_ip: "203.0.113.72", user: "—", severity: "high", score: 78, status: "review", message: "SYN scan across 1024 ports in under 2 seconds" },
-  { id: "EVT-003", timestamp: "2026-03-11 14:19:33", event_type: "SQL Injection", source_ip: "198.51.100.14", user: "guest", severity: "critical", score: 97, status: "open", message: "SQLi payload detected in login form parameter" },
-  { id: "EVT-004", timestamp: "2026-03-11 14:11:02", event_type: "Privilege Escalation", source_ip: "10.0.0.22", user: "jsmith", severity: "high", score: 81, status: "open", message: "User executed sudo with unusual command" },
-  { id: "EVT-005", timestamp: "2026-03-11 13:58:47", event_type: "Suspicious DNS", source_ip: "10.0.1.15", user: "—", severity: "medium", score: 55, status: "review", message: "High-frequency DNS queries to newly registered domain" },
-  { id: "EVT-006", timestamp: "2026-03-11 13:44:19", event_type: "File Integrity", source_ip: "10.0.0.5", user: "deploy", severity: "medium", score: 49, status: "closed", message: "/etc/passwd modification detected outside change window" },
-  { id: "EVT-007", timestamp: "2026-03-11 13:30:05", event_type: "Auth Anomaly", source_ip: "77.88.55.80", user: "mlee", severity: "low", score: 22, status: "closed", message: "Login from new country: RU (usual: US)" },
-  { id: "EVT-008", timestamp: "2026-03-11 13:12:44", event_type: "Malware Signature", source_ip: "10.0.2.33", user: "system", severity: "critical", score: 99, status: "open", message: "Known C2 beacon pattern matched in outbound traffic" },
-];
+interface PlaybookExecution {
+  id: string;
+  playbookId: string;
+  triggeredBy: string;
+  sourceIp: string;
+  startedAt: string;
+  status: string;
+  action: string;
+}
 
-function scoreColor(score: number): string {
+const API_BASE = "http://localhost:8000/api/v1";
+
+function scoreToSeverity(score: number | null): Severity {
+  if (score === null) return "low";
+  if (score >= 80) return "critical";
+  if (score >= 60) return "high";
+  if (score >= 40) return "medium";
+  return "low";
+}
+
+function scoreColor(score: number | null): string {
+  if (score === null) return "var(--severity-low)";
   if (score >= 80) return "var(--severity-critical)";
   if (score >= 60) return "var(--severity-high)";
   if (score >= 40) return "var(--severity-medium)";
   return "var(--severity-low)";
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString();
 }
 
 function Navbar({ time }: { time: string }) {
@@ -52,6 +70,8 @@ function Navbar({ time }: { time: string }) {
 
 export default function Dashboard() {
   const [time, setTime] = useState(() => new Date().toUTCString().slice(0, 25) + " UTC");
+  const [alerts, setAlerts] = useState<BackendAlert[]>([]);
+  const [executions, setExecutions] = useState<PlaybookExecution[]>([]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -60,12 +80,30 @@ export default function Dashboard() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [alertsRes, execRes] = await Promise.all([
+          fetch(`${API_BASE}/alerts?limit=100`),
+          fetch(`${API_BASE}/playbook-executions?limit=100`),
+        ]);
+        if (alertsRes.ok) setAlerts(await alertsRes.json());
+        if (execRes.ok) setExecutions(await execRes.json());
+      } catch {
+        // backend not reachable yet
+      }
+    }
+    fetchData();
+    const id = setInterval(fetchData, 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const counts = {
-    total: MOCK_ALERTS.length,
-    critical: MOCK_ALERTS.filter((a) => a.severity === "critical").length,
-    high: MOCK_ALERTS.filter((a) => a.severity === "high").length,
-    medium: MOCK_ALERTS.filter((a) => a.severity === "medium").length,
-    low: MOCK_ALERTS.filter((a) => a.severity === "low").length,
+    total: alerts.length,
+    critical: alerts.filter((a) => scoreToSeverity(a.score) === "critical").length,
+    high: alerts.filter((a) => scoreToSeverity(a.score) === "high").length,
+    medium: alerts.filter((a) => scoreToSeverity(a.score) === "medium").length,
+    low: alerts.filter((a) => scoreToSeverity(a.score) === "low").length,
   };
 
   return (
@@ -109,52 +147,110 @@ export default function Dashboard() {
         {/* Alerts Table */}
         <div className="card">
           <div className="card-header">
-            <h2 className="card-title">Recent Alerts</h2>
-            <span className="card-badge">{counts.total} events</span>
+            <h2 className="card-title">Active Alerts</h2>
+            <span className="card-badge">{counts.total} alerts</span>
           </div>
           <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Timestamp</th>
-                  <th>Event Type</th>
-                  <th>Source IP</th>
-                  <th>User</th>
-                  <th>Severity</th>
-                  <th>AI Score</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_ALERTS.map((alert) => (
-                  <tr key={alert.id}>
-                    <td className="td-mono">{alert.id}</td>
-                    <td className="td-mono">{alert.timestamp}</td>
-                    <td className="td-event">{alert.event_type}</td>
-                    <td className="td-ip">{alert.source_ip}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>{alert.user}</td>
-                    <td>
-                      <span className={`badge ${alert.severity}`}>{alert.severity}</span>
-                    </td>
-                    <td>
-                      <div className="score-bar">
-                        <div className="score-bar-track">
-                          <div
-                            className="score-bar-fill"
-                            style={{ width: `${alert.score}%`, background: scoreColor(alert.score) }}
-                          />
-                        </div>
-                        <span className="score-label">{alert.score}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`status ${alert.status}`}>{alert.status}</span>
-                    </td>
+            {alerts.length === 0 ? (
+              <p style={{ padding: "1rem", color: "var(--text-secondary)" }}>
+                No alerts yet — waiting for pipeline data...
+              </p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Alert ID</th>
+                    <th>Last Seen</th>
+                    <th>MITRE Tactic</th>
+                    <th>Source IP</th>
+                    <th>User</th>
+                    <th>Events</th>
+                    <th>Severity</th>
+                    <th>AI Score</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {alerts.map((alert) => {
+                    const severity = scoreToSeverity(alert.score);
+                    return (
+                      <tr key={alert.alert_id}>
+                        <td className="td-mono">{alert.alert_id.slice(0, 8)}</td>
+                        <td className="td-mono">{formatTime(alert.last_seen)}</td>
+                        <td className="td-event">{alert.mitre_tactic[0] || "—"}</td>
+                        <td className="td-ip">{alert.source_ips[0] || "—"}</td>
+                        <td style={{ color: "var(--text-secondary)" }}>{alert.users[0] || "—"}</td>
+                        <td style={{ color: "var(--text-secondary)" }}>{alert.event_count}</td>
+                        <td>
+                          <span className={`badge ${severity}`}>{severity}</span>
+                        </td>
+                        <td>
+                          <div className="score-bar">
+                            <div className="score-bar-track">
+                              <div
+                                className="score-bar-fill"
+                                style={{
+                                  width: `${alert.score ?? 0}%`,
+                                  background: scoreColor(alert.score),
+                                }}
+                              />
+                            </div>
+                            <span className="score-label">{alert.score ?? 0}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`status ${alert.status === "active" ? "open" : "closed"}`}>
+                            {alert.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Playbook Executions Table */}
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">Playbook Executions</h2>
+            <span className="card-badge">{executions.length} actions</span>
+          </div>
+          <div className="table-wrap">
+            {executions.length === 0 ? (
+              <p style={{ padding: "1rem", color: "var(--text-secondary)" }}>
+                No playbook executions yet...
+              </p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Playbook</th>
+                    <th>Triggered By</th>
+                    <th>Source IP</th>
+                    <th>Action</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...executions].reverse().map((ex) => (
+                    <tr key={ex.id}>
+                      <td>{ex.playbookId}</td>
+                      <td className="td-event">{ex.triggeredBy}</td>
+                      <td className="td-ip">{ex.sourceIp}</td>
+                      <td className="td-mono" style={{ fontSize: "0.78rem" }}>{ex.action}</td>
+                      <td className="td-mono">{formatTime(ex.startedAt)}</td>
+                      <td>
+                        <span className="status closed">{ex.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

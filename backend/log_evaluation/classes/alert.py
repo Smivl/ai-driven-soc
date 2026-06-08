@@ -164,3 +164,20 @@ class Alert:
         
         self.score = min(100, max(0, normalized_score))
         return self.score
+
+    def to_dict(self) -> dict:
+        return {
+            "alert_id": self.alert_id,
+            "first_seen": self.first_seen.isoformat() if self.first_seen else None,
+            "last_seen": self.last_seen.isoformat() if self.last_seen else None,
+            "score": self.score,
+            "status": self.status,
+            "event_count": self.event_count,
+            "source_ips": list(self.source_ips),
+            "destination_ips": list(self.destination_ips),
+            "users": list(self.users),
+            "mitre_id": list(self.mitre_id),
+            "mitre_tactic": list(self.mitre_tactic),
+            "mitre_technique": list(self.mitre_technique),
+            "explanation": self.explanation,
+        }
