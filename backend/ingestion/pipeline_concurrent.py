@@ -6,9 +6,9 @@ import uuid
 from backend.ingestion.explanation import generate_single_behavior_explanation
 from backend.ingestion.normalizer import normalize_wazuh_alert
 from backend.ingestion.wazuh_client import WazuhClient
-from backend.log_evaluation.log_dataclass import PipelineStatus, SOCevent
+from backend.log_evaluation.classes.soc_event import PipelineStatus, SOCevent
 from backend.log_evaluation.correlator import Correlator
-from backend.log_evaluation.classes.alert import score_rules, Alert
+from backend.log_evaluation.classes.alert import Alert
 from backend.ingestion.playbooks import run_playbooks
 from app import state
 # Instant warning is raised when the individual scoring is over 70
