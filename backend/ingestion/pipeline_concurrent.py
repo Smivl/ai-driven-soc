@@ -3,7 +3,7 @@ import threading
 import datetime
 import uuid
 
-from backend.ingestion.explanation import generate_explanation
+from backend.ingestion.explanation import generate_single_behavior_explanation
 from backend.ingestion.normalizerfixed import normalize_wazuh_alert
 from backend.ingestion.wazuh_client import WazuhClient
 from backend.log_evaluation.log_dataclass import PipelineStatus, SOCevent
@@ -130,7 +130,7 @@ def explain_worker(
                 continue
 
             # Run the single-behavior prompt template built for dedicated vectors
-            explanation = generate_explanation(alert)
+            explanation = generate_single_behavior_explanation(alert)
 
             #NOTE: I want the explaination to be stored in postgreSQL, but it should eb easy to find alert ID from an event ID from opensearch
             
