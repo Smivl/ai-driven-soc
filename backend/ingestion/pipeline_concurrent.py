@@ -4,7 +4,7 @@ import datetime
 import uuid
 
 from backend.ingestion.explanation import generate_single_behavior_explanation
-from backend.ingestion.normalizerfixed import normalize_wazuh_alert
+from backend.ingestion.normalizer import normalize_wazuh_alert
 from backend.ingestion.wazuh_client import WazuhClient
 from backend.log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from backend.log_evaluation.correlator import Correlator
