@@ -13,9 +13,10 @@ import ipaddress
 class PipelineStatus(Enum):
     PENDING    = "pending"
     NORMALIZED = "normalized"  # log has been normalized
-    SCORED     = "scored"     # ML has scored it
-    EXPLAINED  = "explained"  # LLM has explained it
-    RESOLVED   = "resolved"   # SOAR has handled it
+    EVALUATED  = "evaluated"   # scored and correlated into an alert
+    SCORED     = "scored"      # ML has scored it (alias kept for compatibility)
+    EXPLAINED  = "explained"   # LLM has explained it
+    RESOLVED   = "resolved"    # SOAR has handled it
 
 # ── Individual scoring ──────────────────────────────────────────────────────────
 
