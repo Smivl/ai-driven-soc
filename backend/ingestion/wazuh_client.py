@@ -129,7 +129,7 @@ class WazuhClient:
         source = r.json().get("_source", {})
         return self._deserialize_soc_event(source)
 
-    def search_soc_events( self, status: PipelineStatus = None, scoring: Scoring = None, limit: int = 50) -> list[SOCevent]:
+    def search_soc_events( self, status: PipelineStatus = None, scoring=None, limit: int = 50) -> list[SOCevent]:
         """
         Search soc-events index with optional filters.
         Examples:
