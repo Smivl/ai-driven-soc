@@ -139,10 +139,10 @@ class Correlator:
             
             # Clean up DestIP index
             for dest_ip in alert.destination_ips:
-                if dest_ip in self.destination_ip_index:
-                    self.destination_ip_index[dest_ip].discard(alert_id)
-                    if not self.destination_ip_index[dest_ip]:
-                        del self.destination_ip_index[dest_ip]
+                if dest_ip in self.dest_ip_index:
+                    self.dest_ip_index[dest_ip].discard(alert_id)
+                    if not self.dest_ip_index[dest_ip]:
+                        del self.dest_ip_index[dest_ip]
             
             # Clean up user index
             for user in alert.users:

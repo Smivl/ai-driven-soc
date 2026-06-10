@@ -13,8 +13,10 @@ import urllib3
 import os
 import logging
 import uuid
+from datetime import datetime
 
 from backend.log_evaluation.classes.soc_event import *
+from backend.log_evaluation.classes.alert import Alert
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically
@@ -104,6 +106,8 @@ class WazuhClient:
         payload = asdict(event)
         payload["wazuh_level"] = event.wazuh_level
         payload["status"]      = event.status.value if event.status else None
+        if isinstance(payload.get("timestamp"), datetime):
+            payload["timestamp"] = payload["timestamp"].isoformat()
 
         r = requests.put(
             f"{self.indexer_url}/soc-events/_doc/{doc_id}",
@@ -115,6 +119,20 @@ class WazuhClient:
         r.raise_for_status()
         logger.info("Stored SOCevent %s (status=%s)", doc_id, payload["status"])
         return doc_id
+
+    def store_soc_alert(self, alert: Alert) -> str:
+        """Persist an Alert to the soc-alerts index in OpenSearch."""
+        payload = alert.to_dict()
+        r = requests.put(
+            f"{self.indexer_url}/soc-alerts/_doc/{alert.alert_id}",
+            auth=(self.indexer_user, self.indexer_pass),
+            json=payload,
+            verify=self.verify,
+            timeout=15,
+        )
+        r.raise_for_status()
+        logger.info("Stored Alert %s (status=%s)", alert.alert_id, alert.status)
+        return alert.alert_id
 
     def get_soc_event(self, doc_id: str) -> SOCevent:
         """Retrieve a SOCevent by ID and deserialize back into the dataclass"""

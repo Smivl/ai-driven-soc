@@ -88,7 +88,7 @@ def score_worker(
             state.upsert_event(event.return_dict())
             
             # Periodically handle alert timeouts and status updates in correlator
-            now = datetime.datetime.now()
+            now = datetime.datetime.now(datetime.timezone.utc)
             timeout_delta = datetime.timedelta(minutes=30)
             expired_alerts = correlator.update_alerts(current_time=now, alert_timeout=timeout_delta)
 
