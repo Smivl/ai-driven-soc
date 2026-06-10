@@ -102,7 +102,7 @@ class WazuhClient:
 
         # Convert to dict
         payload = asdict(event)
-        payload["wazuh_level"] = event.wazuh_level.value if event.wazuh_level else None
+        payload["wazuh_level"] = event.wazuh_level
         payload["status"]      = event.status.value if event.status else None
 
         r = requests.put(
