@@ -13,8 +13,6 @@ import urllib3
 import os
 import logging
 import uuid
-from datetime import datetime
-
 from backend.log_evaluation.classes.soc_event import *
 from backend.log_evaluation.classes.alert import Alert
 
@@ -106,7 +104,7 @@ class WazuhClient:
         payload = asdict(event)
         payload["wazuh_level"] = event.wazuh_level
         payload["status"]      = event.status.value if event.status else None
-        if isinstance(payload.get("timestamp"), datetime):
+        if hasattr(payload.get("timestamp"), "isoformat"):
             payload["timestamp"] = payload["timestamp"].isoformat()
 
         r = requests.put(
