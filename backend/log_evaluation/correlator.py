@@ -1,6 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import datetime
-import field
 
 from backend.log_evaluation.classes.alert import Alert
 from backend.log_evaluation.classes.soc_event import SOCevent

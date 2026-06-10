@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from log_evaluation.log_dataclass import Scoring, SOCevent
+from backend.log_evaluation.classes.soc_event import SOCevent
 
 
 def _is_external_ip(ip: str | None) -> bool:
