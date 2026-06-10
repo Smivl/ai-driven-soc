@@ -143,7 +143,8 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
         port           = int(p) if (p := data.get("dstport", "").strip()) and p.isdigit() else None,
         user           = _parse_user(full_log) if full_log else None,
         event_type     = rule.get("groups", ["unknown"])[0],
-        timestamp      = alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+        timestamp      = (datetime.fromisoformat(alert.get("timestamp"))
+                         if alert.get("timestamp") else datetime.now(timezone.utc)),
         raw_log        = full_log or rule.get("description", ""),
 
         # From Wazuh
