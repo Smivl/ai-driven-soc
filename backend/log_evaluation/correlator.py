@@ -110,13 +110,13 @@ class Correlator:
             
         return alert
     
-    def update_alerts(self, current_time: datetime.datetime, alert_timeout: datetime.timedelta) -> set[Alert]:
-        expired_alerts = set()
+    def update_alerts(self, current_time: datetime.datetime, alert_timeout: datetime.timedelta) -> list[Alert]:
+        expired_alerts = []
         keys_to_remove = []
-        
+
         for alert_id, alert in self.active_alerts.items():
             if current_time - alert.last_seen > alert_timeout:
-                expired_alerts.add(alert)
+                expired_alerts.append(alert)
                 keys_to_remove.append(alert_id)
 
         # Keep all indexes perfectly synchronized on deletion
