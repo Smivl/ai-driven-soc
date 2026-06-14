@@ -12,8 +12,9 @@ import requests
 import urllib3
 import os
 import logging
-
-from ingestion.normalizerfixed import normalize_wazuh_alert
+import uuid
+from backend.log_evaluation.classes.soc_event import *
+from backend.log_evaluation.classes.alert import Alert
 
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically
@@ -88,42 +89,144 @@ class WazuhClient:
         hits = r.json().get("hits", {}).get("hits", [])
         return [hit["_source"] for hit in hits]
     
-import sys
-import os
-sys.path.append("services/ingestion")
+    # =============== Storing and updating =======================
 
-def test_connection():
-    print("=" * 50)
-    print("  Wazuh Connection Test")
-    print("=" * 50)
+    def store_soc_event(self, event: SOCevent, doc_id: str = None) -> str:
+        """
+            Serialize and store a SOCevent in OpenSearch
+            Returns the doc_id used (auto-generated if not provided)
+        """
 
-    client = WazuhClient()
+        if doc_id is None:
+            doc_id = str(uuid.uuid4())
 
-    # 1. Authenticate
-    print("\n1. Authenticating...")
-    token = client._authenticate()
-    print(f"   Token: {token[:30]}...")
+        # Convert to dict
+        payload = asdict(event)
+        payload["wazuh_level"] = event.wazuh_level
+        payload["status"]      = event.status.value if event.status else None
+        if hasattr(payload.get("timestamp"), "isoformat"):
+            payload["timestamp"] = payload["timestamp"].isoformat()
 
-    # 2. Fetch alerts
-    print("\n2. Fetching last 5 alerts...")
-    alerts = client.get_recent_alerts(limit=1)
-    print(f"   Got {len(alerts)} alerts")
+        r = requests.put(
+            f"{self.indexer_url}/soc-events/_doc/{doc_id}",
+            auth=(self.indexer_user, self.indexer_pass),
+            json=payload,
+            verify=self.verify,
+            timeout=15
+        )
+        r.raise_for_status()
+        logger.info("Stored SOCevent %s (status=%s)", doc_id, payload["status"])
+        return doc_id
 
-    # 3. Print them
-    print()
-    for alert in alerts:
-        level = alert.get("rule", {}).get("level", "?")
-        desc  = alert.get("rule", {}).get("description", "no description")
-        ts    = alert.get("timestamp", "no timestamp")
-        print(f"   [{level}] {desc} | {ts}")
+    def store_soc_alert(self, alert: Alert) -> str:
+        """Persist an Alert to the soc-alerts index in OpenSearch."""
+        payload = alert.to_dict()
+        r = requests.put(
+            f"{self.indexer_url}/soc-alerts/_doc/{alert.alert_id}",
+            auth=(self.indexer_user, self.indexer_pass),
+            json=payload,
+            verify=self.verify,
+            timeout=15,
+        )
+        r.raise_for_status()
+        logger.info("Stored Alert %s (status=%s)", alert.alert_id, alert.status)
+        return alert.alert_id
 
-    print("\n" + "=" * 50)
+    def get_soc_event(self, doc_id: str) -> SOCevent:
+        """Retrieve a SOCevent by ID and deserialize back into the dataclass"""
 
-    print(alerts[0])
+        r = requests.get(
+            f"{self.indexer_url}/soc-events/_doc/{doc_id}",
+            auth=(self.indexer_user, self.indexer_pass),
+            verify=self.verify,
+            timeout=15
+        )
+        r.raise_for_status()
+        source = r.json().get("_source", {})
+        return self._deserialize_soc_event(source)
 
-    normalized = normalize_wazuh_alert(alerts[0])
+    def search_soc_events( self, status: PipelineStatus = None, scoring=None, limit: int = 50) -> list[SOCevent]:
+        """
+        Search soc-events index with optional filters.
+        Examples:
+            client.search_soc_events(status=PipelineStatus.PENDING)
+            client.search_soc_events(scoring=Scoring.CRITICAL)
+        """
+        filters = []
+        if status:
+            filters.append({"term": {"status": status.value}})
+        if scoring:
+            filters.append({"term": {"wazuh_level": scoring.value}})
 
-    print(normalized.return_value("wazuh_level"))
+        query = {"bool": {"filter": filters}} if filters else {"match_all": {}}
 
-if __name__ == "__main__":
-    test_connection()
+        r = requests.post(
+            f"{self.indexer_url}/soc-events/_search",
+            auth=(self.indexer_user, self.indexer_pass),
+            json={
+                "size": limit,
+                "sort": [{"timestamp": {"order": "desc"}}],
+                "query": query
+            },
+            verify=self.verify,
+            timeout=15
+        )
+        r.raise_for_status()
+        hits = r.json().get("hits", {}).get("hits", [])
+        return [self._deserialize_soc_event(hit["_source"]) for hit in hits]
+
+    def update_soc_event(self, doc_id: str, new_status: PipelineStatus, **fields) -> None:
+        """
+        Partial update for any pipeline stage
+        Always updates status, plus any extra fields passed 
+        
+        Examples:
+            # After ML scoring
+            client.update_soc_event(doc_id, PipelineStatus.SCORED, severity=0, label="label")
+            
+            # After LLM explanation
+            client.update_soc_event(doc_id, PipelineStatus.EXPLAINED, explanation="explanation")
+            
+            # After SOAR resolution
+            client.update_soc_event(doc_id, PipelineStatus.RESOLVED)
+        """
+        patch = {"status": new_status.value, **fields}
+
+        # Serialize any Enum values that might be passed in
+        for key, val in patch.items():
+            if isinstance(val, ( PipelineStatus)):
+                patch[key] = val.value
+
+        r = requests.post(
+            f"{self.indexer_url}/soc-events/_update/{doc_id}",
+            auth=(self.indexer_user, self.indexer_pass),
+            json={"doc": patch},
+            verify=self.verify,
+            timeout=15
+        )
+        r.raise_for_status()
+        logger.info("Updated SOCevent %s -> %s | fields: %s", doc_id, new_status.value, list(fields.keys()))
+
+    @staticmethod
+    def _deserialize_soc_event(source: dict) -> SOCevent:
+        """Rebuild a SOCevent from a raw OpenSearch _source dict"""
+
+        # Convert string values back to Enums safely
+        raw_status = source.get("status")
+
+        return SOCevent(
+            source_ip      = source.get("source_ip"),
+            destination_ip = source.get("destination_ip"),
+            port           = source.get("port"),
+            user           = source.get("user"),
+            event_type     = source.get("event_type"),
+            timestamp      = source.get("timestamp"),
+            raw_log        = source.get("raw_log"),
+            wazuh_level    = source.get("wazuh_level"),
+            rule_id        = source.get("rule_id"),
+            severity       = source.get("severity"),
+            label          = source.get("label"),
+            explanation    = source.get("explanation"),
+            status         = PipelineStatus(raw_status) if raw_status else PipelineStatus.PENDING,
+        )
+    

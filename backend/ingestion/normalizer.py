@@ -1,42 +1,210 @@
 import csv
 import json
+import os
+import re
+import sys
 from datetime import datetime, timezone
 
+if __name__ == "__main__":
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def normalize_event(raw_log, source="csv_dataset"):
+from backend.log_evaluation.classes.soc_event import SOCevent, PipelineStatus
+
+
+
+_IP_RE   = re.compile(r'\b(\d{1,3}(?:\.\d{1,3}){3})\b')
+
+# Matches the most common syslog-style timestamps in the dataset
+_TS_PATTERNS = [
+    # 2018-06-27T23:47:31
+    (re.compile(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'), '%Y-%m-%dT%H:%M:%S'),
+    # date=1981-08-26 time=03:09:47
+    (re.compile(r'date=(\d{4}-\d{2}-\d{2})\s+time=(\d{2}:\d{2}:\d{2})'), None),
+    # Jan 02 21:10:59  /  Mar 04 03:12:48
+    (re.compile(r'([A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})'), '%b %d %H:%M:%S'),
+    # [Thu Dec 17 02:47:06 1992]
+    (re.compile(r'\[(?:\w{3}\s+)?(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4})\]'), '%b %d %H:%M:%S %Y'),
+    # [Time 1998.05.04 10:45:30 +05]
+    (re.compile(r'\[Time\s+(\d{4}\.\d{2}\.\d{2}\s+\d{2}:\d{2}:\d{2})'), '%Y.%m.%d %H:%M:%S'),
+    # 19:32:06  (time only — treat as today)
+    (re.compile(r'^(\d{2}:\d{2}:\d{2})\s'), '%H:%M:%S'),
+    # TRACE ... 2024-12-08 07:35:01
+    (re.compile(r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})'), '%Y-%m-%d %H:%M:%S'),
+    # At 20:53:08 23/11/1982
+    (re.compile(r'At\s+(\d{2}:\d{2}:\d{2})\s+(\d{2}/\d{2}/\d{4})'), None),
+    # [12/Aug/1978:23:24:34 ]
+    (re.compile(r'\[(\d{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2})'), '%d/%b/%Y:%H:%M:%S'),
+]
+
+# User extraction patterns, tried in order
+_USER_PATTERNS = [
+    re.compile(r'account=(\S+)'),                          # account=kristenmcgrath
+    re.compile(r'for user (\S+)'),                         # session closed for user X
+    re.compile(r'session (?:opened|closed) for user (\S+)'),
+    re.compile(r'for (\w+)\s+from\s+\d'),                  # Accepted password for X from IP
+    re.compile(r'\] user (\w+):'),                         # [client IP] user X:
+    re.compile(r'user (\w+)'),                             # generic fallback
+    re.compile(r'\(([^)]+@[^)]+)\)'),                      # (user@host)
+    re.compile(r'by \(uid=\d+\).*?user (\S+)'),
+]
+
+
+from datetime import datetime, timezone
+
+def _parse_timestamp(log: str) -> datetime | None:
+    for pattern, fmt in _TS_PATTERNS:
+        m = pattern.search(log)
+        if not m:
+            continue
+        try:
+            if fmt is None:
+                # Special multi-group cases
+                if pattern.pattern.startswith('date='):
+                    dt = datetime.strptime(
+                        f"{m.group(1)} {m.group(2)}",
+                        '%Y-%m-%d %H:%M:%S')
+                elif 'At' in pattern.pattern:
+                    dt = datetime.strptime(
+                        f"{m.group(2)} {m.group(1)}",
+                        '%d/%m/%Y %H:%M:%S')
+                else:
+                    continue
+            else:
+                raw = m.group(1)
+                dt = datetime.strptime(raw, fmt)
+
+                # Syslog lines without a year default to the current year
+                if dt.year == 1900:
+                    dt = dt.replace(year=datetime.now().year)
+
+            return dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+    return None
+ 
+
+
+def _parse_ips(log: str) -> tuple[str | None, str | None]:
+    """Return (source_ip, destination_ip) extracted from the log string."""
+    ips = _IP_RE.findall(log)
+    src = ips[0] if len(ips) > 0 else None
+    dst = ips[1] if len(ips) > 1 else None
+    return src, dst
+
+
+def _parse_user(log: str) -> str | None:
+    for pattern in _USER_PATTERNS:
+        m = pattern.search(log)
+        if m:
+            return m.group(1)
+    return None
+
+
+def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
+   
+    raw_log = row.get("log", "")
+    category = row.get("category", "unknown")
+
+    src_ip, dst_ip = _parse_ips(raw_log)
+
     return {
-        "timestamp": raw_log.get("timestamp", datetime.now(timezone.utc).isoformat()),
-        "source_ip": raw_log.get("src_ip") or raw_log.get("source_ip"),
-        "destination_ip": raw_log.get("dst_ip") or raw_log.get("destination_ip"),
-        "event_type": raw_log.get("event_type", "unknown"),
-        "user": raw_log.get("user"),
-        "severity": 0,
-        "message": raw_log.get("message", ""),
-        "source": source,
-        "context": raw_log
+        "timestamp":       _parse_timestamp(raw_log),
+        "event_type":      category,
+        "source_ip":       src_ip,
+        "destination_ip":  dst_ip,
+        "user":            _parse_user(raw_log),
+        "severity":        0,           # filled in later by severity_scoring
+        "message":         raw_log,
+        "source":          source,
+        "raw":             row,         # original CSV row preserved
     }
 
+def normalize_wazuh_alert(alert: dict) -> SOCevent:
+    """Normalize a raw Wazuh alert into a SOCEvent dataclass."""
+    rule     = alert.get("rule", {})
+    data     = alert.get("data", {})
+    full_log = alert.get("full_log", "")
 
-def process_csv(input_file, output_file):
+    # Try to get source IP from data first, fall back to parsing the raw log
+    src_ip = data.get("srcip")
+    if not src_ip and full_log:
+        parsed_src, _ = _parse_ips(full_log)
+        src_ip = parsed_src
 
+    # Try to get destination IP from agent info
+    _, dst_ip = _parse_ips(full_log) if full_log else (None, None)
+
+    #print("rule keys:", list(rule.keys()))
+    print("mitre keys:", list(rule.get("mitre", {})))
+    event = SOCevent(
+        # From the raw log
+        source_ip      = src_ip,
+        destination_ip = dst_ip or alert.get("agent", {}).get("ip"),
+        port           = int(p) if (p := data.get("dstport", "").strip()) and p.isdigit() else None,
+        user           = _parse_user(full_log) if full_log else None,
+        event_type     = rule.get("groups", ["unknown"])[0],
+        timestamp      = (datetime.fromisoformat(alert.get("timestamp"))
+                         if alert.get("timestamp") else datetime.now(timezone.utc)),
+        raw_log        = full_log or rule.get("description", ""),
+
+        # From Wazuh
+        wazuh_level    = rule.get("level"),
+        rule_id        = rule.get("id"),
+        frequency      = int(rule["frequency"]) if rule.get("frequency") is not None else None,
+        timeframe      = rule.get("timeframe"),
+        mitre_id       = rule.get("mitre", {}).get("id"),
+        mitre_tactic   = rule.get("mitre", {}).get("tactic"),
+        mitre_technique= rule.get("mitre", {}).get("technique"),
+
+        # Pipeline status
+        status         = PipelineStatus.NORMALIZED
+    )
+
+    return event
+
+
+def process_csv(input_file: str, output_file: str) -> int:
+    """Normalize the full CSV and write a JSON file. Returns the event count."""
     normalized_events = []
 
     with open(input_file, newline='', encoding="utf-8") as csvfile:
-        reader = csv.DictReader(csvfile)
+        for row in csv.DictReader(csvfile):
+            normalized_events.append(normalize_event(row))
 
-        for row in reader:
-            event = normalize_event(row)
-            normalized_events.append(event)
-
-    with open(output_file, "w") as outfile:
+    with open(output_file, "w", encoding="utf-8") as outfile:
         json.dump(normalized_events, outfile, indent=2)
 
-    print(f"Normalized {len(normalized_events)} events")
+    print(f"Normalized {len(normalized_events)} events → {output_file}")
+    return len(normalized_events)
 
 
 if __name__ == "__main__":
+    test_alert = {
+        "timestamp": "2024-01-15T02:00:01+00:00",
+        "full_log": "Failed password for root from 10.0.0.99 port 22 ssh2",
+        "rule": {
+            "id": "5710",
+            "level": 10,
+            "description": "sshd: Attempt to login using a non-existent user",
+            "groups": ["authentication_failed", "ssh"],
+            "mitre": {
+                "id": ["T1110"],
+                "tactic": ["Credential Access"],
+                "technique": ["Brute Force"]
+            }
+        },
+        "data": {
+            "srcip": "10.0.0.99",
+            "dstport": "22"
+        },
+        "agent": {
+            "ip": "192.168.1.10"
+        }
+    }
 
-    process_csv(
-        input_file="data/SIEVE_00_100K.csv",
-        output_file="data/normalized_events.json"
-    )
+    from log_evaluation.ml_category import load_and_train_category
+    category_vectorizer, category_model = load_and_train_category()
+
+    event = normalize_wazuh_alert(category_model,category_vectorizer,test_alert)
+   
+    print(event)
