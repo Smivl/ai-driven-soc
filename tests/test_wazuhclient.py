@@ -178,3 +178,120 @@ class TestWazuhClientGetAlerts:
             alerts        = client.get_recent_alerts()
 
             assert alerts == []
+
+    def test_get_alerts_by_agent_filters_on_agent_id(self):
+        """Should query OpenSearch with an agent.id term filter."""
+        with patch("requests.post") as mock_post:
+            mock_post.return_value = mock_response(FAKE_OPENSEARCH_RESPONSE, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            alerts        = client.get_alerts_by_agent("001", limit=2)
+
+            assert len(alerts) == 2
+            sent_query = mock_post.call_args.kwargs["json"]["query"]
+            assert sent_query == {"term": {"agent.id": "001"}}
+
+
+# ── Agent / group management (multi-tenant) ────────────────────────────────
+
+FAKE_AGENTS = {
+    "data": {"affected_items": [
+        {"id": "001", "name": "companyA-web01", "group": ["companyA"]},
+        {"id": "003", "name": "companyB-fw01",  "group": ["companyB"]},
+    ]}
+}
+
+
+class TestWazuhClientTenants:
+
+    def test_register_agent_returns_id(self):
+        with patch("requests.post") as mock_post:
+            mock_post.return_value = mock_response(
+                {"data": {"id": "007", "key": "abc"}, "error": 0}, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            assert client.register_agent("companyA-web01") == "007"
+
+    def test_register_agent_falls_back_to_existing_name(self):
+        """A duplicate-name 400 should resolve to the existing agent's id."""
+        with patch("requests.post") as mock_post, \
+             patch("requests.get") as mock_get:
+            mock_post.return_value = mock_response({"error": 1705}, 400)
+            mock_get.return_value  = mock_response(FAKE_AGENTS, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            assert client.register_agent("companyB-fw01") == "003"
+
+    def test_create_group_tolerates_existing(self):
+        with patch("requests.post") as mock_post:
+            mock = mock_response({"error": 1711}, 400)
+            mock.text = "Group 'companyA' already exists"
+            mock_post.return_value = mock
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            client.create_group("companyA")  # should not raise
+
+    def test_get_agent_group_resolves_and_caches(self):
+        with patch("requests.get") as mock_get:
+            mock_get.return_value = mock_response(FAKE_AGENTS, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            assert client.get_agent_group("001") == "companyA"
+            assert client.get_agent_group("003") == "companyB"
+            # Second lookups are served from cache (one API call total).
+            assert mock_get.call_count == 1
+
+
+class TestSignificantAlerts:
+
+    def test_get_significant_alerts_builds_level_filter(self):
+        """Should query with a rule.level >= min_level range filter."""
+        with patch("requests.post") as mock_post:
+            mock_post.return_value = mock_response(FAKE_OPENSEARCH_RESPONSE, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            client.get_significant_alerts(min_level=7, limit=5)
+
+            query = mock_post.call_args.kwargs["json"]["query"]
+            assert query["bool"]["must"][0] == {"range": {"rule.level": {"gte": 7}}}
+
+    def test_get_significant_alerts_require_mitre_adds_exists(self):
+        with patch("requests.post") as mock_post:
+            mock_post.return_value = mock_response(FAKE_OPENSEARCH_RESPONSE, 200)
+
+            client        = WazuhClient()
+            client._token = FAKE_TOKEN
+            client.get_significant_alerts(min_level=10, require_mitre=True)
+
+            must = mock_post.call_args.kwargs["json"]["query"]["bool"]["must"]
+            assert {"exists": {"field": "rule.mitre.id"}} in must
+
+
+class TestExtractTriggerLogs:
+
+    def test_extracts_full_log_and_previous_output(self):
+        from ingestion.normalizerfixed import extract_trigger_logs
+
+        alert = {
+            "full_log": "line-A",
+            "previous_output": "line-B\nline-C",
+        }
+        assert extract_trigger_logs(alert) == ["line-A", "line-B", "line-C"]
+
+    def test_dedupes_and_strips_blanks(self):
+        from ingestion.normalizerfixed import extract_trigger_logs
+
+        alert = {"full_log": "dup", "previous_output": "dup\n\n  other  "}
+        assert extract_trigger_logs(alert) == ["dup", "other"]
+
+    def test_single_log_without_previous_output(self):
+        from ingestion.normalizerfixed import extract_trigger_logs
+
+        assert extract_trigger_logs({"full_log": "only"}) == ["only"]
+        assert extract_trigger_logs({}) == []

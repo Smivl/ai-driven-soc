@@ -12,6 +12,7 @@ import requests
 import urllib3
 import os
 import logging
+import threading
 
 from ingestion.normalizerfixed import normalize_wazuh_alert
 
@@ -34,11 +35,15 @@ class WazuhClient:
 
         # Certificate verification, as Wazuh generates its own certificate
         # Point this at root-ca.pem for proper verification
-        # or set to False to skip 
+        # or set to False to skip
         cert_path = os.getenv("WAZUH_CERT", None)
         self.verify = cert_path if cert_path else False
 
-        self._token = None 
+        self._token = None
+
+        # Cached {agent_id: group} map, used to resolve a tenant on alert pull.
+        self._group_cache: dict[str, str | None] = {}
+        self._group_cache_lock = threading.Lock()
 
     """
         To log into the Wazuh API
@@ -72,25 +77,152 @@ class WazuhClient:
        # Return auth headers for API calls
         return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token 
 
-    def get_recent_alerts(self, limit: int = 10) -> list:
-        """Fetch recent alerts directly from OpenSearch."""
+    # ── Alert queries (OpenSearch) ────────────────────────────────────
+    def _search_alerts(self, query: dict, limit: int, ascending: bool = False) -> list:
+        """Run an OpenSearch query against wazuh-alerts and return flat hits."""
+        order = "asc" if ascending else "desc"
         r = requests.post(
             f"{self.indexer_url}/wazuh-alerts-*/_search",
             auth=(self.indexer_user, self.indexer_pass),
             json={
                 "size": limit,
-                "sort": [{"@timestamp": {"order": "desc"}}]
+                "query": query,
+                "sort": [{"@timestamp": {"order": order}}],
             },
             verify=self.verify,
-            timeout=15
+            timeout=15,
         )
         r.raise_for_status()
         hits = r.json().get("hits", {}).get("hits", [])
-        return [{"_wazuh_id": hit["_id"], **hit["_source"]} for hit in hits]
-    
-import sys
-import os
-sys.path.append("services/ingestion")
+        return [{"_wazuh_id": hit.get("_id"), **hit["_source"]} for hit in hits]
+
+    def get_recent_alerts(self, limit: int = 10) -> list:
+        """Fetch recent alerts directly from OpenSearch."""
+        return self._search_alerts({"match_all": {}}, limit)
+
+    def get_alerts_by_agent(self, agent_id: str, limit: int = 10) -> list:
+        """Fetch recent alerts attributed to a single agent."""
+        return self._search_alerts({"term": {"agent.id": agent_id}}, limit)
+
+    def get_alerts_by_group(self, group: str, limit: int = 10) -> list:
+        """Fetch recent alerts for every agent in a Wazuh group (tenant)."""
+        agent_ids = [a["id"] for a in self.list_agents(group=group)]
+        if not agent_ids:
+            return []
+        return self._search_alerts({"terms": {"agent.id": agent_ids}}, limit)
+
+    def get_significant_alerts(
+        self,
+        min_level: int = 7,
+        limit: int = 10,
+        group: str | None = None,
+        require_mitre: bool = False,
+        since: str | None = None,
+        ascending: bool = False,
+    ) -> list:
+        """Fetch only "useful" alerts: rule.level >= min_level.
+
+        Optionally restrict to a tenant ``group`` and/or to MITRE-tagged rules.
+        ``since`` (an ISO timestamp) limits results to alerts at/after that time
+        — used by the pipeline as a watermark so restarts don't re-ingest old
+        alerts. ``ascending`` returns oldest-first (so the watermark can advance
+        without skipping bursts larger than ``limit``).
+        """
+        must: list[dict] = [{"range": {"rule.level": {"gte": min_level}}}]
+        if require_mitre:
+            must.append({"exists": {"field": "rule.mitre.id"}})
+        if since:
+            must.append({"range": {"@timestamp": {"gte": since}}})
+        if group:
+            agent_ids = [a["id"] for a in self.list_agents(group=group)]
+            if not agent_ids:
+                return []
+            must.append({"terms": {"agent.id": agent_ids}})
+        return self._search_alerts({"bool": {"must": must}}, limit, ascending=ascending)
+
+    # ── Agent / group management (Wazuh API) ──────────────────────────
+    def create_group(self, group_id: str) -> None:
+        """Create a Wazuh group. Treats an already-existing group as success."""
+        r = requests.post(
+            f"{self.api_url}/groups",
+            headers=self._headers(),
+            json={"group_id": group_id},
+            verify=self.verify,
+            timeout=10,
+        )
+        if r.status_code == 200:
+            logger.info("Created Wazuh group %s", group_id)
+            return
+        # Wazuh returns 400 with error 1711 when the group already exists.
+        if r.status_code == 400 and "already exists" in r.text:
+            logger.info("Wazuh group %s already exists", group_id)
+            return
+        r.raise_for_status()
+
+    def list_agents(self, group: str | None = None) -> list[dict]:
+        """List registered agents (optionally filtered by group)."""
+        params = {"limit": 1000}
+        if group:
+            params["group"] = group
+        r = requests.get(
+            f"{self.api_url}/agents",
+            headers=self._headers(),
+            params=params,
+            verify=self.verify,
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json().get("data", {}).get("affected_items", [])
+
+    def register_agent(self, name: str, ip: str = "any") -> str:
+        """Register an agent by name and return its 3-digit ID.
+
+        Idempotent: if an agent with this name already exists, its existing ID
+        is returned instead of raising.
+        """
+        r = requests.post(
+            f"{self.api_url}/agents",
+            headers=self._headers(),
+            json={"name": name, "ip": ip},
+            verify=self.verify,
+            timeout=10,
+        )
+        if r.status_code == 200:
+            return r.json()["data"]["id"]
+        # Error 1705: an agent with that name already exists — look it up.
+        if r.status_code in (400, 409):
+            for agent in self.list_agents():
+                if agent.get("name") == name:
+                    return agent["id"]
+        r.raise_for_status()
+        raise RuntimeError(f"Could not register or find agent {name!r}")
+
+    def assign_agent_to_group(self, agent_id: str, group_id: str) -> None:
+        """Assign an agent to a group (idempotent on the Wazuh side)."""
+        r = requests.put(
+            f"{self.api_url}/agents/{agent_id}/group/{group_id}",
+            headers=self._headers(),
+            verify=self.verify,
+            timeout=10,
+        )
+        r.raise_for_status()
+
+    def get_agent_group(self, agent_id: str) -> str | None:
+        """Resolve an agent's group (tenant), caching the full map on first use."""
+        if agent_id is None:
+            return None
+        with self._group_cache_lock:
+            if agent_id in self._group_cache:
+                return self._group_cache[agent_id]
+        # Cache miss — refresh the whole id→group map from the API.
+        fresh: dict[str, str | None] = {}
+        for agent in self.list_agents():
+            groups = agent.get("group") or []
+            fresh[agent["id"]] = groups[0] if groups else None
+        with self._group_cache_lock:
+            self._group_cache = fresh
+            return self._group_cache.get(agent_id)
+
 
 def test_connection():
     print("=" * 50)
@@ -99,31 +231,23 @@ def test_connection():
 
     client = WazuhClient()
 
-    # 1. Authenticate
     print("\n1. Authenticating...")
     token = client._authenticate()
     print(f"   Token: {token[:30]}...")
 
-    # 2. Fetch alerts
     print("\n2. Fetching last 5 alerts...")
-    alerts = client.get_recent_alerts(limit=1)
+    alerts = client.get_recent_alerts(limit=5)
     print(f"   Got {len(alerts)} alerts")
 
-    # 3. Print them
     print()
     for alert in alerts:
         level = alert.get("rule", {}).get("level", "?")
         desc  = alert.get("rule", {}).get("description", "no description")
-        ts    = alert.get("timestamp", "no timestamp")
-        print(f"   [{level}] {desc} | {ts}")
+        agent = alert.get("agent", {})
+        print(f"   [{level}] {desc} | agent={agent.get('id')} ({agent.get('name')})")
 
     print("\n" + "=" * 50)
 
-    print(alerts[0])
-
-    normalized = normalize_wazuh_alert(alerts[0])
-
-    print(normalized.return_value("wazuh_level"))
 
 if __name__ == "__main__":
     test_connection()

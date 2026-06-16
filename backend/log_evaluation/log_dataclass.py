@@ -23,6 +23,11 @@ class SOCevent:
             - Severity
             - LLM explaination 
     """
+    # ── Tenant (multi-tenant attribution) ─────────────
+    agent_id:       str   = None   # Wazuh agent id, e.g. "001"
+    agent_name:     str   = None   # Wazuh agent name, e.g. "companyA-web01"
+    group:          str   = None   # Wazuh group = tenant/company
+
     # ── From the raw log ──────────────────────────────
     source_ip:      str   = None
     destination_ip: str   = None
@@ -30,23 +35,28 @@ class SOCevent:
     user:           str   = None
     event_type:     str   = None
     timestamp:      str   = None
+    first_seen:     str   = None   # earliest contributing log time (start of attack)
+    last_seen:      str   = None   # most recent contributing log time
     raw_log:        str   = None
 
     # ── From Wazuh ────────────────────────────────────
     wazuh_level:    Scoring = None
     rule_id:        str     = None
+    rule_description: str   = None
     frequency:      int     = None
     timeframe:      int     = None
     mitre_id:       list    = None
     mitre_tactic:   list    = None
     mitre_technique:list    = None
+    trigger_logs:   list    = None   # raw logs that triggered this event
 
     # ── From ML ───────────────────────────────────────
     severity:       int   = None   # 0-100
     label:          str   = None   
 
     # ── From LLM ─────────────────────────────────────
-    explanation:    str   = None
+    explanation:        str   = None
+    recommended_action: str   = None
 
     # ── Pipeline tracking ─────────────────────────────
     event_id:        str             = None

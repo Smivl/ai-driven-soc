@@ -1,13 +1,15 @@
 import queue
 import threading
 import uuid
+from datetime import datetime, timezone
 
-from ingestion.explanation import generate_explanation
+from ingestion.explanation import fallback_recommendation, generate_analysis
 from ingestion.normalizerfixed import normalize_wazuh_alert
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
 from app import state
+from app.services import tenants as tenant_service
 
 
 def ingest_worker(
@@ -19,13 +21,28 @@ def ingest_worker(
     poll_seconds: int = 15,
     batch_size: int = 10,
 ) -> None:
+    # Watermark: only ingest alerts at/after this time. Initialised to startup,
+    # so a restart begins fresh and won't re-pull alerts already in OpenSearch.
+    since = datetime.now(timezone.utc).isoformat()
     while not stop.is_set():
         try:
-            alerts = client.get_recent_alerts(limit=batch_size)
+            # Query at the lowest threshold any tenant uses; filter per-tenant below.
+            alerts = client.get_significant_alerts(
+                min_level=tenant_service.floor_min_level(),
+                limit=batch_size, since=since, ascending=True,
+            )
             for alert in alerts:
+                # Advance the watermark for every fetched alert (oldest-first),
+                # so we always move forward even past already-seen ones.
+                ts = alert.get("@timestamp") or alert.get("timestamp")
+                if ts and ts > since:
+                    since = ts
                 wazuh_id = alert.pop("_wazuh_id", None)
-                event: SOCevent = normalize_wazuh_alert(alert)
+                event: SOCevent = normalize_wazuh_alert(alert, group_resolver=client.get_agent_group)
                 event.event_id = wazuh_id or str(uuid.uuid4())
+                # Per-tenant threshold: drop alerts below this tenant's min_level.
+                if (event.wazuh_level or 0) < tenant_service.min_level_for(event.group):
+                    continue
                 if state.get_event(event.event_id) is not None:
                     continue  # already in pipeline, skip re-ingestion
                 with cache_lock:
@@ -81,13 +98,29 @@ def explain_worker(
                 event = cache.get(event_id)
             if event is None:
                 continue
-            explanation_input = {
+            analysis_input = {
                 "event_type": event.event_type,
+                "rule_id": event.rule_id,
+                "rule_description": event.rule_description,
                 "message": event.raw_log,
                 "user": event.user,
                 "source_ip": event.source_ip,
+                "group": event.group,
+                "agent_name": event.agent_name,
+                "label": event.label,
+                "mitre_id": event.mitre_id,
+                "mitre_tactic": event.mitre_tactic,
+                "mitre_technique": event.mitre_technique,
+                "wazuh_level": event.wazuh_level,
+                "trigger_logs": event.trigger_logs,
             }
-            event.explanation = generate_explanation(explanation_input, event.severity or 0)
+            try:
+                explanation, action = generate_analysis(analysis_input, event.severity or 0)
+            except Exception as e:
+                print(f"[explain_worker] analysis error: {e}")
+                explanation, action = None, fallback_recommendation(analysis_input)
+            event.explanation = explanation
+            event.recommended_action = action
             event.status = PipelineStatus.EXPLAINED
             state.upsert_event(event.return_dict())
             with cache_lock:

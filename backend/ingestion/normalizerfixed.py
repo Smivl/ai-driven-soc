@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.log_evaluation.log_dataclass import SOCevent, PipelineStatus
+from log_evaluation.log_dataclass import SOCevent, PipelineStatus
 
 
 
@@ -112,11 +112,60 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
         "raw":             row,         # original CSV row preserved
     }
 
-def normalize_wazuh_alert(alert: dict) -> SOCevent:
-    """Normalize a raw Wazuh alert into a SOCEvent dataclass."""
+def extract_trigger_logs(alert: dict) -> list[str]:
+    """Return the raw logs that triggered an alert.
+
+    Wazuh embeds the causal logs in-band: ``full_log`` is the line that tripped
+    the rule, and ``previous_output`` holds the earlier contributing lines for a
+    correlation/frequency rule (newline-delimited string, occasionally a list).
+    Returns them de-duplicated, triggering line first.
+    """
+    logs: list[str] = []
+
+    full_log = alert.get("full_log")
+    if full_log:
+        logs.append(full_log)
+
+    prev = alert.get("previous_output")
+    if isinstance(prev, str):
+        logs.extend(prev.split("\n"))
+    elif isinstance(prev, list):
+        logs.extend(prev)
+
+    # Strip blanks and de-dupe while preserving order.
+    seen: set[str] = set()
+    result: list[str] = []
+    for line in logs:
+        line = (line or "").strip()
+        if line and line not in seen:
+            seen.add(line)
+            result.append(line)
+    return result
+
+
+def _trigger_time_range(trigger_logs: list[str], fallback: str) -> tuple[str, str]:
+    """Return (first_seen, last_seen) ISO timestamps across the triggering logs.
+
+    Parses each log's own timestamp with _parse_timestamp; falls back to the
+    alert timestamp when there are no parseable trigger logs. ISO strings sort
+    chronologically, so min/max give the range directly.
+    """
+    times = [_parse_timestamp(log) for log in trigger_logs if log]
+    if not times:
+        return fallback, fallback
+    return min(times), max(times)
+
+
+def normalize_wazuh_alert(alert: dict, group_resolver=None) -> SOCevent:
+    """Normalize a raw Wazuh alert into a SOCEvent dataclass.
+
+    If ``group_resolver`` is given (a callable ``agent_id -> group``), the
+    event's tenant/group is resolved from the agent id.
+    """
     rule     = alert.get("rule", {})
     data     = alert.get("data", {})
     full_log = alert.get("full_log", "")
+    agent    = alert.get("agent", {})
 
     # Try to get source IP from data first, fall back to parsing the raw log
     src_ip = data.get("srcip")
@@ -127,26 +176,40 @@ def normalize_wazuh_alert(alert: dict) -> SOCevent:
     # Try to get destination IP from agent info
     _, dst_ip = _parse_ips(full_log) if full_log else (None, None)
 
-    #print("rule keys:", list(rule.keys()))
-    print("mitre keys:", list(rule.get("mitre", {})))
+    agent_id = agent.get("id")
+    group = group_resolver(agent_id) if (group_resolver and agent_id) else None
+
+    timestamp = alert.get("timestamp") or datetime.now(timezone.utc).isoformat()
+    triggers = extract_trigger_logs(alert)
+    first_seen, last_seen = _trigger_time_range(triggers, timestamp)
+
     return SOCevent(
+        # Tenant attribution
+        agent_id       = agent_id,
+        agent_name     = agent.get("name"),
+        group          = group,
+
         # From the raw log
         source_ip      = src_ip,
         destination_ip = dst_ip or alert.get("agent", {}).get("ip"),
         port           = int(data.get("dstport", 0)) or None,
         user           = _parse_user(full_log) if full_log else None,
         event_type     = rule.get("groups", ["unknown"])[0],
-        timestamp      = alert.get("timestamp") or datetime.now(timezone.utc).isoformat(),
+        timestamp      = timestamp,
+        first_seen     = first_seen,
+        last_seen      = last_seen,
         raw_log        = full_log or rule.get("description", ""),
 
         # From Wazuh
-        wazuh_level    = rule.get("level"),
-        rule_id        = rule.get("id"),
-        frequency      = int(rule["frequency"]) if rule.get("frequency") is not None else None,
-        timeframe      = rule.get("timeframe"),
-        mitre_id       = rule.get("mitre", {}).get("id"),
-        mitre_tactic   = rule.get("mitre", {}).get("tactic"),
-        mitre_technique= rule.get("mitre", {}).get("technique"),
+        wazuh_level     = rule.get("level"),
+        rule_id         = rule.get("id"),
+        rule_description= rule.get("description"),
+        frequency       = int(rule["frequency"]) if rule.get("frequency") is not None else None,
+        timeframe       = rule.get("timeframe"),
+        mitre_id        = rule.get("mitre", {}).get("id"),
+        mitre_tactic    = rule.get("mitre", {}).get("tactic"),
+        mitre_technique = rule.get("mitre", {}).get("technique"),
+        trigger_logs    = triggers,
 
         # Pipeline status
         status         = PipelineStatus.NORMALIZED
