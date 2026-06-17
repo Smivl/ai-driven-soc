@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     # Postgres connection (tenant registry + settings).
     DATABASE_URL: str = "postgresql+psycopg://soc:soc@localhost:5432/soc"
 
+    # ── Auth ──────────────────────────────────────────────────────────────────
+    # Secret used to sign JWT access tokens. Override in .env for any real deploy.
+    SECRET_KEY: str = "dev-insecure-secret-key-change-me-in-production"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12  # 12h
+    JWT_ALGORITHM: str = "HS256"
+
+    # Admin account seeded on first boot when the user table is empty.
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_PASSWORD: str = "admin"  # change in .env before any real deploy
+
     class Config:
         env_file = ".env"
         case_sensitive = True

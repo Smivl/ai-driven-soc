@@ -9,8 +9,10 @@ from app.core.config import settings
 from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
 from app.api.v1.tenants import router as tenants_router
+from app.api.v1.users import router as users_router
 from app.db import init_db
 from app.services import tenants as tenant_service
+from app.services import users as user_service
 from ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.severity_scoring import load_blacklist, train_model
@@ -33,9 +35,10 @@ async def lifespan(app: FastAPI):
     # in Wazuh, and warm the per-tenant threshold cache. Resilient to DB/Wazuh hiccups.
     try:
         init_db()
+        user_service.seed_admin_if_empty()
         tenant_service.bootstrap(client)
     except Exception as e:
-        print(f"[startup] tenant registry bootstrap failed: {e}")
+        print(f"[startup] registry bootstrap failed: {e}")
 
     _stop.clear()
     threads = [
@@ -83,6 +86,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(events_router, prefix=settings.API_V1_STR)
 app.include_router(tenants_router, prefix=settings.API_V1_STR)
+app.include_router(users_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

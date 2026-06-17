@@ -9,6 +9,7 @@ from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
 from app import state
+from app.services import events_archive
 from app.services import tenants as tenant_service
 
 
@@ -122,7 +123,10 @@ def explain_worker(
             event.explanation = explanation
             event.recommended_action = action
             event.status = PipelineStatus.EXPLAINED
-            state.upsert_event(event.return_dict())
+            event_dict = event.return_dict()
+            state.upsert_event(event_dict)
+            # Event is fully processed — persist it to Postgres for the archive.
+            events_archive.archive_event(event_dict)
             with cache_lock:
                 cache.pop(event_id, None)
         except Exception as e:

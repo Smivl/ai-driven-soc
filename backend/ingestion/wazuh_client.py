@@ -40,6 +40,7 @@ class WazuhClient:
         self.verify = cert_path if cert_path else False
 
         self._token = None
+        self._token_lock = threading.Lock()
 
         # Cached {agent_id: group} map, used to resolve a tenant on alert pull.
         self._group_cache: dict[str, str | None] = {}
@@ -56,26 +57,43 @@ class WazuhClient:
 
     """
     def _authenticate(self) -> str:
-        # If the authentication token is already fetched
-        if self._token:
-            return self._token
+        with self._token_lock:
+            # If the authentication token is already fetched
+            if self._token:
+                return self._token
 
-        r = requests.get(
-            f"{self.api_url}/security/user/authenticate?raw=true",
-            auth=(self.api_user, self.api_pass),
-            verify=self.verify,
-            timeout=10
-        )
-        r.raise_for_status()
-        # We cache it in self._token so we don't re-authenticate every call.
-        self._token = r.text.strip()
-        logger.info("Authenticated with Wazuh successfully")
-        return self._token
+            r = requests.get(
+                f"{self.api_url}/security/user/authenticate?raw=true",
+                auth=(self.api_user, self.api_pass),
+                verify=self.verify,
+                timeout=10
+            )
+            r.raise_for_status()
+            # We cache it in self._token so we don't re-authenticate every call.
+            self._token = r.text.strip()
+            logger.info("Authenticated with Wazuh successfully")
+            return self._token
 
 
     def _headers(self) -> dict:
        # Return auth headers for API calls
-        return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token 
+        return {"Authorization": f"Bearer {self._authenticate()}"} # Wazuh uses Bearer token auth with the JWT token
+
+    def _api(self, method: str, path: str, **kwargs) -> requests.Response:
+        """Call the Wazuh API, re-authenticating once if the JWT has expired.
+
+        Wazuh API tokens are short-lived (~15 min). On a 401 we drop the cached
+        token, re-authenticate, and retry the request once.
+        """
+        kwargs.setdefault("verify", self.verify)
+        kwargs.setdefault("timeout", 10)
+        url = f"{self.api_url}{path}"
+        r = requests.request(method, url, headers=self._headers(), **kwargs)
+        if r.status_code == 401:
+            with self._token_lock:
+                self._token = None  # force a fresh login on the next _headers()
+            r = requests.request(method, url, headers=self._headers(), **kwargs)
+        return r
 
     # ── Alert queries (OpenSearch) ────────────────────────────────────
     def _search_alerts(self, query: dict, limit: int, ascending: bool = False) -> list:
@@ -143,13 +161,7 @@ class WazuhClient:
     # ── Agent / group management (Wazuh API) ──────────────────────────
     def create_group(self, group_id: str) -> None:
         """Create a Wazuh group. Treats an already-existing group as success."""
-        r = requests.post(
-            f"{self.api_url}/groups",
-            headers=self._headers(),
-            json={"group_id": group_id},
-            verify=self.verify,
-            timeout=10,
-        )
+        r = self._api("POST", "/groups", json={"group_id": group_id})
         if r.status_code == 200:
             logger.info("Created Wazuh group %s", group_id)
             return
@@ -164,13 +176,7 @@ class WazuhClient:
         params = {"limit": 1000}
         if group:
             params["group"] = group
-        r = requests.get(
-            f"{self.api_url}/agents",
-            headers=self._headers(),
-            params=params,
-            verify=self.verify,
-            timeout=10,
-        )
+        r = self._api("GET", "/agents", params=params)
         r.raise_for_status()
         return r.json().get("data", {}).get("affected_items", [])
 
@@ -180,13 +186,7 @@ class WazuhClient:
         Idempotent: if an agent with this name already exists, its existing ID
         is returned instead of raising.
         """
-        r = requests.post(
-            f"{self.api_url}/agents",
-            headers=self._headers(),
-            json={"name": name, "ip": ip},
-            verify=self.verify,
-            timeout=10,
-        )
+        r = self._api("POST", "/agents", json={"name": name, "ip": ip})
         if r.status_code == 200:
             return r.json()["data"]["id"]
         # Error 1705: an agent with that name already exists — look it up.
@@ -199,12 +199,7 @@ class WazuhClient:
 
     def assign_agent_to_group(self, agent_id: str, group_id: str) -> None:
         """Assign an agent to a group (idempotent on the Wazuh side)."""
-        r = requests.put(
-            f"{self.api_url}/agents/{agent_id}/group/{group_id}",
-            headers=self._headers(),
-            verify=self.verify,
-            timeout=10,
-        )
+        r = self._api("PUT", f"/agents/{agent_id}/group/{group_id}")
         r.raise_for_status()
 
     def get_agent_group(self, agent_id: str) -> str | None:

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEvents } from "../hooks/useEvents";
 import NotificationPanel from "./NotificationPanel";
@@ -42,7 +42,16 @@ function NavIcon({ d }: { d: string }) {
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  // Search is URL-backed (?q=) so tenant nodes on the radar can deep-link into
+  // Active Alerts pre-filtered, and the filter survives refresh/sharing.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("q") ?? "";
+  const setSearch = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set("q", value);
+    else next.delete("q");
+    setSearchParams(next, { replace: true });
+  };
   const [notifOpen, setNotifOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
@@ -70,8 +79,12 @@ export default function AppLayout() {
         </div>
         <nav className="shell-nav">
           <NavLink to="/" end className={({ isActive }) => `shell-nav-item ${isActive ? "active" : ""}`}>
-            <NavIcon d="M2 6l6-4 6 4v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6z" />
+            <NavIcon d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM8 5v3l2 1.5M8 1.5V3m0 10v1.5M14.5 8H13M3 8H1.5" />
             Dashboard
+          </NavLink>
+          <NavLink to="/alerts" className={({ isActive }) => `shell-nav-item ${isActive ? "active" : ""}`}>
+            <NavIcon d="M8 1.5A4.5 4.5 0 0 0 3.5 6v2.5L2 11h12l-1.5-2.5V6A4.5 4.5 0 0 0 8 1.5zM6.5 11a1.5 1.5 0 0 0 3 0" />
+            Active Alerts
           </NavLink>
           <NavLink to="/tenants" className={({ isActive }) => `shell-nav-item ${isActive ? "active" : ""}`}>
             <NavIcon d="M2 13V9l4-2 4 2v4M6 7V3l4-2 4 2v10" />

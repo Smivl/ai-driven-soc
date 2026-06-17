@@ -33,6 +33,6 @@ def session_scope() -> Iterator[Session]:
 
 def init_db() -> None:
     """Create tables if they don't exist. Models must be imported first."""
-    from app.models import tenant  # noqa: F401  (register mappers)
+    from app.models import event, tenant, user  # noqa: F401  (register mappers)
 
     Base.metadata.create_all(bind=engine)

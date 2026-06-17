@@ -19,4 +19,6 @@ dependencies = [
     "pyyaml>=6.0.3",
     "sqlalchemy>=2.0.51",
     "psycopg[binary]>=3.3.4",
+    "pyjwt>=2.13.0",
+    "bcrypt>=5.0.0",
 ]

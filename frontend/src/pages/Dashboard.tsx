@@ -1,139 +1,321 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
-import { useResolveEvent } from "../hooks/useResolveEvent";
+import { useTenants } from "../hooks/useTenants";
+import type { Tenant } from "../types/tenant";
 import type { SOCEvent } from "../types/event";
-import type { OutletCtx } from "../components/AppLayout";
-import { formatAgo, formatClock, levelInfo, matchesSearch, SEV_COLOR } from "../lib/eventFmt";
 
-function AlertCard({ evt }: { evt: SOCEvent }) {
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-  const resolve = useResolveEvent();
-  const { cls, label } = levelInfo(evt.wazuh_level);
-  const correlated = evt.trigger_logs?.length ?? 0;
+type ThreatLevel = "secured" | "at-risk" | "under-attack";
 
+interface RadarTenant {
+  tenant: Tenant;
+  status: ThreatLevel;
+  maxLevel: number; // worst active Wazuh level seen for this tenant
+  activeCount: number;
+}
+
+type RadarItem =
+  | { kind: "tenant"; rt: RadarTenant }
+  | { kind: "overflow"; count: number };
+
+// Inner → outer. Inner rings are more severe and sit closer to the centre.
+const RING_ORDER: ThreatLevel[] = ["under-attack", "at-risk", "secured"];
+
+// Largest radius (% from centre) a ring's nodes may sit on, by severity.
+const RING_MAX_RADIUS: Record<ThreatLevel, number> = {
+  "under-attack": 14,
+  "at-risk": 31,
+  secured: 46,
+};
+
+const RING_META: Record<ThreatLevel, { label: string; cls: string }> = {
+  "under-attack": { label: "⛊ UNDER ATTACK", cls: "ua" },
+  "at-risk": { label: "⚠ AT RISK", cls: "ar" },
+  secured: { label: "⛉ SECURED", cls: "sec" },
+};
+
+// Hundreds of secured tenants can't all be shown legibly — cap and summarise.
+// At-risk / under-attack are not capped: we aim to show every one.
+const SECURED_MAX = 16;
+
+// Classify a tenant by the worst active (unresolved) event attributed to it.
+function classify(maxLevel: number, activeCount: number): ThreatLevel {
+  if (activeCount === 0) return "secured";
+  if (maxLevel >= 12) return "under-attack";
+  if (maxLevel >= 7) return "at-risk";
+  return "secured";
+}
+
+function polar(radius: number, deg: number) {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    left: `${50 + radius * Math.cos(rad)}%`,
+    top: `${50 + radius * Math.sin(rad)}%`,
+  };
+}
+
+// Angles (deg) for n nodes: 1 → centred, 2 → side by side across the middle,
+// 3+ → regular polygon. The half-step offset keeps a gap at the top (-90°) for
+// the ring's label. n=1/2 sit on the horizontal so the cluster stays vertically
+// centred (the ring wraps them) instead of bunching at the top.
+function anglesFor(n: number): number[] {
+  if (n <= 0) return [];
+  if (n === 1) return [0];
+  if (n === 2) return [180, 0];
+  return Array.from({ length: n }, (_, i) => -90 + (360 * (i + 0.5)) / n);
+}
+
+function BuildingIcon() {
   return (
-    <div className={`alert-card alert-${cls} ${open ? "open" : ""}`} style={{ borderLeftColor: SEV_COLOR[cls] }}>
-      <div className="alert-row">
-        {/* Severity */}
-        <div className="alert-sev">
-          <span className={`badge ${cls}`}>Level {evt.wazuh_level ?? "—"}</span>
-          <span className="alert-sev-label">{label}</span>
-        </div>
-
-        {/* Main */}
-        <div className="alert-main">
-          <span className="alert-title">{evt.rule_description ?? evt.event_type ?? "Security event"}</span>
-          <span className="alert-meta">
-            <span className="alert-tenant">{evt.group ?? "unattributed"}</span>
-            <span className="alert-sep">·</span>
-            {evt.agent_name ?? "unknown host"}
-            {evt.user ? <><span className="alert-sep">·</span>{evt.user}</> : null}
-            {evt.mitre_id?.length ? <span className="alert-mitre">{evt.mitre_id.join(", ")}</span> : null}
-          </span>
-        </div>
-
-        {/* Correlated */}
-        <div className="alert-corr">
-          <span className="alert-corr-num">{correlated}</span>
-          <span className="alert-corr-label">correlated</span>
-        </div>
-
-        {/* Times */}
-        <div className="alert-times">
-          <div className="alert-time">
-            <span className="alert-time-label">First seen</span>
-            <span className="alert-time-val">{formatClock(evt.first_seen)}</span>
-            <span className="alert-time-ago">{formatAgo(evt.first_seen)}</span>
-          </div>
-          <div className="alert-time">
-            <span className="alert-time-label">Last seen</span>
-            <span className="alert-time-val">{formatClock(evt.last_seen)}</span>
-            <span className="alert-time-ago">{formatAgo(evt.last_seen)}</span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="alert-actions">
-          <button
-            className="btn-resolve"
-            disabled={resolve.isPending}
-            onClick={() => evt.event_id && resolve.mutate(evt.event_id)}
-            title="Mark resolved"
-          >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Resolve
-          </button>
-          <button className="btn-view" onClick={() => evt.event_id && navigate(`/alerts/${encodeURIComponent(evt.event_id)}`)}>
-            View
-          </button>
-          <button className={`alert-expand ${open ? "open" : ""}`} onClick={() => setOpen((o) => !o)} aria-label="Expand">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <div className="alert-expanded">
-          <div className="alert-expanded-col">
-            <p className="alert-expanded-label">✦ LLM Explanation</p>
-            <p className="alert-expanded-text">
-              {evt.explanation ??
-                (evt.status === "explained" ? "—" : "Generating analysis…")}
-            </p>
-          </div>
-          <div className="alert-expanded-col">
-            <p className="alert-expanded-label">⛨ Recommended Action</p>
-            <p className="alert-expanded-text">{evt.recommended_action ?? "Pending…"}</p>
-            <button className="btn-primary sharp" disabled>Take Action</button>
-          </div>
-        </div>
-      )}
-    </div>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M3 21h18M5 21V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v16M13 21V9a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v12M8 8h2M8 12h2M8 16h2M16 12h0M16 16h0"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
 export default function Dashboard() {
-  const { search } = useOutletContext<OutletCtx>();
-  const { data: events = [], isFetching } = useEvents();
+  const navigate = useNavigate();
+  const { data: tenants = [] } = useTenants();
+  const { data: events = [] } = useEvents();
 
-  const alerts = useMemo(() => {
-    return events
-      .filter((e) => e.status !== "resolved")
-      .filter((e) => matchesSearch(e, search))
-      .sort((a, b) => {
-        const lvl = (b.wazuh_level ?? 0) - (a.wazuh_level ?? 0);
-        if (lvl !== 0) return lvl;
-        return Date.parse(b.last_seen ?? "") - Date.parse(a.last_seen ?? "");
+  // Fullscreen "TV mode": overlay everything with just the radar, and request
+  // native fullscreen for a true kiosk view. Esc / browser exit syncs back.
+  const [fullscreen, setFullscreen] = useState(false);
+  const toggleFullscreen = useCallback(() => {
+    setFullscreen((prev) => {
+      const next = !prev;
+      try {
+        if (next) document.documentElement.requestFullscreen?.();
+        else if (document.fullscreenElement) document.exitFullscreen?.();
+      } catch {
+        /* ignore — fall back to the CSS overlay */
+      }
+      return next;
+    });
+  }, []);
+
+  // Hide the app chrome (sidebar + header) while in fullscreen TV mode.
+  useEffect(() => {
+    document.body.classList.toggle("radar-fullscreen", fullscreen);
+    return () => document.body.classList.remove("radar-fullscreen");
+  }, [fullscreen]);
+
+  useEffect(() => {
+    const onFsChange = () => {
+      if (!document.fullscreenElement) setFullscreen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  // Per-tenant threat status from live, unresolved events.
+  const radarTenants = useMemo<RadarTenant[]>(() => {
+    const byGroup = new Map<string, { max: number; count: number }>();
+    for (const e of events as SOCEvent[]) {
+      if (e.status === "resolved" || !e.group) continue;
+      const agg = byGroup.get(e.group) ?? { max: 0, count: 0 };
+      agg.max = Math.max(agg.max, e.wazuh_level ?? 0);
+      agg.count += 1;
+      byGroup.set(e.group, agg);
+    }
+    return tenants.map((tenant) => {
+      const agg = byGroup.get(tenant.group) ?? { max: 0, count: 0 };
+      return {
+        tenant,
+        maxLevel: agg.max,
+        activeCount: agg.count,
+        status: classify(agg.max, agg.count),
+      };
+    });
+  }, [tenants, events]);
+
+  const byRing = useMemo(() => {
+    const groups: Record<ThreatLevel, RadarTenant[]> = {
+      "under-attack": [],
+      "at-risk": [],
+      secured: [],
+    };
+    for (const rt of radarTenants) groups[rt.status].push(rt);
+    // Worst first within attack/risk; alphabetical for secured.
+    groups["under-attack"].sort((a, b) => b.maxLevel - a.maxLevel);
+    groups["at-risk"].sort((a, b) => b.maxLevel - a.maxLevel);
+    groups.secured.sort((a, b) => a.tenant.company.localeCompare(b.tenant.company));
+    return groups;
+  }, [radarTenants]);
+
+  const counts = {
+    "under-attack": byRing["under-attack"].length,
+    "at-risk": byRing["at-risk"].length,
+    secured: byRing.secured.length,
+  };
+
+  // Geometry for each populated ring: a draw radius (ring circle) plus the
+  // positioned items inside it. The innermost present ring is a centred cluster
+  // that grows with count; every outer ring's nodes sit in the MIDDLE of their
+  // band (between the inner ring and the wall), never hugging the wall.
+  const OUTER_WALL = 49;
+  const rings = useMemo(() => {
+    const present = RING_ORDER.filter((r) => byRing[r].length > 0);
+    const k = present.length;
+    const out: {
+      ring: ThreatLevel;
+      drawR: number;
+      dense: boolean;
+      items: { item: RadarItem; pos: { left: string; top: string } }[];
+    }[] = [];
+
+    present.forEach((ring, idx) => {
+      // Build the items, capping the secured ring with a "+N" overflow chip.
+      let items: RadarItem[];
+      if (ring === "secured" && byRing.secured.length > SECURED_MAX) {
+        items = [
+          ...byRing.secured.slice(0, SECURED_MAX).map((rt) => ({ kind: "tenant", rt } as RadarItem)),
+          { kind: "overflow", count: byRing.secured.length - SECURED_MAX },
+        ];
+      } else {
+        items = byRing[ring].map((rt) => ({ kind: "tenant", rt } as RadarItem));
+      }
+
+      const n = items.length;
+      const maxR = RING_MAX_RADIUS[ring];
+
+      let nodeR: number;
+      let drawR: number;
+      if (idx === 0) {
+        // Innermost present ring: centred cluster that grows with count.
+        if (n <= 1) nodeR = 0;
+        else if (n === 2) nodeR = Math.min(maxR, 12);
+        else nodeR = Math.min(maxR, 7 + n * 1.4);
+        nodeR = Math.min(nodeR, 46);
+        drawR = Math.min(Math.max(nodeR + 9, 12), OUTER_WALL);
+      } else {
+        // Outer band: walls spread evenly out to the edge; nodes centred in the band.
+        const prevWall = out[idx - 1].drawR;
+        drawR = out[0].drawR + ((OUTER_WALL - out[0].drawR) * idx) / (k - 1);
+        nodeR = (prevWall + drawR) / 2;
+      }
+
+      const angs = anglesFor(n);
+      out.push({
+        ring,
+        drawR,
+        dense: n > 10,
+        items: items.map((item, i) => ({ item, pos: polar(nodeR, angs[i]) })),
       });
-  }, [events, search]);
+    });
+    return out;
+  }, [byRing]);
+
+  function openTenant(rt: RadarTenant) {
+    // Deep-link into Active Alerts, pre-filtered to this tenant's events.
+    navigate(`/alerts?q=${encodeURIComponent(rt.tenant.group)}`);
+  }
 
   return (
-    <div className="page">
+    <div className={`page radar-page ${fullscreen ? "fullscreen" : ""}`}>
       <div className="page-head">
         <div>
-          <h1 className="page-title">Active Alerts</h1>
-          <p className="page-sub">Showing active security events requiring your attention.</p>
+          <h1 className="page-title">Threat Radar</h1>
+          <p className="page-sub">Real-time overview of client security posture.</p>
         </div>
-        <div className="page-head-right">
-          {isFetching && <span className="page-refresh">Refreshing…</span>}
-          <span className="page-count">{alerts.length} alerts</span>
+        <div className="radar-head-right">
+          <div className="radar-legend">
+            {counts["under-attack"] > 0 && (
+              <span className="radar-legend-item ua"><i /> Under attack {counts["under-attack"]}</span>
+            )}
+            {counts["at-risk"] > 0 && (
+              <span className="radar-legend-item ar"><i /> At risk {counts["at-risk"]}</span>
+            )}
+            <span className="radar-legend-item sec"><i /> Secured {counts.secured}</span>
+          </div>
+          <button
+            className="radar-fs-btn"
+            onClick={toggleFullscreen}
+            title={fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen TV mode"}
+          >
+            {fullscreen ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Exit
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Fullscreen
+              </>
+            )}
+          </button>
         </div>
       </div>
 
-      <div className="alert-list">
-        {alerts.length === 0 ? (
-          <div className="alert-empty">
-            {search ? `No alerts match “${search}”.` : "Waiting for events from the pipeline…"}
-          </div>
-        ) : (
-          alerts.map((evt) => <AlertCard key={evt.event_id ?? evt.timestamp} evt={evt} />)
-        )}
+      <div className="radar-stage">
+        <div className="radar-board" key={fullscreen ? "fs" : "win"}>
+          {rings.map(({ ring, drawR, dense, items }) => {
+            const meta = RING_META[ring];
+            const size = `${drawR * 2}%`;
+            return (
+              <div key={ring}>
+                <div
+                  className={`radar-ring radar-ring-${ring === "under-attack" ? "attack" : ring === "at-risk" ? "atrisk" : "secured"}`}
+                  style={{ width: size, height: size }}
+                />
+                <span
+                  className={`radar-ring-label ${meta.cls}`}
+                  style={{ top: `${50 - drawR}%` }}
+                >
+                  {meta.label}
+                </span>
+                {items.map(({ item, pos }) =>
+                  item.kind === "tenant" ? (
+                    <button
+                      key={item.rt.tenant.group}
+                      className={`radar-node radar-node-${meta.cls} ${dense ? "dense" : ""}`}
+                      style={pos}
+                      onClick={() => openTenant(item.rt)}
+                      title={`${item.rt.tenant.company} — view active alerts`}
+                    >
+                      <span className="radar-node-icon"><BuildingIcon /></span>
+                      <span className="radar-node-name">{item.rt.tenant.company}</span>
+                      {ring !== "secured" && (
+                        <span className="radar-node-level">Level {item.rt.maxLevel}</span>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      key="overflow"
+                      className={`radar-node radar-node-overflow ${dense ? "dense" : ""}`}
+                      style={pos}
+                      onClick={() => navigate("/tenants")}
+                      title="View all tenants"
+                    >
+                      <span className="radar-node-icon">+{item.count}</span>
+                      <span className="radar-node-name">more secured</span>
+                    </button>
+                  ),
+                )}
+              </div>
+            );
+          })}
+
+          {tenants.length === 0 && <div className="radar-empty">Waiting for tenants…</div>}
+        </div>
       </div>
     </div>
   );

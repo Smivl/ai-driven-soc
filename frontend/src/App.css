@@ -1979,3 +1979,150 @@ tbody td {
 .detail-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .detail-topbar .btn-back { margin-bottom: 0; }
 .resolved-tag { font-size: 0.82rem; padding: 0.4rem 0.8rem; }
+
+/* ───────────────────────── Threat Radar (Dashboard) ───────────────────────── */
+.radar-page { display: flex; flex-direction: column; height: 100%; }
+
+.radar-legend { display: flex; gap: 1rem; align-items: center; }
+.radar-legend-item {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+.radar-legend-item i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.radar-legend-item.ua i { background: var(--severity-critical); box-shadow: 0 0 8px var(--severity-critical); }
+.radar-legend-item.ar i { background: var(--severity-medium); box-shadow: 0 0 8px var(--severity-medium); }
+.radar-legend-item.sec i { background: var(--severity-low); box-shadow: 0 0 8px var(--severity-low); }
+
+.radar-stage {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 0; padding: 1rem 0;
+}
+.radar-board {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  height: min(82vh, 1000px);
+  max-width: 100%;
+  animation: radar-open 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Opens from the centre, small → big */
+@keyframes radar-open {
+  from { transform: scale(0.08); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Header right: legend + fullscreen toggle */
+.radar-head-right { display: flex; align-items: center; gap: 1.25rem; }
+.radar-fs-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.7rem; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg-surface); color: var(--text-secondary);
+  cursor: pointer; font-size: 0.8rem; font-weight: 600;
+}
+.radar-fs-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
+
+/* Fullscreen TV mode: overlay everything, just the radar */
+.radar-page.fullscreen {
+  position: fixed; inset: 0; z-index: 1000; margin: 0;
+  max-width: none; width: auto;  /* ignore the 1400px .page cap — fill the viewport */
+  padding: 1.25rem 2rem; background: var(--bg-base); overflow: hidden;
+}
+.radar-page.fullscreen .page-sub { display: none; }
+.radar-page.fullscreen .radar-board { height: min(92vh, 1300px); }
+
+/* Fullscreen TV mode hides the app chrome entirely */
+body.radar-fullscreen .shell-sidebar,
+body.radar-fullscreen .shell-header { display: none; }
+body.radar-fullscreen .shell { grid-template-columns: 1fr; }
+
+/* Concentric rings, all centred on the board */
+.radar-ring {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  border-radius: 50%; pointer-events: none;
+}
+.radar-ring-secured {
+  border: 1px solid color-mix(in srgb, var(--severity-low) 35%, transparent);
+  background: radial-gradient(circle, transparent 60%, color-mix(in srgb, var(--severity-low) 7%, transparent) 100%);
+}
+.radar-ring-atrisk {
+  border: 1px solid color-mix(in srgb, var(--severity-medium) 45%, transparent);
+  background: radial-gradient(circle, transparent 55%, color-mix(in srgb, var(--severity-medium) 9%, transparent) 100%);
+}
+.radar-ring-attack {
+  border: 1.5px solid var(--severity-critical);
+  background: radial-gradient(circle, color-mix(in srgb, var(--severity-critical) 22%, transparent) 0%, color-mix(in srgb, var(--severity-critical) 6%, transparent) 100%);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--severity-critical) 55%, transparent),
+              inset 0 0 24px color-mix(in srgb, var(--severity-critical) 30%, transparent);
+  animation: radar-pulse 2.4s ease-in-out infinite;
+}
+@keyframes radar-pulse {
+  0%, 100% { box-shadow: 0 0 24px color-mix(in srgb, var(--severity-critical) 40%, transparent), inset 0 0 20px color-mix(in srgb, var(--severity-critical) 25%, transparent); }
+  50%      { box-shadow: 0 0 46px color-mix(in srgb, var(--severity-critical) 75%, transparent), inset 0 0 30px color-mix(in srgb, var(--severity-critical) 40%, transparent); }
+}
+
+/* Ring labels sit at the top edge of their ring */
+.radar-ring-label {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.12em;
+  padding: 0.15rem 0.5rem; border-radius: 5px; white-space: nowrap;
+  background: var(--bg-base);
+  pointer-events: none; z-index: 6;
+}
+.radar-ring-label.sec { color: var(--severity-low); }
+.radar-ring-label.ar  { color: var(--severity-medium); }
+.radar-ring-label.ua  { color: var(--severity-critical); }
+
+/* Tenant nodes */
+.radar-node {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  background: none; border: none; cursor: pointer; padding: 0;
+  color: var(--text-primary); width: 96px;
+  transition: transform 0.15s ease;
+}
+.radar-node:hover { transform: translate(-50%, -50%) scale(1.08); z-index: 5; }
+.radar-node-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--border); background: var(--bg-surface);
+}
+.radar-node-name { font-size: 0.8rem; font-weight: 600; text-align: center; line-height: 1.15; }
+.radar-node-level { font-size: 0.72rem; font-weight: 700; }
+
+.radar-node-sec .radar-node-icon {
+  border-color: color-mix(in srgb, var(--severity-low) 60%, transparent);
+  color: var(--severity-low);
+}
+.radar-node-ar .radar-node-icon {
+  border-color: var(--severity-medium); color: var(--severity-medium);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--severity-medium) 40%, transparent);
+}
+.radar-node-ar .radar-node-level { color: var(--severity-medium); }
+.radar-node-ua .radar-node-icon {
+  border-color: var(--severity-critical); color: #fff;
+  background: color-mix(in srgb, var(--severity-critical) 75%, var(--bg-surface));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--severity-critical) 70%, transparent);
+  animation: radar-pulse 2.4s ease-in-out infinite;
+}
+.radar-node-ua .radar-node-level { color: var(--severity-critical); }
+
+/* Dense rings: shrink nodes so many tenants still fit */
+.radar-node.dense { width: 68px; gap: 0.2rem; }
+.radar-node.dense .radar-node-icon { width: 34px; height: 34px; }
+.radar-node.dense .radar-node-icon svg { width: 16px; height: 16px; }
+.radar-node.dense .radar-node-name { font-size: 0.7rem; }
+.radar-node.dense .radar-node-level { font-size: 0.64rem; }
+
+/* "+N more" overflow chip (secured ring only) */
+.radar-node-overflow .radar-node-icon {
+  border-style: dashed; border-color: var(--text-muted);
+  color: var(--text-secondary); font-size: 0.78rem; font-weight: 700;
+}
+.radar-node-overflow .radar-node-name { color: var(--text-secondary); }
+
+.radar-empty {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  color: var(--text-secondary); font-size: 0.9rem;
+}
