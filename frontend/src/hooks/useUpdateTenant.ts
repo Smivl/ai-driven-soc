@@ -5,7 +5,7 @@ import type { Tenant } from "../types/tenant";
 export type TenantPatch = Partial<
   Pick<
     Tenant,
-    "company" | "description" | "industry" | "website" | "phone" | "address" | "min_level" | "notify_level"
+    "company" | "description" | "industry" | "website" | "phone" | "address" | "min_level" | "notify_level" | "window_size"
   >
 >;
 

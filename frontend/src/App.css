@@ -2181,9 +2181,18 @@ body.radar-fullscreen .shell { grid-template-columns: 1fr; }
 .tenant-addrow .btn-primary { white-space: nowrap; }
 .tenant-recipient-add { display: flex; flex-direction: column; gap: 0.2rem; }
 
-.tenant-levels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+.tenant-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; }
 .tenant-empty { color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0; }
 
+.tenant-section-spaced { margin-top: 1.5rem; }
+.tenant-assessment { border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; background: var(--bg-base); }
+.tenant-assessment-under-attack { border-color: color-mix(in srgb, var(--severity-critical) 55%, transparent); }
+.tenant-assessment-at-risk { border-color: color-mix(in srgb, var(--severity-medium) 55%, transparent); }
+.tenant-assessment-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.tenant-assessment-risk { font-weight: 700; font-size: 0.85rem; }
+.tenant-assessment-tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.35rem; }
+.tenant-assessment-summary { margin: 0 0 0.4rem; font-size: 0.9rem; color: var(--text-primary); line-height: 1.4; }
+
 @media (max-width: 720px) {
-  .tenant-info-grid, .tenant-form, .tenant-levels { grid-template-columns: 1fr; }
+  .tenant-info-grid, .tenant-form { grid-template-columns: 1fr; }
 }

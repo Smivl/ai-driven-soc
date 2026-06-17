@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTenants } from "../hooks/useTenants";
+import { useAssessments } from "../hooks/useAssessments";
 import { useUpdateTenant } from "../hooks/useUpdateTenant";
 import { useUsers } from "../hooks/useUsers";
 import { useAddContact, useDeleteContact } from "../hooks/useTenantContacts";
@@ -9,6 +10,12 @@ import { useAddRecipient, useDeleteRecipient } from "../hooks/useTenantRecipient
 import type { Tenant } from "../types/tenant";
 
 const LEVELS = Array.from({ length: 16 }, (_, i) => i); // 0..15
+const WINDOW_OPTIONS = [5, 10, 20, 30, 50, 75, 100];
+const STATUS_LABEL: Record<string, string> = {
+  secured: "Secured",
+  "at-risk": "At risk",
+  "under-attack": "Under attack",
+};
 
 function emptyToNull(v: string): string | null {
   const t = v.trim();
@@ -168,6 +175,8 @@ function SettingsSection({ tenant, isAdmin }: { tenant: Tenant; isAdmin: boolean
   const addRecipient = useAddRecipient(tenant.group);
   const delRecipient = useDeleteRecipient(tenant.group);
   const { data: users = [] } = useUsers(isAdmin);
+  const { data: assessments = {} } = useAssessments();
+  const assessment = assessments[tenant.group];
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
 
@@ -186,9 +195,41 @@ function SettingsSection({ tenant, isAdmin }: { tenant: Tenant; isAdmin: boolean
 
   return (
     <section className="card sharp tenant-section">
-      <h2 className="tenant-section-title">Settings</h2>
+      <h2 className="tenant-section-title">AI agent</h2>
+      {assessment ? (
+        <div className={`tenant-assessment tenant-assessment-${assessment.status}`}>
+          <div className="tenant-assessment-head">
+            <span className={`badge ${assessment.status === "under-attack" ? "critical" : assessment.status === "at-risk" ? "medium" : ""}`}>
+              {STATUS_LABEL[assessment.status] ?? assessment.status}
+            </span>
+            <span className="tenant-assessment-risk">Risk {assessment.risk_score}/100</span>
+            <span className="tenant-assessment-tag">{assessment.ai ? "AI agent" : "heuristic"}</span>
+          </div>
+          <p className="tenant-assessment-summary">{assessment.summary}</p>
+          <span className="tenant-setting-hint">
+            Assessed {assessment.events} event(s) over a {assessment.window}-event window.
+          </span>
+        </div>
+      ) : (
+        <p className="tenant-empty">No assessment yet — the agent runs once this tenant has events.</p>
+      )}
+
+      <h2 className="tenant-section-title tenant-section-spaced">Settings</h2>
 
       <div className="tenant-levels">
+        <div className="tenant-setting">
+          <label className="tenant-setting-label">AI window size</label>
+          <select
+            className="tenant-setting-select"
+            value={tenant.window_size}
+            disabled={!isAdmin || update.isPending}
+            onChange={(e) => update.mutate({ group: tenant.group, window_size: Number(e.target.value) })}
+          >
+            {WINDOW_OPTIONS.map((w) => <option key={w} value={w}>{w} events</option>)}
+          </select>
+          <span className="tenant-setting-hint">How many recent events the agent assesses together.</span>
+        </div>
+
         <div className="tenant-setting">
           <label className="tenant-setting-label">Ingestion threshold</label>
           <select

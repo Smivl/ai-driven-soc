@@ -13,7 +13,7 @@ from app.api.v1.users import router as users_router
 from app.db import init_db
 from app.services import tenants as tenant_service
 from app.services import users as user_service
-from ingestion.pipeline_concurrent import explain_worker, ingest_worker, score_worker
+from ingestion.pipeline_concurrent import assess_worker, explain_worker, ingest_worker, score_worker
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.severity_scoring import load_blacklist, train_model
 
@@ -55,6 +55,11 @@ async def lifespan(app: FastAPI):
         threading.Thread(
             target=explain_worker,
             args=(cache, cache_lock, pq23, _stop),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=assess_worker,
+            args=(_stop,),
             daemon=True,
         ),
     ]

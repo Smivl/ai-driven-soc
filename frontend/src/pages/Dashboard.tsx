@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
 import { useTenants } from "../hooks/useTenants";
+import { useAssessments } from "../hooks/useAssessments";
 import type { Tenant } from "../types/tenant";
 import type { SOCEvent } from "../types/event";
 
@@ -12,6 +13,9 @@ interface RadarTenant {
   status: ThreatLevel;
   maxLevel: number; // worst active Wazuh level seen for this tenant
   activeCount: number;
+  risk: number | null; // AI risk score 0-100, when an assessment exists
+  ai: boolean; // status came from the AI agent (vs per-event fallback)
+  summary: string | null; // AI rationale (shown on hover)
 }
 
 type RadarItem =
@@ -83,6 +87,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data: tenants = [] } = useTenants();
   const { data: events = [] } = useEvents();
+  const { data: assessments = {} } = useAssessments();
 
   // Fullscreen "TV mode": overlay everything with just the radar, and request
   // native fullscreen for a true kiosk view. Esc / browser exit syncs back.
@@ -133,14 +138,21 @@ export default function Dashboard() {
     }
     return tenants.map((tenant) => {
       const agg = byGroup.get(tenant.group) ?? { max: 0, count: 0 };
+      const assessment = assessments[tenant.group];
+      // The AI agent's holistic verdict drives the ring; fall back to per-event
+      // severity only until the first assessment arrives.
+      const status = assessment?.status ?? classify(agg.max, agg.count);
       return {
         tenant,
         maxLevel: agg.max,
         activeCount: agg.count,
-        status: classify(agg.max, agg.count),
+        status,
+        risk: assessment ? assessment.risk_score : null,
+        ai: assessment?.ai ?? false,
+        summary: assessment?.summary ?? null,
       };
     });
-  }, [tenants, events]);
+  }, [tenants, events, assessments]);
 
   const byRing = useMemo(() => {
     const groups: Record<ThreatLevel, RadarTenant[]> = {
@@ -289,12 +301,18 @@ export default function Dashboard() {
                       className={`radar-node radar-node-${meta.cls} ${dense ? "dense" : ""}`}
                       style={pos}
                       onClick={() => openTenant(item.rt)}
-                      title={`${item.rt.tenant.company} — view active alerts`}
+                      title={
+                        item.rt.summary
+                          ? `${item.rt.tenant.company} — ${item.rt.summary}`
+                          : `${item.rt.tenant.company} — view active alerts`
+                      }
                     >
                       <span className="radar-node-icon"><BuildingIcon /></span>
                       <span className="radar-node-name">{item.rt.tenant.company}</span>
                       {ring !== "secured" && (
-                        <span className="radar-node-level">Level {item.rt.maxLevel}</span>
+                        <span className="radar-node-level">
+                          {item.rt.risk != null ? `Risk ${item.rt.risk}` : `Level ${item.rt.maxLevel}`}
+                        </span>
                       )}
                     </button>
                   ) : (

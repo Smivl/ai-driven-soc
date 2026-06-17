@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from app import state
 from app.api.deps import get_current_user, require_admin
 from app.db import session_scope
 from app.services import tenants as tenant_service
@@ -17,6 +18,7 @@ class TenantUpdate(BaseModel):
     address: str | None = None
     min_level: int | None = Field(default=None, ge=0, le=15)
     notify_level: int | None = Field(default=None, ge=0, le=15)
+    window_size: int | None = Field(default=None, ge=1, le=200)
 
 
 class ContactIn(BaseModel):
@@ -35,6 +37,12 @@ class RecipientIn(BaseModel):
 def list_tenants():
     with session_scope() as session:
         return tenant_service.list_tenants(session)
+
+
+@router.get("/assessments", dependencies=[Depends(get_current_user)])
+def get_assessments():
+    """Per-tenant AI agent assessments, keyed by group. Read by the radar."""
+    return state.get_assessments()
 
 
 @router.patch("/tenants/{group}", dependencies=[Depends(require_admin)])

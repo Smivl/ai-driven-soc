@@ -19,11 +19,26 @@ export interface NotificationRecipient {
   email: string | null;
 }
 
+export type ThreatStatus = "secured" | "at-risk" | "under-attack";
+
+export interface TenantAssessment {
+  status: ThreatStatus;
+  risk_score: number;
+  summary: string;
+  ai: boolean; // true = produced by the Ollama agent, false = heuristic fallback
+  window: number;
+  events: number;
+  updated_at: string;
+}
+
+export type Assessments = Record<string, TenantAssessment>;
+
 export interface Tenant {
   company: string;
   group: string;
   min_level: number;
   notify_level: number;
+  window_size: number;
   description: string | null;
   industry: string | null;
   website: string | null;

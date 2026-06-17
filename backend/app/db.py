@@ -44,6 +44,7 @@ def _run_light_migrations() -> None:
     idempotently (Postgres). Safe to run on every startup."""
     stmts = [
         "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notify_level INTEGER NOT NULL DEFAULT 12",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS window_size INTEGER NOT NULL DEFAULT 20",
         "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS description TEXT",
         "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS industry VARCHAR(120)",
         "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS website VARCHAR(255)",

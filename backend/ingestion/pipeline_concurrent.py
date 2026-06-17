@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from ingestion.explanation import fallback_recommendation, generate_analysis
 from ingestion.normalizerfixed import normalize_wazuh_alert
+from ingestion.tenant_agent import assess_window
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
@@ -134,3 +135,32 @@ def explain_worker(
                 cache.pop(event_id, None)
         except Exception as e:
             print(f"[explain_worker] error: {e}")
+
+
+def assess_worker(stop: threading.Event, interval: int = 20) -> None:
+    """Per-tenant AI agent: periodically assess each tenant's sliding window of
+    events and publish an overall threat status that the radar reads.
+
+    Only re-runs the model for a tenant whose window actually changed, so idle
+    tenants don't burn Ollama calls.
+    """
+    last_sig: dict[str, tuple] = {}
+    while not stop.is_set():
+        try:
+            for group, window in tenant_service.group_windows().items():
+                events = state.get_events_by_group(group, limit=window)
+                max_level = max((e.get("wazuh_level") or 0 for e in events), default=0)
+                sig = (window, len(events), events[-1].get("event_id") if events else None, max_level)
+                if sig == last_sig.get(group):
+                    continue
+                result = assess_window(group, events)
+                result.update({
+                    "window": window,
+                    "events": len(events),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                })
+                state.set_assessment(group, result)
+                last_sig[group] = sig
+        except Exception as e:
+            print(f"[assess_worker] error: {e}")
+        stop.wait(interval)

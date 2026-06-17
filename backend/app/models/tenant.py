@@ -24,6 +24,8 @@ class Tenant(Base):
     min_level: Mapped[int] = mapped_column(default=settings.MIN_ALERT_LEVEL)
     # Events at/above this level notify the tenant's recipient list.
     notify_level: Mapped[int] = mapped_column(default=12, server_default="12")
+    # How many recent events the AI agent assesses together (sliding window).
+    window_size: Mapped[int] = mapped_column(default=20, server_default="20")
 
     # ── Tenant info ───────────────────────────────────────────────────────────
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

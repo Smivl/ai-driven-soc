@@ -98,6 +98,7 @@ def _serialize(tenant: Tenant) -> dict:
         "group": tenant.group,
         "min_level": tenant.min_level,
         "notify_level": tenant.notify_level,
+        "window_size": tenant.window_size,
         "description": tenant.description,
         "industry": tenant.industry,
         "website": tenant.website,
@@ -123,8 +124,15 @@ def list_tenants(session: Session) -> list[dict]:
 # Fields the API may patch on a tenant (group is the immutable key).
 _EDITABLE_FIELDS = (
     "company", "description", "industry", "website", "phone", "address",
-    "min_level", "notify_level",
+    "min_level", "notify_level", "window_size",
 )
+
+
+def group_windows() -> dict[str, int]:
+    """Map of group -> AI assessment window size, read by the assess worker."""
+    with session_scope() as session:
+        rows = session.execute(select(Tenant.group, Tenant.window_size)).all()
+        return {group: size for group, size in rows}
 
 
 def update_tenant(session: Session, group: str, fields: dict) -> dict | None:
