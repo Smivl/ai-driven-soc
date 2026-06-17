@@ -15,7 +15,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db import session_scope
-from app.models.tenant import Agent, Tenant
+from app.models.tenant import Agent, NotificationRecipient, Tenant, TenantContact
+from app.models.user import User
 from ingestion.tenants import load_tenants
 from ingestion.wazuh_client import WazuhClient
 
@@ -75,15 +76,43 @@ def register_with_wazuh(session: Session, client: WazuhClient) -> None:
 
 
 # ── Reads / writes for the API ────────────────────────────────────────────────
+def _serialize_contact(c: TenantContact) -> dict:
+    return {"id": c.id, "name": c.name, "role": c.role, "email": c.email, "phone": c.phone}
+
+
+def _serialize_recipient(r: NotificationRecipient) -> dict:
+    if r.user_id and r.user is not None:
+        return {
+            "id": r.id,
+            "kind": "user",
+            "user_id": r.user_id,
+            "username": r.user.username,
+            "email": r.user.email,
+        }
+    return {"id": r.id, "kind": "email", "email": r.email}
+
+
 def _serialize(tenant: Tenant) -> dict:
     return {
         "company": tenant.company,
         "group": tenant.group,
         "min_level": tenant.min_level,
+        "notify_level": tenant.notify_level,
+        "description": tenant.description,
+        "industry": tenant.industry,
+        "website": tenant.website,
+        "phone": tenant.phone,
+        "address": tenant.address,
         "agents": [
             {"name": a.name, "wazuh_agent_id": a.wazuh_agent_id} for a in tenant.agents
         ],
+        "contacts": [_serialize_contact(c) for c in tenant.contacts],
+        "recipients": [_serialize_recipient(r) for r in tenant.recipients],
     }
+
+
+def _get(session: Session, group: str) -> Tenant | None:
+    return session.scalar(select(Tenant).where(Tenant.group == group))
 
 
 def list_tenants(session: Session) -> list[dict]:
@@ -91,15 +120,82 @@ def list_tenants(session: Session) -> list[dict]:
     return [_serialize(t) for t in tenants]
 
 
-def update_min_level(session: Session, group: str, min_level: int) -> dict | None:
-    tenant = session.scalar(select(Tenant).where(Tenant.group == group))
+# Fields the API may patch on a tenant (group is the immutable key).
+_EDITABLE_FIELDS = (
+    "company", "description", "industry", "website", "phone", "address",
+    "min_level", "notify_level",
+)
+
+
+def update_tenant(session: Session, group: str, fields: dict) -> dict | None:
+    tenant = _get(session, group)
     if tenant is None:
         return None
-    tenant.min_level = min_level
+    for key in _EDITABLE_FIELDS:
+        if key in fields and fields[key] is not None:
+            setattr(tenant, key, fields[key])
     session.flush()
-    with _cache_lock:
-        _min_levels[group] = min_level
+    if fields.get("min_level") is not None:
+        with _cache_lock:
+            _min_levels[group] = tenant.min_level
     return _serialize(tenant)
+
+
+# ── Contacts ──────────────────────────────────────────────────────────────────
+def add_contact(session: Session, group: str, **fields) -> dict | None:
+    tenant = _get(session, group)
+    if tenant is None:
+        return None
+    contact = TenantContact(
+        tenant_id=tenant.id,
+        name=fields["name"],
+        role=fields.get("role"),
+        email=fields.get("email"),
+        phone=fields.get("phone"),
+    )
+    session.add(contact)
+    session.flush()
+    return _serialize_contact(contact)
+
+
+def delete_contact(session: Session, group: str, contact_id: int) -> bool:
+    tenant = _get(session, group)
+    if tenant is None:
+        return False
+    contact = session.get(TenantContact, contact_id)
+    if contact is None or contact.tenant_id != tenant.id:
+        return False
+    session.delete(contact)
+    return True
+
+
+# ── Notification recipients ─────────────────────────────────────────────────────
+def add_recipient(
+    session: Session, group: str, user_id: int | None = None, email: str | None = None
+) -> dict | None:
+    """Add a recipient. Provide exactly one of user_id or email."""
+    if (user_id is None) == (email is None):
+        raise ValueError("provide exactly one of user_id or email")
+    tenant = _get(session, group)
+    if tenant is None:
+        return None
+    if user_id is not None and session.get(User, user_id) is None:
+        raise ValueError("user not found")
+    recipient = NotificationRecipient(tenant_id=tenant.id, user_id=user_id, email=email)
+    session.add(recipient)
+    session.flush()
+    return _serialize_recipient(recipient)
+
+
+def delete_recipient(session: Session, group: str, recipient_id: int) -> bool:
+    tenant = _get(session, group)
+    if tenant is None:
+        return False
+    recipient = session.get(NotificationRecipient, recipient_id)
+    if recipient is None or recipient.tenant_id != tenant.id:
+        return False
+    session.delete(recipient)
+    return True
 
 
 def bootstrap(client: WazuhClient) -> None:

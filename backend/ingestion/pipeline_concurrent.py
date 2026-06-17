@@ -10,6 +10,7 @@ from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
 from app import state
 from app.services import events_archive
+from app.services import notifications
 from app.services import tenants as tenant_service
 
 
@@ -127,6 +128,8 @@ def explain_worker(
             state.upsert_event(event_dict)
             # Event is fully processed — persist it to Postgres for the archive.
             events_archive.archive_event(event_dict)
+            # Alert the tenant's recipient list if it meets their threshold.
+            notifications.maybe_notify(event_dict)
             with cache_lock:
                 cache.pop(event_id, None)
         except Exception as e:

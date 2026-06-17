@@ -3,7 +3,7 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import settings
@@ -36,3 +36,20 @@ def init_db() -> None:
     from app.models import event, tenant, user  # noqa: F401  (register mappers)
 
     Base.metadata.create_all(bind=engine)
+    _run_light_migrations()
+
+
+def _run_light_migrations() -> None:
+    """create_all() never ALTERs existing tables, so add new tenant columns
+    idempotently (Postgres). Safe to run on every startup."""
+    stmts = [
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS notify_level INTEGER NOT NULL DEFAULT 12",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS description TEXT",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS industry VARCHAR(120)",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS website VARCHAR(255)",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS phone VARCHAR(64)",
+        "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS address VARCHAR(255)",
+    ]
+    with engine.begin() as conn:
+        for stmt in stmts:
+            conn.execute(text(stmt))

@@ -5,6 +5,7 @@ import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import ActiveAlerts from "./pages/ActiveAlerts";
 import Tenants from "./pages/Tenants";
+import TenantDetail from "./pages/TenantDetail";
 import EventDetail from "./pages/EventDetail";
 import Login from "./pages/Login";
 
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/alerts" element={<ActiveAlerts />} />
             <Route path="/tenants" element={<Tenants />} />
+            <Route path="/tenants/:group" element={<TenantDetail />} />
             <Route path="/alerts/:id" element={<EventDetail />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

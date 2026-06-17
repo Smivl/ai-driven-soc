@@ -1,55 +1,34 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useTenants } from "../hooks/useTenants";
-import { useUpdateTenant } from "../hooks/useUpdateTenant";
 import { useEvents } from "../hooks/useEvents";
 import type { Tenant } from "../types/tenant";
 
-const LEVELS = Array.from({ length: 16 }, (_, i) => i); // 0..15
-
 function TenantCard({ tenant, events, highEvents }: { tenant: Tenant; events: number; highEvents: number }) {
-  const update = useUpdateTenant();
-
   return (
-    <div className="card sharp tenant-card">
+    <Link to={`/tenants/${encodeURIComponent(tenant.group)}`} className="card sharp tenant-card tenant-card-link">
       <div className="tenant-card-head">
         <span className="tenant-card-name">{tenant.company}</span>
         <span className="tenant-group-tag">{tenant.group}</span>
       </div>
 
+      {tenant.industry && <div className="tenant-card-industry">{tenant.industry}</div>}
+
       <div className="tenant-card-stats">
         <span><strong>{tenant.agents.length}</strong> agents</span>
         <span><strong>{events}</strong> events</span>
+        <span><strong>{tenant.contacts.length}</strong> contacts</span>
         {highEvents > 0 && <span className="badge critical">{highEvents} high+</span>}
       </div>
 
-      <div className="tenant-setting">
-        <label className="tenant-setting-label" htmlFor={`lvl-${tenant.group}`}>
-          Min detection level
-        </label>
-        <select
-          id={`lvl-${tenant.group}`}
-          className="tenant-setting-select"
-          value={tenant.min_level}
-          disabled={update.isPending}
-          onChange={(e) => update.mutate({ group: tenant.group, min_level: Number(e.target.value) })}
-        >
-          {LEVELS.map((l) => (
-            <option key={l} value={l}>Level {l}</option>
-          ))}
-        </select>
-        <span className="tenant-setting-hint">
-          Only Wazuh alerts ≥ this level are ingested for this tenant.
+      <div className="tenant-card-meta">
+        <span className="tenant-card-chip">Ingest ≥ L{tenant.min_level}</span>
+        <span className="tenant-card-chip">Notify ≥ L{tenant.notify_level}</span>
+        <span className="tenant-card-chip">
+          {tenant.recipients.length} recipient{tenant.recipients.length === 1 ? "" : "s"}
         </span>
       </div>
-
-      <div className="tenant-card-agents">
-        {tenant.agents.map((a) => (
-          <span key={a.name} className="tenant-agent-chip">
-            {a.name}{a.wazuh_agent_id ? ` · ${a.wazuh_agent_id}` : ""}
-          </span>
-        ))}
-      </div>
-    </div>
+    </Link>
   );
 }
 
@@ -74,7 +53,7 @@ export default function Tenants() {
       <div className="page-head">
         <div>
           <h1 className="page-title">Tenants</h1>
-          <p className="page-sub">Registered companies and the agents reporting into this SOC. Adjust per-tenant detection thresholds.</p>
+          <p className="page-sub">Registered companies and the agents reporting into this SOC. Select a tenant to manage its details, contacts, and notifications.</p>
         </div>
         <span className="page-count">{tenants.length} tenants</span>
       </div>

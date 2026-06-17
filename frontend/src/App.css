@@ -2126,3 +2126,64 @@ body.radar-fullscreen .shell { grid-template-columns: 1fr; }
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   color: var(--text-secondary); font-size: 0.9rem;
 }
+
+/* ───────────────────────── Tenant detail / management ───────────────────────── */
+.tenant-card-link { text-decoration: none; color: inherit; cursor: pointer; transition: border-color 0.15s, transform 0.1s; }
+.tenant-card-link:hover { border-color: var(--accent-blue); transform: translateY(-1px); }
+.tenant-card-industry { color: var(--text-secondary); font-size: 0.82rem; margin-top: -0.25rem; }
+.tenant-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+.tenant-card-chip {
+  font-size: 0.72rem; color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: 5px; padding: 0.15rem 0.45rem;
+  background: var(--bg-elevated);
+}
+
+.tenant-detail-grid { display: flex; flex-direction: column; gap: 1rem; }
+.tenant-section { padding: 1.25rem 1.5rem; }
+.tenant-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.tenant-section-title { font-size: 1.05rem; font-weight: 700; margin: 0; }
+.tenant-subhead { font-size: 0.9rem; font-weight: 700; margin: 1.25rem 0 0.6rem; color: var(--text-primary); }
+
+.tenant-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem 1.5rem; margin: 0; }
+.tenant-info-grid dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem; }
+.tenant-info-grid dd { margin: 0; font-size: 0.9rem; color: var(--text-primary); word-break: break-word; }
+.tenant-info-grid a { color: var(--accent-blue); }
+
+.tenant-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem 1rem; }
+.tenant-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.tenant-field > span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.tenant-field-wide { grid-column: 1 / -1; }
+.tenant-form-actions { grid-column: 1 / -1; display: flex; gap: 0.6rem; }
+
+.tenant-input {
+  background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-primary); padding: 0.45rem 0.6rem; font-size: 0.85rem; font-family: inherit;
+  width: 100%;
+}
+.tenant-input:focus { outline: none; border-color: var(--accent-blue); }
+
+.tenant-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tenant-list-row { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+.tenant-list-row:last-child { border-bottom: none; }
+.tenant-list-main { display: flex; align-items: center; gap: 0.5rem; min-width: 180px; flex: 1; }
+.tenant-list-name { font-weight: 600; font-size: 0.9rem; }
+.tenant-list-sub { color: var(--text-secondary); font-size: 0.8rem; }
+.tenant-list-contact { display: flex; flex-direction: column; gap: 0.15rem; min-width: 200px; }
+.tenant-list-contact a { color: var(--accent-blue); font-size: 0.83rem; }
+.tenant-remove {
+  background: none; border: none; color: var(--text-muted); font-size: 1.2rem; line-height: 1;
+  cursor: pointer; padding: 0 0.3rem; border-radius: 4px;
+}
+.tenant-remove:hover { color: var(--severity-critical); background: var(--bg-elevated); }
+
+.tenant-addrow { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.tenant-addrow .tenant-input { flex: 1; min-width: 120px; }
+.tenant-addrow .btn-primary { white-space: nowrap; }
+.tenant-recipient-add { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.tenant-levels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+.tenant-empty { color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0; }
+
+@media (max-width: 720px) {
+  .tenant-info-grid, .tenant-form, .tenant-levels { grid-template-columns: 1fr; }
+}
