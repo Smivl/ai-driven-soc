@@ -44,7 +44,8 @@ async def lifespan(app: FastAPI):
     threads = [
         threading.Thread(
             target=ingest_worker,
-            args=(client, cache, cache_lock, pq12, _stop),
+            args=(client, cache, cache_lock, pq12, _stop,
+                  settings.INGEST_POLL_SECONDS, settings.INGEST_BATCH_SIZE),
             daemon=True,
         ),
         threading.Thread(

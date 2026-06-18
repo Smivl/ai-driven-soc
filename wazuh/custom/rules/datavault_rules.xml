@@ -1,0 +1,31 @@
+<!--
+  Custom rule — Honeytoken / canary access detection.
+
+  A honeytoken is a decoy credential/file that no legitimate process should ever
+  touch. Default Wazuh cannot detect this: it has no decoder for the DataVault
+  app and no knowledge of which objects are decoys. Any access to a honeytoken
+  object is, by definition, malicious — so we raise it to a critical alert.
+
+  Rule IDs are in the 100000+ range reserved for local/custom rules.
+  Deployed to: /var/ossec/etc/rules/datavault_rules.xml
+-->
+<group name="datavault,honeytoken,">
+
+  <!-- Base: any successfully decoded DataVault access event (level 0 = no alert) -->
+  <rule id="100100" level="0">
+    <decoded_as>datavault</decoded_as>
+    <description>DataVault application access event.</description>
+  </rule>
+
+  <!-- Detection: the accessed object is a decoy / honeytoken -->
+  <rule id="100110" level="13">
+    <if_sid>100100</if_sid>
+    <url>honeytoken|canary|/decoy/</url>
+    <description>Honeytoken accessed in DataVault: $(url) by user $(srcuser) from $(srcip) — credential theft / unauthorized data access.</description>
+    <mitre>
+      <id>T1552</id>
+    </mitre>
+    <group>honeytoken,credential_access,exfiltration,</group>
+  </rule>
+
+</group>

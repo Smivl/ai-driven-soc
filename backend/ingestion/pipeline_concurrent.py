@@ -9,7 +9,7 @@ from ingestion.tenant_agent import assess_window
 from ingestion.wazuh_client import WazuhClient
 from log_evaluation.log_dataclass import PipelineStatus, SOCevent
 from log_evaluation.severity_scoring import score_event
-from app import state
+from app import perf_trace, state
 from app.services import events_archive
 from app.services import notifications
 from app.services import tenants as tenant_service
@@ -51,6 +51,7 @@ def ingest_worker(
                 with cache_lock:
                     cache[event.event_id] = event
                 state.upsert_event(event.return_dict())
+                perf_trace.record("received", event.event_id, event.source_ip)  # T4
                 print(f"Event ID {event.event_id}\nLevel: {event.wazuh_level}\nMitre ID: {event.mitre_id}\nTactic: {event.mitre_tactic}\nTechnique: {event.mitre_technique}\n")
                 pq12.put((-(event.wazuh_level or 0), event.event_id))
         except Exception as e:
@@ -127,6 +128,7 @@ def explain_worker(
             event.status = PipelineStatus.EXPLAINED
             event_dict = event.return_dict()
             state.upsert_event(event_dict)
+            perf_trace.record("explained", event.event_id, event.source_ip)  # T5
             # Event is fully processed — persist it to Postgres for the archive.
             events_archive.archive_event(event_dict)
             # Alert the tenant's recipient list if it meets their threshold.

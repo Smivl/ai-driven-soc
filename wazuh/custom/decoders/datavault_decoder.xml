@@ -1,0 +1,21 @@
+<!--
+  Custom decoder — "DataVault" application access logs.
+
+  Default Wazuh ships no decoder for this bespoke application's log format, so
+  these events would otherwise be dropped as undecoded. This decoder extracts
+  the fields our custom rule (datavault_rules.xml) needs.
+
+  Example log line (syslog program = "datavault"):
+    Jun 17 10:00:00 web01 datavault[2211]: action=download user=jsmith src=203.0.113.66 object=/vault/honeytoken/aws_keys.csv status=ok
+
+  Deployed to: /var/ossec/etc/decoders/datavault_decoder.xml
+-->
+<decoder name="datavault">
+  <program_name>datavault</program_name>
+</decoder>
+
+<decoder name="datavault-access">
+  <parent>datavault</parent>
+  <regex type="pcre2">action=(\S+) user=(\S+) src=(\S+) object=(\S+) status=(\w+)</regex>
+  <order>action, srcuser, srcip, url, status</order>
+</decoder>

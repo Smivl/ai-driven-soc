@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "generated": "2026-06-18T13:08:55.112413+00:00",
+    "platform": "macOS-15.1-arm64-arm-64bit-Mach-O",
+    "python": "3.13.7"
+  },
+  "startup": {
+    "blacklist_load_s": 0.287,
+    "blacklist_size": 4566,
+    "model_train_s": 0.479
+  },
+  "components": {
+    "normalizer": {
+      "n": 20,
+      "min_ms": 1.658,
+      "mean_ms": 1.733,
+      "median_ms": 1.712,
+      "p95_ms": 1.859,
+      "max_ms": 1.878
+    },
+    "normalizer_per_event": {
+      "n": 20,
+      "min_ms": 0.0166,
+      "mean_ms": 0.0173,
+      "median_ms": 0.0171,
+      "p95_ms": 0.0186,
+      "max_ms": 0.0188
+    },
+    "ml_scoring": {
+      "n": 300,
+      "min_ms": 0.448,
+      "mean_ms": 0.56,
+      "median_ms": 0.549,
+      "p95_ms": 0.675,
+      "max_ms": 1.19
+    }
+  },
+  "database": {
+    "archive_write": {
+      "n": 100,
+      "min_ms": 1.895,
+      "mean_ms": 2.306,
+      "median_ms": 2.126,
+      "p95_ms": 2.972,
+      "max_ms": 13.665
+    },
+    "query_recent_100": {
+      "n": 30,
+      "min_ms": 1.447,
+      "mean_ms": 1.696,
+      "median_ms": 1.538,
+      "p95_ms": 2.108,
+      "max_ms": 4.735
+    }
+  },
+  "siem_latency": {
+    "detect_index_s": 8.08,
+    "found": true
+  },
+  "llm": {
+    "explanation_per_event": {
+      "n": 3,
+      "min_ms": 3070.708,
+      "mean_ms": 4323.605,
+      "median_ms": 3234.245,
+      "p95_ms": 6665.861,
+      "max_ms": 6665.861
+    },
+    "assessment_per_window": {
+      "n": 3,
+      "min_ms": 1045.227,
+      "mean_ms": 2124.359,
+      "median_ms": 1586.461,
+      "p95_ms": 3741.39,
+      "max_ms": 3741.39
+    }
+  },
+  "resources": {
+    "containers": [
+      {
+        "name": "soc-postgres",
+        "cpu": "0.17%",
+        "mem": "31.32MiB / 7.653GiB",
+        "mem_pct": "0.40%"
+      },
+      {
+        "name": "single-node-wazuh.dashboard-1",
+        "cpu": "0.08%",
+        "mem": "257.8MiB / 7.653GiB",
+        "mem_pct": "3.29%"
+      },
+      {
+        "name": "single-node-wazuh.manager-1",
+        "cpu": "0.84%",
+        "mem": "1.095GiB / 7.653GiB",
+        "mem_pct": "14.31%"
+      },
+      {
+        "name": "single-node-wazuh.indexer-1",
+        "cpu": "3.05%",
+        "mem": "1.581GiB / 7.653GiB",
+        "mem_pct": "20.66%"
+      }
+    ],
+    "ollama": {
+      "cpu_pct": 37.9,
+      "mem_pct": 6.0,
+      "rss_mb": 1006.5
+    }
+  },
+  "analysis": {
+    "stage_mean_ms": {
+      "normalize": 0.0173,
+      "ml_score": 0.56,
+      "llm_explain": 4323.605
+    },
+    "bottleneck": "llm_explain",
+    "throughput_events_per_min_single_worker": 13.9,
+    "non_llm_pipeline_ms_per_event": 0.577
+  }
+}

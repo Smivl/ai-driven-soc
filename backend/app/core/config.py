@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     # This is the global default; tenants can override it (see app.services.tenants).
     MIN_ALERT_LEVEL: int = 7
 
+    # Ingest worker cadence. Defaults suit normal monitoring; raise the batch and
+    # lower the poll for load/throughput testing so the SOC keeps pace with bursts.
+    INGEST_POLL_SECONDS: int = 15
+    INGEST_BATCH_SIZE: int = 10
+
     # Postgres connection (tenant registry + settings).
     DATABASE_URL: str = "postgresql+psycopg://soc:soc@localhost:5432/soc"
 
