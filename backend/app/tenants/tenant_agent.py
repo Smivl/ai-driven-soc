@@ -124,6 +124,14 @@ def assess_window(group: str, events: list[dict]) -> dict:
             raise ValueError(f"unrecognised status: {data.get('status')!r}")
         score = data.get("risk_score")
         score = int(score) if isinstance(score, (int, float)) else 0
+
+        if score >= 70:
+            status = "under-attack"
+        elif score >= 40:
+            status = "at-risk"
+        else:
+            status = "secured"
+
         return {
             "status": status,
             "risk_score": max(0, min(100, score)),
