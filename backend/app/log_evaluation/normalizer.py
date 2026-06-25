@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from log_evaluation.log_dataclass import SOCevent, PipelineStatus
+from app.log_evaluation.socevent import SOCevent, PipelineStatus
 
 
 
@@ -230,10 +230,3 @@ def process_csv(input_file: str, output_file: str) -> int:
     print(f"Normalized {len(normalized_events)} events → {output_file}")
     return len(normalized_events)
 
-
-if __name__ == "__main__":
-    _repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    process_csv(
-        input_file=os.path.join(_repo, "data", "SIEVE_00_100K.csv"),
-        output_file=os.path.join(_repo, "data", "normalized_events.json"),
-    )

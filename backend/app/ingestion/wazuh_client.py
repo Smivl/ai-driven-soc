@@ -14,8 +14,6 @@ import os
 import logging
 import threading
 
-from ingestion.normalizerfixed import normalize_wazuh_alert
-
 from dotenv import load_dotenv
 load_dotenv()   # reads .env into os.environ automatically
 
@@ -219,30 +217,3 @@ class WazuhClient:
             return self._group_cache.get(agent_id)
 
 
-def test_connection():
-    print("=" * 50)
-    print("  Wazuh Connection Test")
-    print("=" * 50)
-
-    client = WazuhClient()
-
-    print("\n1. Authenticating...")
-    token = client._authenticate()
-    print(f"   Token: {token[:30]}...")
-
-    print("\n2. Fetching last 5 alerts...")
-    alerts = client.get_recent_alerts(limit=5)
-    print(f"   Got {len(alerts)} alerts")
-
-    print()
-    for alert in alerts:
-        level = alert.get("rule", {}).get("level", "?")
-        desc  = alert.get("rule", {}).get("description", "no description")
-        agent = alert.get("agent", {})
-        print(f"   [{level}] {desc} | agent={agent.get('id')} ({agent.get('name')})")
-
-    print("\n" + "=" * 50)
-
-
-if __name__ == "__main__":
-    test_connection()

@@ -14,11 +14,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db import session_scope
+from app.models.db import session_scope
 from app.models.tenant import Agent, NotificationRecipient, Tenant, TenantContact
 from app.models.user import User
-from ingestion.tenants import load_tenants
-from ingestion.wazuh_client import WazuhClient
+from app.tenants.tenants import load_tenants
+from app.ingestion.wazuh_client import WazuhClient
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app import state
+from app.services import state
 from app.api.deps import get_current_user
-from app.db import session_scope
+from app.models.db import session_scope
 from app.services import events_archive
 
 router = APIRouter()

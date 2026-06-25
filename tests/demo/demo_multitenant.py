@@ -10,10 +10,10 @@ that each log came back attributed to the right company / group / agent.
 
 import time
 
-from ingestion.feeder import setup_tenants
-from ingestion.tenants import DEFAULT_TENANTS_PATH, load_tenants
-from ingestion.wazuh_client import WazuhClient
-from ingestion.wazuh_injector import inject_batch, wrap
+from backend.app.ingestion.feeder import setup_tenants
+from backend.app.tenants.tenants import DEFAULT_TENANTS_PATH, load_tenants
+from backend.app.ingestion.wazuh_client import WazuhClient
+from backend.app.ingestion.wazuh_injector import inject_batch, wrap
 
 CONTAINER = "single-node-wazuh.manager-1"
 

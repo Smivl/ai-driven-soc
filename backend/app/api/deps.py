@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import settings
 from app.core.security import decode_access_token
-from app.db import session_scope
+from app.models.db import session_scope
 from app.services import users as user_service
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")

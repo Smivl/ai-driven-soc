@@ -11,7 +11,7 @@ import logging
 
 from sqlalchemy import select
 
-from app.db import session_scope
+from app.models.db import session_scope
 from app.models.tenant import Tenant
 
 logger = logging.getLogger(__name__)

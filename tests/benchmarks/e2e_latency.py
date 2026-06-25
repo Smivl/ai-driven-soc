@@ -21,9 +21,9 @@ PREREQUISITES
     (Ollama running too, or T5 falls back to a heuristic and is still recorded.)
 
 USAGE
-    python -m benchmarks.e2e_latency --test all
-    python -m benchmarks.e2e_latency --test baseline
-    python -m benchmarks.e2e_latency --test saturation --max-drain 60
+    python -m tests.benchmarks.e2e_latency --test all
+    python -m tests.benchmarks.e2e_latency --test baseline
+    python -m tests.benchmarks.e2e_latency --test saturation --max-drain 60
 
 Writes one CSV per test plus a Markdown summary to benchmarks/reports/.
 Note: T5 includes the LLM stage (~seconds/event, single worker) so at higher
@@ -39,10 +39,10 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from ingestion.feeder import setup_tenants
-from ingestion.tenants import DEFAULT_TENANTS_PATH, load_tenants
-from ingestion.wazuh_client import WazuhClient
-from ingestion.wazuh_injector import inject_batch, wrap
+from backend.app.ingestion.feeder import setup_tenants
+from backend.app.tenants.tenants import DEFAULT_TENANTS_PATH, load_tenants
+from backend.app.ingestion.wazuh_client import WazuhClient
+from backend.app.ingestion.wazuh_injector import inject_batch, wrap
 
 import os
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import hash_password, verify_password
-from app.db import session_scope
+from app.models.db import session_scope
 from app.models.user import User
 
 logger = logging.getLogger(__name__)

@@ -3,16 +3,17 @@ import threading
 import uuid
 from datetime import datetime, timezone
 
-from ingestion.explanation import fallback_recommendation, generate_analysis
-from ingestion.normalizerfixed import normalize_wazuh_alert
-from ingestion.tenant_agent import assess_window
+from backend.log_evaluation.explanation import fallback_recommendation, generate_analysis
+from backend.log_evaluation.normalizer import normalize_wazuh_alert
+from backend.tenants.tenant_agent import assess_window
 from ingestion.wazuh_client import WazuhClient
-from log_evaluation.log_dataclass import PipelineStatus, SOCevent
-from log_evaluation.severity_scoring import score_event
-from app import perf_trace, state
+from backend.log_evaluation.socevent import PipelineStatus, SOCevent
+from log_evaluation.severity_scoring import  score_rules
+from backend.app.services import state
 from app.services import events_archive
 from app.services import notifications
 from app.services import tenants as tenant_service
+from backend.app import perf_trace
 
 
 def ingest_worker(
@@ -60,7 +61,7 @@ def ingest_worker(
 
 
 def score_worker(
-    model,
+    tor_exits: set,
     blacklist: set,
     cache: dict,
     cache_lock: threading.Lock,
@@ -78,7 +79,7 @@ def score_worker(
                 event = cache.get(event_id)
             if event is None:
                 continue
-            score_event(model, blacklist, event)
+            score_rules(event, blacklist, tor_exits)
             state.upsert_event(event.return_dict())
             avg_priority = -((event.wazuh_level or 0) + (event.severity or 0)) / 2
             pq23.put((avg_priority, event_id))

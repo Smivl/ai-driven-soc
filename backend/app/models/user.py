@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Boolean, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db import Base
+from app.models.db import Base
 
 
 def _now() -> datetime:

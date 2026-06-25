@@ -19,11 +19,11 @@ import random
 import time
 from datetime import datetime
 
-from ingestion.feeder import setup_tenants
-from ingestion.normalizerfixed import extract_trigger_logs
-from ingestion.tenants import DEFAULT_TENANTS_PATH, load_tenants
-from ingestion.wazuh_client import WazuhClient
-from ingestion.wazuh_injector import inject_batch, wrap
+from backend.app.ingestion.feeder import setup_tenants
+from backend.app.log_evaluation.normalizer import extract_trigger_logs
+from backend.app.tenants.tenants import DEFAULT_TENANTS_PATH, load_tenants
+from backend.app.ingestion.wazuh_client import WazuhClient
+from backend.app.ingestion.wazuh_injector import inject_batch, wrap
 
 CONTAINER = "single-node-wazuh.manager-1"
 ATTACKER_IP = f"203.0.113.{random.randint(2, 250)}"

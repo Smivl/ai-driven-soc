@@ -10,12 +10,11 @@ agent / group (tenant).
 
 import argparse
 import csv
-import sys
 import time
 
-from ingestion.tenants import DEFAULT_TENANTS_PATH, Tenant, load_tenants
-from ingestion.wazuh_client import WazuhClient
-from ingestion.wazuh_injector import DEFAULT_LOCATION, inject_batch, wrap
+from backend.app.tenants.tenants import DEFAULT_TENANTS_PATH, Tenant, load_tenants
+from backend.app.ingestion.wazuh_client import WazuhClient
+from backend.app.ingestion.wazuh_injector import DEFAULT_LOCATION, inject_batch, wrap
 
 
 def setup_tenants(client: WazuhClient, tenants: list[Tenant]) -> None:

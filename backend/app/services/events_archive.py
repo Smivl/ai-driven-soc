@@ -5,7 +5,7 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db import session_scope
+from app.models.db import session_scope
 from app.models.event import ArchivedEvent
 
 logger = logging.getLogger(__name__)

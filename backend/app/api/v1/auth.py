@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from app.api.deps import get_current_user
 from app.core.security import create_access_token
-from app.db import session_scope
+from app.models.db import session_scope
 from app.services import users as user_service
 
 router = APIRouter()

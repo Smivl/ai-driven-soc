@@ -7,7 +7,7 @@ from sqlalchemy import ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.config import settings
-from app.db import Base
+from app.models.db import Base
 
 
 def _now() -> datetime:

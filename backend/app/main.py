@@ -10,12 +10,12 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.events import router as events_router
 from app.api.v1.tenants import router as tenants_router
 from app.api.v1.users import router as users_router
-from app.db import init_db
+from app.models.db import init_db
 from app.services import tenants as tenant_service
 from app.services import users as user_service
-from ingestion.pipeline_concurrent import assess_worker, explain_worker, ingest_worker, score_worker
-from ingestion.wazuh_client import WazuhClient
-from log_evaluation.severity_scoring import load_blacklist, train_model
+from app.pipeline_concurrent import assess_worker, explain_worker, ingest_worker, score_worker
+from app.ingestion.wazuh_client import WazuhClient
+from app.log_evaluation.severity_scoring import load_blacklist, load_tor_exits
 
 _stop = threading.Event()
 
@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
     pq23: queue.PriorityQueue = queue.PriorityQueue()
 
     blacklist = load_blacklist()
-    model = train_model(blacklist)
+    tor_exits = load_tor_exits()
     client = WazuhClient()
 
     # Tenant registry: create tables, seed from yaml (first run), register agents
@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
         ),
         threading.Thread(
             target=score_worker,
-            args=(model, blacklist, cache, cache_lock, pq12, pq23, _stop),
+            args=(tor_exits, blacklist, cache, cache_lock, pq12, pq23, _stop),
             daemon=True,
         ),
         threading.Thread(

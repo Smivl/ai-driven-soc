@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from app import state
+from app.services import state
 from app.api.deps import get_current_user, require_admin
-from app.db import session_scope
+from app.models.db import session_scope
 from app.services import tenants as tenant_service
 
 router = APIRouter()
