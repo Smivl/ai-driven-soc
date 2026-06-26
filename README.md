@@ -29,3 +29,14 @@ npm run dev
 ```
 
 Runs at http://localhost:5173.
+
+
+cd /Users/nicholasandersen/Desktop/ai-driven-soc/backend
+
+## Feed Wazuh
+
+# Dry run first to verify CSV is readable and Docker is reachable
+python -m ingestion.feeder --input ../data/SIEVE_00_100K.csv --limit 10 --dry-run
+
+# Live injection: inject 100 log lines into the Wazuh container
+python -m ingestion.feeder --input ../data/SIEVE_00_100K.csv --limit 100

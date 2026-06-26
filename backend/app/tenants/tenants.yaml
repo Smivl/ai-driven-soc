@@ -1,0 +1,17 @@
+# Multi-tenant simulation config.
+#
+# Each tenant is a company mapped to one Wazuh group; every listed agent is a
+# system/host belonging to that company. Agent IDs are NOT defined here — they
+# are assigned by Wazuh when the agent is registered (see WazuhClient.register_agent)
+# and resolved by name at setup time.
+tenants:
+  - company: "Company A"
+    group: companyA
+    agents:
+      - companyA-web01
+      - companyA-db01
+  - company: "Company B"
+    group: companyB
+    agents:
+      - companyB-fw01
+      - companyB-app01

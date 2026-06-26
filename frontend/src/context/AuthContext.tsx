@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { api } from "../lib/api";
+import { api, TOKEN_KEY } from "../lib/api";
 import type { User, LoginResponse } from "../types/auth";
 
 interface AuthContextValue {
@@ -20,12 +20,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(username: string, password: string) {
     const { data } = await api.post<LoginResponse>("/api/v1/auth/login", { username, password });
-    const u: User = { username: data.username };
+    sessionStorage.setItem(TOKEN_KEY, data.access_token);
+    const u: User = { username: data.username, role: data.role };
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(u));
     setUser(u);
   }
 
   function logout() {
+    sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(STORAGE_KEY);
     setUser(null);
   }
