@@ -6,6 +6,7 @@ export interface RecipientInput {
   email?: string;
 }
 
+// Add or remove a notification recipient on one tenant, refreshing on success.
 export function useAddRecipient(group: string) {
   const qc = useQueryClient();
   return useMutation({

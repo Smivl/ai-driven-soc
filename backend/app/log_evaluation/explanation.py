@@ -1,16 +1,20 @@
+# This file asks a local LLM (Ollama) to explain an event in plain words and to
+# suggest a response. If the model is not running or replies badly, we fall back
+# to a fixed suggestion so the event always gets some recommended action.
+
 import re
 import requests
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "llama3.2"
-MAX_LOGS = 20  # cap the evidence passed to the model
+MAX_LOGS = 20  # most log lines we hand to the model as evidence
 
 
 def fallback_recommendation(event: dict) -> str:
-    """Deterministic recommended action, used when the LLM is unavailable.
+    """Pick a fixed recommended action for when the LLM is not available.
 
-    Keyed on MITRE tactic / Wazuh level / event type so the field is always
-    populated even without Ollama running.
+    Looks at the MITRE tactic, event type and Wazuh level to choose the closest
+    matching advice, so the action field is never left empty.
     """
     tactics = " ".join(event.get("mitre_tactic") or []).lower()
     etype = (event.get("event_type") or "").lower()
@@ -45,6 +49,8 @@ def _mitre_ref(event: dict) -> str:
 
 
 def _build_prompt(event: dict, severity: int) -> str:
+    # Lay out the event details and its raw logs as the instructions we send to
+    # the model, including the exact section headers we expect back.
     logs = event.get("trigger_logs") or []
     if not logs and event.get("message"):
         logs = [event["message"]]
@@ -107,11 +113,11 @@ SOC RESPONSE:
 
 
 def generate_analysis(event: dict, severity: int) -> tuple[str | None, str]:
-    """Return (explanation, recommended_action) for an event.
+    """Ask the LLM to explain an event and return its explanation and action.
 
-    Sends the SOCevent plus its triggering logs to Ollama and parses the
-    ATTACK SUMMARY / SOC RESPONSE sections. On any failure the explanation is
-    None and the recommended action falls back to a deterministic suggestion.
+    Sends the event and its logs to Ollama and reads back the attack summary and
+    the suggested response. If anything goes wrong the explanation comes back as
+    None and the action falls back to a fixed suggestion.
     """
     try:
         response = requests.post(

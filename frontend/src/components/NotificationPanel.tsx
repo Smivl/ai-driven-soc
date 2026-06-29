@@ -1,3 +1,7 @@
+// The slide-out panel that opens from the bell in the header. Lists the current
+// notifications and lets the user dismiss one or clear them all. The parent
+// (AppLayout) owns the data and the open/closed state; this just draws it.
+
 import type { Notification, NotificationType } from "../types/notification";
 
 const TYPE_COLOR: Record<NotificationType, string> = {

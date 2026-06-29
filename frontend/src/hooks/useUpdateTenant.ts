@@ -9,6 +9,7 @@ export type TenantPatch = Partial<
   >
 >;
 
+// Saves edits to one tenant, then refreshes the tenant list so the UI updates.
 export function useUpdateTenant() {
   const qc = useQueryClient();
   return useMutation({

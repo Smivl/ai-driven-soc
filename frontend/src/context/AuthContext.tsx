@@ -1,3 +1,7 @@
+// Holds who is logged in and shares it with the whole app. The user and token
+// are kept in sessionStorage so a page refresh stays signed in, but closing the
+// tab signs out. Components read this through the useAuth hook at the bottom.
+
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { api, TOKEN_KEY } from "../lib/api";
 import type { User, LoginResponse } from "../types/auth";

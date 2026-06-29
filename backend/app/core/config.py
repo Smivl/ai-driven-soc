@@ -1,3 +1,7 @@
+# All app-wide settings in one place. Values default to the dev settings below
+# and can be overridden in a .env file, so nothing secret is hard-coded for real
+# deployments.
+
 from pydantic_settings import BaseSettings
 
 

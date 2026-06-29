@@ -1,3 +1,6 @@
+// Shape of one event as the backend sends it. This mirrors the SOCevent the
+// pipeline builds, so the fields line up one-to-one with the API response.
+
 export type PipelineStatus = "pending" | "normalized" | "scored" | "explained" | "resolved";
 export type ScoringLabel = "benign" | "suspicious" | "malicious" | "critical";
 

@@ -9,6 +9,9 @@ import TenantDetail from "./pages/TenantDetail";
 import EventDetail from "./pages/EventDetail";
 import Login from "./pages/Login";
 
+// Sets up all the pages and their URLs. The login page is open to everyone;
+// every other page sits behind ProtectedRoute, so a signed-out user is sent to
+// login, and inside the shared AppLayout (sidebar, header, search).
 function App() {
   return (
     <AuthProvider>

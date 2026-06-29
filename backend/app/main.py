@@ -1,3 +1,7 @@
+# Entry point for the backend. On startup it sets up the database and tenants,
+# then launches the four pipeline workers as background threads that run for the
+# life of the server. It also wires up the API routes and CORS.
+
 import queue
 import threading
 from contextlib import asynccontextmanager

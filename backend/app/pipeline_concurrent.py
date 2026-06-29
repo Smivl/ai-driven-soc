@@ -1,3 +1,12 @@
+"""Concurrent SOC pipeline workers, one thread per stage:
+
+    ingest_worker --pq12--> score_worker --pq23--> explain_worker
+
+In-flight events live in the shared cache (guarded by cache_lock); each
+stage adds to the event and writes it to state for the API. assess_worker
+runs on its own timer. All workers loop until stop is set.
+"""
+
 import queue
 import threading
 import uuid
@@ -25,6 +34,9 @@ def ingest_worker(
     poll_seconds: int = 15,
     batch_size: int = 10,
 ) -> None:
+    """Stage 1: poll Wazuh, normalize alerts to SOCevents, push to pq12.
+    Drops alerts below the tenant's min_level and already-seen ids.
+    """
     # Watermark: only ingest alerts at/after this time. Initialised to startup,
     # so a restart begins fresh and won't re-pull alerts already in OpenSearch.
     since = datetime.now(timezone.utc).isoformat()
@@ -69,6 +81,9 @@ def score_worker(
     pq23: queue.PriorityQueue,
     stop: threading.Event,
 ) -> None:
+    """Stage 2: take events off pq12, set event.severity (0-100) via score_rules,
+    forward to pq23 keyed by the average of wazuh_level and severity.
+    """
     while not stop.is_set():
         try:
             _, event_id = pq12.get(timeout=1)
@@ -93,6 +108,9 @@ def explain_worker(
     pq23: queue.PriorityQueue,
     stop: threading.Event,
 ) -> None:
+    """Stage 3 (final): take events off pq23, add the LLM explanation + recommended
+    action, mark EXPLAINED, archive to Postgres, notify the tenant, evict from cache.
+    """
     while not stop.is_set():
         try:
             _, event_id = pq23.get(timeout=1)
@@ -124,6 +142,7 @@ def explain_worker(
             except Exception as e:
                 print(f"[explain_worker] analysis error: {e}")
                 explanation, action = None, fallback_recommendation(analysis_input)
+           
             event.explanation = explanation
             event.recommended_action = action
             event.status = PipelineStatus.EXPLAINED

@@ -1,3 +1,7 @@
+// The shared frame around every signed-in page: the sidebar, the top header with
+// search and notifications, the user menu, and the area where the current page is
+// drawn. The pages themselves are rendered into the Outlet near the bottom.
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";

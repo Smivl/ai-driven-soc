@@ -1,3 +1,7 @@
+// One tenant's detail page. Shows and (for admins) edits the company info, the
+// alert and notification thresholds, the AI assessment, and the lists of
+// contacts and notification recipients. It is split into the sections below.
+
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";

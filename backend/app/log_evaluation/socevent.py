@@ -1,3 +1,6 @@
+# This file defines the single event type that every pipeline stage reads and
+# writes, plus the two small enums used to label an event.
+
 from dataclasses import dataclass, asdict
 from enum import Enum
 
@@ -9,19 +12,18 @@ class Scoring(Enum):
 
 class PipelineStatus(Enum):
     PENDING    = "pending"
-    NORMALIZED = "normalized"  # log has been normalized
-    SCORED     = "scored"     # ML has scored it
-    EXPLAINED  = "explained"  # LLM has explained it
-    RESOLVED   = "resolved"   # SOAR has handled it
+    NORMALIZED = "normalized"  # the raw log has been parsed into fields
+    SCORED     = "scored"      # the model has given it a severity
+    EXPLAINED  = "explained"   # the LLM has written an explanation
+    RESOLVED   = "resolved"    # the event has been handled
 
 @dataclass
 class SOCevent:
-    """
-        A class to store the normalized log with ML info
-            - All data given by the log
-            - Level given by Wazuh
-            - Severity
-            - LLM explaination 
+    """One security event as it moves through the pipeline.
+
+    It starts as a parsed log, then the model adds a severity, and finally the
+    LLM adds an explanation and a suggested action. Every field is optional so
+    the event can be built up a stage at a time.
     """
     # ── Tenant (multi-tenant attribution) ─────────────
     agent_id:       str   = None   # Wazuh agent id, e.g. "001"
@@ -62,10 +64,12 @@ class SOCevent:
     event_id:        str             = None
     status:          PipelineStatus   = PipelineStatus.PENDING   # pending -> normalized -> scored -> explained
 
-    # Obtain any of the information stored in the class from a log
+    # Read one field by name. Returns None if that field has not been set.
     def return_value(self, field_name):
         return getattr(self, field_name, None)
-    
+
+    # Turn the event into a plain dictionary for JSON. Enum fields become their
+    # string value so the result is easy to send to the frontend.
     def return_dict(self):
         d = asdict(self)
         return {k: (v.value if isinstance(v, Enum) else v) for k, v in d.items()}

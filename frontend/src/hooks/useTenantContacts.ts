@@ -8,6 +8,7 @@ export interface ContactInput {
   phone?: string | null;
 }
 
+// Add or remove a contact on one tenant. Both refresh the tenant list on success.
 export function useAddContact(group: string) {
   const qc = useQueryClient();
   return useMutation({

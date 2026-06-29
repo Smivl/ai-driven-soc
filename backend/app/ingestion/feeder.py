@@ -51,6 +51,8 @@ def feed(
     location: str,
     dry_run: bool,
 ) -> None:
+    # Read the CSV, hand each row to the next agent in turn (round-robin), and
+    # inject the wrapped lines. With dry_run set it only prints what it would send.
     tenants = load_tenants(tenants_path)
 
     print("=" * 60)

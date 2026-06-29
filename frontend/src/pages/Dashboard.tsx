@@ -1,3 +1,8 @@
+// The main dashboard: a radar view where every tenant is a dot placed on one of
+// three rings by how much danger it is in (secured, at risk, under attack). The
+// ring and position come from the tenant's worst active event and its AI
+// assessment. Clicking a tenant deep-links into its alerts.
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";

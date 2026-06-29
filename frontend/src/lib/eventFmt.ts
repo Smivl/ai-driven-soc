@@ -1,3 +1,7 @@
+// Small helpers shared by the event views: turning a Wazuh level into a severity
+// label and colour, showing times as "5m ago" or a clock, and matching an event
+// against a search box.
+
 import type { SOCEvent } from "../types/event";
 
 export type SevClass = "critical" | "high" | "medium" | "low";

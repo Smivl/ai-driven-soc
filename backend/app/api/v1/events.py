@@ -1,3 +1,6 @@
+# Endpoints for reading events: the live ones from memory and the saved history
+# from the archive, plus resolving and clearing live events.
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.services import state

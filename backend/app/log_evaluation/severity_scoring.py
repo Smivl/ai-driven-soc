@@ -1,6 +1,10 @@
-"""
-    Rule-based scoring for individual security events
-    Uses: Wazuh level, source/destination IP, port, and keyword matching
+"""Gives each event a severity from 0 to 100.
+
+There is no trained model here. The score is the sum of a few simple rules, one
+per signal we care about: how serious Wazuh thought it was, whether the IPs are
+known-bad or external, whether a sensitive port was hit, and whether the log
+text mentions known-bad words. Each rule has its own cap and together they add
+up to 100.
 """
 
 import ipaddress
@@ -56,8 +60,8 @@ def load_tor_exits(timeout: int = 10) -> set:
 # ---- Helpers -----------------------------------------------------------------------------
  
 def _is_private_ip(ip: str) -> bool:
-    """True if `ip` parses as a private address; False if it doesn't
-    parse at all or isn't private."""
+    """True if the address is on a private network. False if it is public or
+    cannot be read as an address at all."""
     try:
         return ipaddress.ip_address(ip).is_private
     except ValueError:
@@ -136,7 +140,10 @@ def keyword_score(raw_log: str) -> int:
 # ---- Define a score based on the rules 0-100 -----------------------------------------------------------------------
  
 def score_rules(event: SOCevent, blacklist: set, tor_exits: set) -> int:
-    """Score a SOCevent using rules only — returns an int in [0, 100]."""
+    """Add up every rule score for one event and return a number from 0 to 100.
+
+    blacklist and tor_exits are sets of known-bad IPs used by the IP rules.
+    """
  
     raw_score = (
         wazuh_rule_score(event.wazuh_level or 0)

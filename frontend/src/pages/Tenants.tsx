@@ -1,3 +1,6 @@
+// The tenants list: one card per tenant showing its agents, event counts, and
+// alert thresholds. Each card links to that tenant's detail page.
+
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTenants } from "../hooks/useTenants";

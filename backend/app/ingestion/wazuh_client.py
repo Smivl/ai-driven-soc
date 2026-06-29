@@ -1,12 +1,13 @@
-# services/ingestion/wazuh_client.py
-"""
-Usage:
-    client = WazuhClient()
-    alerts = client.get_recent_alerts(limit= some number)
-"""
+"""Client for talking to Wazuh.
 
-###### source .venv/bin/activate
-##### python -m services.soc.ingestion.wazuh_client
+It wraps the two things the SOC needs: the Wazuh REST API for managing groups and
+agents, and the OpenSearch indexer for reading the alerts those agents produce.
+Logging in uses a short-lived token that is cached here and refreshed
+automatically when it expires.
+
+    client = WazuhClient()
+    alerts = client.get_recent_alerts(limit=10)
+"""
 
 import requests
 import urllib3
@@ -22,6 +23,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger(__name__)
 
 class WazuhClient:
+    # Reads all connection details and credentials from environment variables
+    # (loaded from .env), so the same code works against any Wazuh deployment.
     def __init__(self):
         self.api_url  = os.getenv("API_URL",  "https://localhost:55000")
         self.api_user  = os.getenv("API_USER", "admin") # these are the standard username and password
@@ -44,17 +47,9 @@ class WazuhClient:
         self._group_cache: dict[str, str | None] = {}
         self._group_cache_lock = threading.Lock()
 
-    """
-        To log into the Wazuh API
-        JSON Web Token (JWT) authentication, this is more secure than the HTTP basic authentication
-
-        An example for the output of fectching a JSON web token
-        {"user":"admin","authenticationToken":"bA-a-wc9Ip...KcrUV2omGg","durationSeconds":180}
-
-        - https://documentation.wazuh.com/current/user-manual/indexer-api/getting-started.html
-
-    """
     def _authenticate(self) -> str:
+        # Log in to the Wazuh API and return a token. The token is cached on the
+        # client so we only log in once and reuse it for later calls.
         with self._token_lock:
             # If the authentication token is already fetched
             if self._token:

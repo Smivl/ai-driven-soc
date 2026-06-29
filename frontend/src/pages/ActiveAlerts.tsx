@@ -1,3 +1,6 @@
+// The live alerts list. Shows recent events as cards, sorted and filtered by the
+// header search box, and lets an analyst expand a card or mark an event resolved.
+
 import { useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";

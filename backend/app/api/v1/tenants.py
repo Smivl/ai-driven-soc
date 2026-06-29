@@ -1,3 +1,7 @@
+# Endpoints for viewing and editing tenants, their contacts, and their
+# notification recipients, plus the latest AI assessment per tenant. Edits are
+# admin-only; the request bodies below set what each call accepts.
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 

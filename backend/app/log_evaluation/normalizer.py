@@ -1,3 +1,7 @@
+# This file pulls the useful fields out of messy raw logs and turns them into a
+# clean SOCevent. Logs come in many shapes, so most of the work here is matching
+# the common timestamp, IP and username patterns with regular expressions.
+
 import csv
 import json
 import os
@@ -50,7 +54,11 @@ _USER_PATTERNS = [
 
 
 def _parse_timestamp(log: str) -> str:
-    """Extract and normalise a timestamp from the raw log string."""
+    """Find a timestamp in the log text and return it as an ISO string.
+
+    Tries each known pattern in turn. If none match, falls back to the time
+    right now so the event still has a usable timestamp.
+    """
     for pattern, fmt in _TS_PATTERNS:
         m = pattern.search(log)
         if not m:
@@ -86,6 +94,7 @@ def _parse_ips(log: str) -> tuple[str | None, str | None]:
 
 
 def _parse_user(log: str) -> str | None:
+    # Try each username pattern in order and return the first match, or None.
     for pattern in _USER_PATTERNS:
         m = pattern.search(log)
         if m:
@@ -94,7 +103,8 @@ def _parse_user(log: str) -> str | None:
 
 
 def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
-   
+    # Turn one row from the CSV dataset into a clean dictionary. The severity is
+    # left at 0 here and filled in later by the scoring step.
     raw_log = row.get("log", "")
     category = row.get("category", "unknown")
 
@@ -113,12 +123,11 @@ def normalize_event(row: dict, source: str = "csv_dataset") -> dict:
     }
 
 def extract_trigger_logs(alert: dict) -> list[str]:
-    """Return the raw logs that triggered an alert.
+    """Return the raw log lines that set off an alert, newest cause first.
 
-    Wazuh embeds the causal logs in-band: ``full_log`` is the line that tripped
-    the rule, and ``previous_output`` holds the earlier contributing lines for a
-    correlation/frequency rule (newline-delimited string, occasionally a list).
-    Returns them de-duplicated, triggering line first.
+    Wazuh puts these inside the alert: full_log is the line that tripped the
+    rule, and previous_output holds the earlier lines that built up to it. The
+    result keeps the order and drops blanks and duplicates.
     """
     logs: list[str] = []
 
@@ -144,11 +153,11 @@ def extract_trigger_logs(alert: dict) -> list[str]:
 
 
 def _trigger_time_range(trigger_logs: list[str], fallback: str) -> tuple[str, str]:
-    """Return (first_seen, last_seen) ISO timestamps across the triggering logs.
+    """Return the earliest and latest time seen across the triggering logs.
 
-    Parses each log's own timestamp with _parse_timestamp; falls back to the
-    alert timestamp when there are no parseable trigger logs. ISO strings sort
-    chronologically, so min/max give the range directly.
+    Reads each log's own timestamp. If none can be read, it uses the alert time
+    for both. ISO strings sort by time, so the smallest and largest give the
+    start and end of the activity.
     """
     times = [_parse_timestamp(log) for log in trigger_logs if log]
     if not times:
@@ -157,10 +166,11 @@ def _trigger_time_range(trigger_logs: list[str], fallback: str) -> tuple[str, st
 
 
 def normalize_wazuh_alert(alert: dict, group_resolver=None) -> SOCevent:
-    """Normalize a raw Wazuh alert into a SOCEvent dataclass.
+    """Build a SOCevent from a raw Wazuh alert.
 
-    If ``group_resolver`` is given (a callable ``agent_id -> group``), the
-    event's tenant/group is resolved from the agent id.
+    Pulls the IPs, user, MITRE tags and rule details out of the alert. If a
+    group_resolver function is given, it looks up which tenant the alert belongs
+    to from the agent id.
     """
     rule     = alert.get("rule", {})
     data     = alert.get("data", {})

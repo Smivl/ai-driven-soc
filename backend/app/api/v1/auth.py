@@ -1,3 +1,6 @@
+# Login endpoint that checks a username and password and hands back an access
+# token, plus a small endpoint to return the current logged-in user.
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 

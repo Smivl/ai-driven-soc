@@ -1,3 +1,7 @@
+// Shared HTTP client for talking to the backend. Every call goes through here so
+// the login token is attached automatically and an expired session sends the
+// user back to the login page.
+
 import axios from "axios";
 
 export const TOKEN_KEY = "soc_token";

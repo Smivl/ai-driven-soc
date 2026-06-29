@@ -1,3 +1,7 @@
+// The full view of a single event, opened from the alerts list. Shows every
+// field, the triggering logs, and the AI explanation, and lets the analyst
+// resolve it. If the event has aged out of the live buffer it shows a notice.
+
 import { useNavigate, useParams } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
 import { useResolveEvent } from "../hooks/useResolveEvent";

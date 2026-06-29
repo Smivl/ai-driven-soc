@@ -1,3 +1,7 @@
+// The sign-in page. Takes a username and password, asks the auth context to log
+// in, and on success sends the user to the dashboard. Shows an error if the
+// backend cannot be reached.
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";

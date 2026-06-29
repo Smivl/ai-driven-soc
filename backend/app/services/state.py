@@ -1,3 +1,7 @@
+# The live, in-memory store of recent events that the pipeline writes to and the
+# API reads from. It keeps only the newest 500 events and drops the oldest once
+# full. A lock guards every access because the pipeline runs on several threads.
+
 import threading
 
 _MAX_EVENTS = 500
